@@ -1,6 +1,6 @@
 # MyGrid
 
-![MyGrid Logo](https://github.com/lucassm/MyGrid/my_grid_logo_2.png)
+![MyGrid Logo](https://github.com/lucassm/MyGrid/blob/master/my_grid_logo_2.png)
 
 ## What MyGrid is?
 
