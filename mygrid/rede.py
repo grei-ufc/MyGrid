@@ -439,6 +439,18 @@ class Alimentador(Arvore):
          nos_de_carga, arvore_nos_de_carga, rnp_nos_de_carga,
          chaves, trechos) = poda
 
+        # atualiza setores do alimentador
+        self.setores.update(setores)
+
+        # atualiza os nos de carga do alimentador
+        self.nos_de_carga.update(nos_de_carga)
+
+        # atualiza as chaves do alimentador
+        self.chaves.update(chaves)
+
+        # atualiza os trechos do alimentador
+        self.trechos.update(trechos)
+
         if no_raiz is None:
             setor_inserir = setores[rnp_setores[1, 0]]
         else:
@@ -472,18 +484,6 @@ class Alimentador(Arvore):
             super(Alimentador, self).inserir_ramo(no, (rnp_setores, arvore_setores))
         else:
             super(Alimentador, self).inserir_ramo(no, (rnp_setores, arvore_setores), no_raiz)
-
-        # atualiza setores do alimentador
-        self.setores.update(setores)
-
-        # atualiza os nos de carga do alimentador
-        self.nos_de_carga.update(nos_de_carga)
-
-        # atualiza as chaves do alimentador
-        self.chaves.update(chaves)
-
-        # atualiza os trechos do alimentador
-        self.trechos.update(trechos)
 
         # atualiza a arvore de setores do alimentador
         self.atualizar_arvore_da_rede()
