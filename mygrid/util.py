@@ -2,172 +2,207 @@
 
 import numpy as np
 
+HEAD_WIDTH = 5.0
+HEAD_LENGTH = 8.0
+WIDTH = 2.0
 
-class Fasor(object):
-
-    Tensao, Corrente, Impedancia, Potencia = range(4)
+class Phasor(object):
 
     def __init__(self,
-                 real=None,
-                 imag=None,
-                 mod=None,
-                 ang=None,
-                 tipo=None):
-        if tipo is None:
-            raise Exception('Um tipo precisa ser associado ao Fasor!')
-        else:
-            self.__tipo = tipo
+                 r=None,
+                 i=None,
+                 m=None,
+                 a=None,
+                 nom=None):
 
         self.__base = None
         self.__pu = None
+        self.__polar = False
+        self.__nome = nom
 
-        if not real == None:
-            if not imag == None:
-                self.__real = real
-                self.__imag = imag
-                self.__mod = np.absolute(self.__real + self.__imag * 1.0j)
-                self.__ang = np.angle(self.__real + self.__imag * 1.0j, deg=1)
+        if r is not None:
+            if i is not None:
+                self.__r = r
+                self.__i = i
+                self.__m = np.absolute(self.__r + self.__i * 1.0j)
+                self.__a = np.angle(self.__r + self.__i * 1.0j, deg=1)
             else:
-                raise Exception('O parâmetro imag esta vazio!')
-        elif not mod == None:
-            if not ang == None:
-                self.__mod = mod
-                self.__ang = ang
-                self.__real = self.__mod * np.cos(np.pi / 180.0 * self.__ang)
-                self.__imag = self.__mod * np.sin(np.pi / 180.0 * self.__ang)
+                raise Exception('O parâmetro i esta vazio!')
+        elif m is not None:
+            if a is not None:
+                self.__m = m
+                self.__a = a
+                self.__r = self.__m * np.cos(np.pi / 180.0 * self.__a)
+                self.__i = self.__m * np.sin(np.pi / 180.0 * self.__a)
             else:
-                raise Exception('O parâmetro ang esta vazio!')
+                raise Exception('O parâmetro a esta vazio!')
         else:
-            raise Exception('O parâmetro real ou o parâmetro mod prescisam ser passados!')
+            raise Exception('O parâmetro r ou o parâmetro m prescisam \
+                ser passados!')
+
+    def conj(self):
+        f = Phasor(r=self.__r, i=-self.__i)
+        if self.polar:
+            f.polar = True
+        return f
 
     @property
-    def tipo(self):
-        if self.__tipo == 0:
-            return 'Tensao'
-        elif self.__tipo == 1:
-            return 'Corrente'
-        elif self.__tipo == 2:
-            return 'Impedancia'
-        elif self.__tipo == 3:
-            return 'Potencia'
+    def nome(self):
+        return self.__nome
 
-    @tipo.setter
-    def tipo(self, valor):
-        raise Exception('O tipo de um fasor não pode ser alterado!')
+    @nome.setter
+    def nome(self, value):
+        if type(value) is not str:
+            raise Exception('O parâmetro nome deve ser do tipo string')
+        else:
+            self.__nome = value
+
+    @property
+    def polar(self):
+        return self.__polar
+
+    @polar.setter
+    def polar(self, value):
+        if type(value) is not bool:
+            raise Exception('O parâmetro polar deve ser do tipo bool')
+        else:
+            self.__polar = value
 
     @property
     def base(self):
         if self.__base is None:
-            raise Exception('Nenhuma Base está associada ao Fasor!')
+            raise Exception('Nenhuma Base está associada ao Phasor!')
         else:
             return self.__base
 
     @base.setter
     def base(self, valor):
-        if not isinstance(valor, Base):
-            raise TypeError('O parâmetro base deve ser do tipo Base!')
+        if not isinstance(valor, float) and not isinstance(valor, int):
+            raise TypeError('O parâmetro base deve ser do tipo float ou int!')
         else:
             self.__base = valor
+
     @property
     def pu(self):
         if self.__base is None:
-            raise Exception('Uma base deve estar associada ao Fasor!')
+            raise Exception('Uma base deve estar associada ao Phasor!')
         else:
-            if self.__tipo == 0:
-                return self.mod / self.__base.tensao
-            elif self.__tipo == 1:
-                return self.mod / self.__base.corrente
-            elif self.__tipo == 2:
-                return self.mod / self.__base.impedancia
-            elif self.__tipo == 3:
-                return self.mod / self.__base.potencia
+            f = Phasor(m=self.m / self.base, a=self.a)
+            f.polar = True
+            return f
 
     @pu.setter
     def pu(self, valor):
         raise Exception('Esse valor não pode ser alterado!')
 
     @property
-    def real(self):
-        return self.__real
+    def r(self):
+        return self.__r
 
-    @real.setter
-    def real(self, valor):
-        self.__real = valor
-        self.__mod = np.absolute(self.__real + self.__imag * 1.0j)
-        self.__ang = np.angle(self.__real + self.__imag * 1.0j, deg=1)
-
-    @property
-    def imag(self):
-        return self.__imag
-
-    @imag.setter
-    def imag(self, valor):
-        self.__imag = valor
-        self.__mod = np.absolute(self.__real + self.__imag * 1.0j)
-        self.__ang = np.angle(self.__real + self.__imag * 1.0j, deg=1)
+    @r.setter
+    def r(self, valor):
+        self.__r = valor
+        self.__m = np.absolute(self.__r + self.__i * 1.0j)
+        self.__a = np.angle(self.__r + self.__i * 1.0j, deg=1)
 
     @property
-    def mod(self):
-        return self.__mod
+    def i(self):
+        return self.__i
 
-    @mod.setter
-    def mod(self, valor):
-        self.__mod = abs(valor)
-        self.__real = self.__mod * np.cos(np.pi / 180.0 * self.__ang)
-        self.__imag = self.__mod * np.sin(np.pi / 180.0 * self.__ang)
+    @i.setter
+    def i(self, valor):
+        self.__i = valor
+        self.__m = np.absolute(self.__r + self.__i * 1.0j)
+        self.__a = np.angle(self.__r + self.__i * 1.0j, deg=1)
 
     @property
-    def ang(self):
-        return self.__ang
+    def m(self):
+        return self.__m
 
-    @ang.setter
-    def ang(self, valor):
-        self.__ang = valor
-        self.__real = self.__mod * np.cos(np.pi / 180.0 * self.__ang)
-        self.__imag = self.__mod * np.sin(np.pi / 180.0 * self.__ang)
+    @m.setter
+    def m(self, valor):
+        self.__m = abs(valor)
+        self.__r = self.__m * np.cos(np.pi / 180.0 * self.__a)
+        self.__i = self.__m * np.sin(np.pi / 180.0 * self.__a)
+
+    @property
+    def a(self):
+        return self.__a
+
+    @a.setter
+    def a(self, valor):
+        self.__a = valor
+        self.__r = self.__m * np.cos(np.pi / 180.0 * self.__a)
+        self.__i = self.__m * np.sin(np.pi / 180.0 * self.__a)
 
     def __add__(self, other):
-        if not isinstance(other, Fasor):
-            raise TypeError('O objeto deve ser do tipo Fasor para proceder a soma!')
-        elif not self.tipo == other.tipo:
-            raise TypeError('Os fasores devem ser do mesmo tipo para proceder a soma!')
+        if not isinstance(other, Phasor):
+            raise TypeError('O objeto deve ser do tipo Phasor \
+                para proceder a soma!')
         else:
-            return Fasor(real=self.real + other.real,
-                         imag=self.imag + other.imag,
-                         tipo=self.__tipo)
+            return Phasor(r=self.r + other.r,
+                     i=self.i + other.i)
 
     def __sub__(self, other):
-        if not isinstance(other, Fasor):
-            raise TypeError('O objeto deve ser do tipo Fasor para proceder a subtracao!')
-        elif not self.tipo == other.tipo:
-            raise TypeError('Os fasores devem ser do mesmo tipo para proceder a subtracao!')
+        if not isinstance(other, Phasor):
+            raise TypeError('O objeto deve ser do tipo Phasor \
+                para proceder a subtracao!')
         else:
-            return Fasor(real=self.real - other.real,
-                         imag=self.imag - other.imag,
-                         tipo=self.__tipo)
+            return Phasor(r=self.r - other.r,
+                     i=self.i - other.i)
 
     def __mul__(self, other):
-        if not isinstance(other, Fasor):
-            raise TypeError('O objeto deve ser do tipo Fasor para proceder a multiplicacao!')
-        elif not self.tipo == other.tipo:
-            raise TypeError('Os fasores devem ser do mesmo tipo para proceder a multiplicacao!')
+        if not isinstance(other, Phasor):
+            raise TypeError('O objeto deve ser do tipo Phasor \
+                para proceder a multiplicacao!')
         else:
-            return Fasor(mod=self.mod * other.mod,
-                         ang=self.ang + other.ang,
-                         tipo=self.__tipo)
+            f = Phasor(m=self.m * other.m, a=self.a + other.a)
+
+            if self.polar is True and other.polar is True:
+                f.polar = True
+
+            return f
+
+    def __rmul__(self, other):
+        return Phasor(m=self.m * other,
+                 a=self.a)
 
     def __div__(self, other):
-        if not isinstance(other, Fasor):
-            raise TypeError('O objeto deve ser do tipo Fasor para proceder a divisao!')
-        elif not self.tipo == other.tipo:
-            raise TypeError('Os fasores devem ser do mesmo tipo para proceder a divisao!')
+        if not isinstance(other, Phasor):
+            raise TypeError('O objeto deve ser do tipo Phasor \
+                para proceder a divisao!')
         else:
-            return Fasor(mod=self.mod / other.mod,
-                         ang=self.ang - other.ang,
-                         tipo=self.__tipo)
+            return Phasor(m=self.m / other.m,
+                     a=self.a - other.a)
 
-    def __str__(self):
-        return 'Fasor de {tipo}: {real} + {imag}j'.format(tipo=self.tipo, real=self.real, imag=self.imag)
+    def __rdiv__(self, other):
+        return Phasor(m=self.m / other,
+                 a=self.a)
+
+    def __repr__(self):
+        if self.__polar:
+            return '{r} ∠ {i}º'.format(r=round(self.m, 2),
+                                          i=round(self.a, 2))
+        else:
+            return '{r} + {i}j'.format(r=round(self.r, 2),
+                                       i=round(self.i, 2))
+
+
+class R(Phasor):
+    def __init__(self, r=None, i=None, nom=None):
+        if r is None or i is None:
+            raise Exception('Os parâmetros r e i precisam ser passados!')
+        else:
+            super(R, self).__init__(r=r, i=i, nom=nom)
+
+
+class P(Phasor):
+    def __init__(self, m=None, a=None, nom=None):
+        if m is None or a is None:
+            raise Exception('Os parâmetros m e a precisam ser passados!')
+        else:
+            super(P, self).__init__(m=m, a=a, nom=nom)
+            self.polar = True
 
 
 class Base(object):
@@ -177,50 +212,6 @@ class Base(object):
         self.corrente = self.potencia / (np.sqrt(3) * self.tensao)
         self.impedancia = self.tensao ** 2 / self.potencia
 
-    def __str__(self):
-        return 'Base de {tensao} V e potencia {} VA'.format(tensao=self.tensao, potencia=self.potencia)
-
-#
-# class Tensao(Fasor):
-#     def __init__(self, mod, ang, mult=None):
-#         super(Tensao, self).__init__(mod=mod, ang=ang, mult=mult)
-#
-#     def __str__(self):
-#         if self.mult == 1e3:
-#             return 'Tensão: {mod}/_{ang} kV'.format(mod=self.mod, ang=self.ang)
-#         elif self.mult == 1e6:
-#             return 'Tensão: {mod}/_{ang} MV'.format(mod=self.mod, ang=self.ang)
-#         else:
-#             return 'Tensão: {mod}/_{ang} V'.format(mod=self.mod, ang=self.ang)
-#
-#
-# class Corrente(Fasor):
-#     def __init__(self, mod, ang, mult=None):
-#         super(Corrente, self).__init__(mod=mod, ang=ang, mult=mult)
-#
-#     def __str__(self):
-#         if self.mult == 1e3:
-#             return 'Corrente: {mod}/_{ang} MA'.format(mod=self.mod, ang=self.ang)
-#         elif self.mult == 1e6:
-#             return 'Corrente: {mod}/_{ang} MA'.format(mod=self.mod, ang=self.ang)
-#         else:
-#             return 'Corrente: {mod}/_{ang} A'.format(mod=self.mod, ang=self.ang)
-#
-#
-# class Potencia(Fasor):
-#     def __init__(self, ativa, reativa, mult=None):
-#         super(Potencia, self).__init__(real=ativa, imag=reativa, mult=mult)
-#
-#     def __str__(self):
-#         if self.mult == 1e3:
-#             return 'Potencia {mod} kVA'.format(mod=self.mod)
-#         elif self.mult == 1e6:
-#             return 'Potencia: {mod} MVA'.format(mod=self.mod)
-#         else:
-#             return 'Potencia {mod} VA'.format(mod=self.mod)
-
-
-if __name__ == '__main__':
-    fasor_1 = Fasor(real=1.0, imag=0.5)
-    print fasor_1.real
-    print fasor_1.imag
+    def __repr__(self):
+        return 'Base de {tensao} V e potencia {potencia} VA'.format(
+            tensao=self.tensao, potencia=self.potencia)

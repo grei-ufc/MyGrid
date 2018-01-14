@@ -2,7 +2,13 @@
 
 from mygrid.rede import Subestacao, Alimentador, Setor, Chave
 from mygrid.rede import Trecho, NoDeCarga, Transformador, Condutor
-from mygrid.util import Fasor
+from mygrid.util import R, P
+
+from mygrid.fluxo_de_carga.varred_dir_inv import calcular_fluxo_de_carga
+from mygrid.curto_circuito.componentes_simetricas import config_objects, calculaimpedanciaeq, calculacurto
+
+
+from terminaltables import AsciiTable
 
 # Este trecho do módulo faz parte de sua documentacao e serve
 # como exemplo de como utiliza-lo. Uma pequena rede com duas
@@ -58,70 +64,70 @@ ch7 = Chave(nome='7', estado=1)
 # Nos de carga do alimentador S1_AL1
 s1 = NoDeCarga(nome='S1',
                vizinhos=['A2'],
-               potencia=Fasor(real=0.0, imag=0.0, tipo=Fasor.Potencia),
+               potencia=R(0.0, 0.0),
                chaves=['1'])
 a1 = NoDeCarga(nome='A1',
                vizinhos=['A2'],
-               potencia=Fasor(real=160.0e3, imag=120.0e3, tipo=Fasor.Potencia))
+               potencia=R(160.0e3, 120.0e3))
 a2 = NoDeCarga(nome='A2',
                vizinhos=['S1', 'A1', 'A3', 'C1'],
-               potencia=Fasor(real=150.0e3, imag=110.0e3, tipo=Fasor.Potencia),
+               potencia=R(150.0e3, 110.0e3),
                chaves=['1', '3'])
 a3 = NoDeCarga(nome='A3',
                vizinhos=['A2', 'B1'],
-               potencia=Fasor(real=100.0e3, imag=80.0e3, tipo=Fasor.Potencia),
+               potencia=R(100.0e3, 80.0e3),
                chaves=['2'])
 b1 = NoDeCarga(nome='B1',
                vizinhos=['B2', 'A3'],
-               potencia=Fasor(real=200.0e3, imag=140.0e3, tipo=Fasor.Potencia),
+               potencia=R(200.0e3, 140.0e3),
                chaves=['2'])
 b2 = NoDeCarga(nome='B2',
                vizinhos=['B1', 'B3', 'E2'],
-               potencia=Fasor(real=150.0e3, imag=110.0e3, tipo=Fasor.Potencia),
+               potencia=R(150.0e3, 110.0e3),
                chaves=['4'])
 b3 = NoDeCarga(nome='B3',
                vizinhos=['B2', 'C3'],
-               potencia=Fasor(real=100.0e3, imag=80.0e3, tipo=Fasor.Potencia),
+               potencia=R(100.0e3, 80.0e3),
                chaves=['5'])
 c1 = NoDeCarga(nome='C1',
                vizinhos=['C2', 'C3', 'A2'],
-               potencia=Fasor(real=200.0e3, imag=140.0e3, tipo=Fasor.Potencia),
+               potencia=R(200.0e3, 140.0e3),
                chaves=['3'])
 c2 = NoDeCarga(nome='C2',
                vizinhos=['C1'],
-               potencia=Fasor(real=150.0e3, imag=110.0e3, tipo=Fasor.Potencia))
-c3 = NoDeCarga(nome='C3',
+               potencia=R(150.0e3, 110.0e3))
+c3 = NoDeCarga(nome=  'C3',
                vizinhos=['C1', 'E3', 'B3'],
-               potencia=Fasor(real=100.0e3, imag=80.0e3, tipo=Fasor.Potencia),
+               potencia=R(100.0e3, 80.0e3),
                chaves=['5', '8'])
 
 # Nos de carga do alimentador S2_AL1
 s2 = NoDeCarga(nome='S2',
                vizinhos=['D1'],
-               potencia=Fasor(real=0.0, imag=0.0, tipo=Fasor.Potencia),
+               potencia=R(0.0, 0.0),
                chaves=['6'])
 d1 = NoDeCarga(nome='D1',
                vizinhos=['S2', 'D2', 'D3', 'E1'],
-               potencia=Fasor(real=200.0e3, imag=160.0e3, tipo=Fasor.Potencia),
+               potencia=R(200.0e3, 160.0e3),
                chaves=['6', '7'])
 d2 = NoDeCarga(nome='D2',
                vizinhos=['D1'],
-               potencia=Fasor(real=90.0e3, imag=40.0e3, tipo=Fasor.Potencia))
-d3 = NoDeCarga(nome='D3',
+               potencia=R(90.0e3, 40.0e3))
+d3 = NoDeCarga(nome=  'D3',
                vizinhos=['D1'],
-               potencia=Fasor(real=100.0e3, imag=80.0e3, tipo=Fasor.Potencia))
-e1 = NoDeCarga(nome='E1',
+               potencia=R(100.0e3, 80.0e3))
+e1 = NoDeCarga(nome=  'E1',
                vizinhos=['E3', 'E2', 'D1'],
-               potencia=Fasor(real=100.0e3, imag=40.0e3, tipo=Fasor.Potencia),
+               potencia=R(100.0e3, 40.0e3),
                chaves=['7'])
 e2 = NoDeCarga(nome='E2',
                vizinhos=['E1', 'B2'],
-               potencia=Fasor(real=110.0e3, imag=70.0e3, tipo=Fasor.Potencia),
+               potencia=R(110.0e3, 70.0e3),
                chaves=['4'])
 e3 = NoDeCarga(nome='E3',
                vizinhos=['E1', 'C3'],
-               potencia=Fasor(real=150.0e3, imag=80.0e3, tipo=Fasor.Potencia),
-               chaves=['8'])
+               potencia=R(150.0e3, 80.0e3),
+               chaves = ['8'])
 
 cond_1 = Condutor(nome='CAA 266R',
                   rp=0.2391,
@@ -226,36 +232,31 @@ ch8.n1 = stC
 ch8.n2 = stE
 
 # Alimentador 1 de S1
+taux = [s1_ch1, ch1_a2, a2_a1, a2_a3, a2_ch3, ch3_c1, c1_c2, c1_c3, c3_ch5,
+         c3_ch8, a3_ch2, ch2_b1, b1_b2, b2_ch4, b2_b3, b3_ch5]
 sub_1_al_1 = Alimentador(nome='S1_AL1',
                          setores=[st1, stA, stB, stC],
-                         trechos=[s1_ch1, ch1_a2, a2_a1,
-                                  a2_a3, a2_ch3, ch3_c1,
-                                  c1_c2, c1_c3, c3_ch5,
-                                  c3_ch8, a3_ch2, ch2_b1,
-                                  b1_b2, b2_ch4, b2_b3,
-                                  b3_ch5],
+                         trechos=taux,
                          chaves=[ch1, ch2, ch3, ch4, ch5, ch8])
 
 # Alimentador 1 de S2
+taux = [s2_ch6, ch6_d1, d1_d2, d1_d3, d1_ch7, ch7_e1, e1_e2, e2_ch4, e1_e3, e3_ch8]
 sub_2_al_1 = Alimentador(nome='S2_AL1',
                          setores=[st2, stD, stE],
-                         trechos=[s2_ch6, ch6_d1, d1_d2,
-                                  d1_d3, d1_ch7, ch7_e1,
-                                  e1_e2, e2_ch4, e1_e3,
-                                  e3_ch8],
+                         trechos=taux,
                          chaves=[ch6, ch7, ch4, ch8])
 
 t1 = Transformador(nome='S1_T1',
-                   tensao_primario=Fasor(mod=69e3, ang=0.0, tipo=Fasor.Tensao),
-                   tensao_secundario=Fasor(mod=13.8e3, ang=0.0, tipo=Fasor.Tensao),
-                   potencia=Fasor(mod=10e6, ang=0.0, tipo=Fasor.Potencia),
-                   impedancia=Fasor(real=0.5, imag=0.2, tipo=Fasor.Impedancia))
+                   tensao_primario=P(69e3, 0.0),
+                   tensao_secundario=P(13.8e3, 0.0),
+                   potencia=P(10e6, 0.0),
+                   impedancia=R(0.5, 0.2))
 
 t2 = Transformador(nome='S2_T1',
-                   tensao_primario=Fasor(mod=69e3, ang=0.0, tipo=Fasor.Tensao),
-                   tensao_secundario=Fasor(mod=13.8e3, ang=0.0, tipo=Fasor.Tensao),
-                   potencia=Fasor(mod=10e6, ang=0.0, tipo=Fasor.Potencia),
-                   impedancia=Fasor(real=0.5, imag=0.2, tipo=Fasor.Impedancia))
+                   tensao_primario=P(69e3, 0.0),
+                   tensao_secundario=P(13.8e3, 0.0),
+                   potencia=P(10e6, 0.0),
+                   impedancia=R(0.5, 0.2))
 
 sub_1 = Subestacao(nome='S1', alimentadores=[sub_1_al_1], transformadores=[t1])
 
@@ -268,3 +269,21 @@ sub_2_al_1.ordenar(raiz='S2')
 
 sub_1_al_1.gerar_arvore_nos_de_carga()
 sub_2_al_1.gerar_arvore_nos_de_carga()
+
+# calculos com a subestacao 1
+
+# calculo de fluxo de carga
+
+calcular_fluxo_de_carga(sub_1)
+
+# calculo de curto circuito
+
+config_objects(sub_1)
+
+curto_trifasico = calculacurto(sub_1, 'trifasico')
+tabela = AsciiTable(curto_trifasico)
+print tabela.table
+
+calculacurto(sub_1, 'monofasico')
+calculacurto(sub_1, 'bifasico')
+calculacurto(sub_1, 'monofasico_minimo')

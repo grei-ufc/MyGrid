@@ -3,7 +3,7 @@
 # Esta é a implementação do cálculo de fluxo de carga de varredura
 # direta-inversa utilizando a estrutura de dados do pacote MyGrid
 
-from mygrid.util import Fasor
+from mygrid.util import Phasor, R, P
 from mygrid.rede import Trecho
 import numpy as np
 
@@ -12,7 +12,7 @@ def calcular_fluxo_de_carga(subestacao):
 
         # atribui a tensão de fase da barra da subestação a todos
         # os nós de carga da subestação
-        f1 = Fasor(mod=13.8e3 / np.sqrt(3), ang=0.0, tipo=Fasor.Tensao)
+        f1 = P(13.8e3 / np.sqrt(3), 0.0)
         _atribuir_tensao_a_subestacao(subestacao, f1)
 
         for alimentador in subestacao.alimentadores.values():
@@ -34,27 +34,25 @@ def calcular_fluxo_de_carga(subestacao):
 
                 tensao_nos = dict()
                 for no in alimentador.nos_de_carga.values():
-                    tensao_nos[no.nome] = Fasor(real=no.tensao.real,
-                                                imag=no.tensao.imag,
-                                                tipo=Fasor.Tensao)
+                    tensao_nos[no.nome] = R(no.tensao.r, no.tensao.i)
 
                 _varrer_alimentador(alimentador)
 
                 for no in alimentador.nos_de_carga.values():
-                    converg_nos[no.nome] = abs(tensao_nos[no.nome].mod -
-                                               no.tensao.mod)
+                    converg_nos[no.nome] = abs(tensao_nos[no.nome].m -
+                                               no.tensao.m)
 
                 converg = max(converg_nos.values())
                 print 'Max. diferença de tensões: {conv}'.format(conv=converg)
 
         # for atualiza os valores das tensões dos nós de carga para valores
         # de tensão de linha
-        subestacao.tensao.mod = subestacao.tensao.mod * np.sqrt(3)
+        subestacao.tensao.m = subestacao.tensao.m * np.sqrt(3)
         nos = list()
         for alimentador in subestacao.alimentadores.values():
             for no in alimentador.nos_de_carga.values():
                 if no.nome not in nos:
-                    no.tensao.mod = no.tensao.mod * np.sqrt(3)
+                    no.tensao.m = no.tensao.m * np.sqrt(3)
                     nos.append(no.nome)
 
 
@@ -106,13 +104,9 @@ def _atribuir_tensao_a_subestacao(subestacao, tensao):
     subestacao.tensao = tensao
     for alimentador in subestacao.alimentadores.values():
         for no in alimentador.nos_de_carga.values():
-            no.tensao = Fasor(real=tensao.real,
-                              imag=tensao.imag,
-                              tipo=Fasor.Tensao)
+            no.tensao = R(tensao.r, tensao.i)
         for trecho in alimentador.trechos.values():
-            trecho.fluxo = Fasor(real=0.0,
-                                 imag=0.0,
-                                 tipo=Fasor.Corrente)
+            trecho.fluxo = R(0.0, 0.0)
 
 
 def _varrer_alimentador(alimentador):
@@ -162,8 +156,8 @@ def _varrer_alimentador(alimentador):
         for no in nos:
             # zera as potências para que na próxima
             # iteração não ocorra acúmulo.
-            no.potencia_eq.real = 0.0
-            no.potencia_eq.imag = 0.0
+            no.potencia_eq.r = 0.0
+            no.potencia_eq.i = 0.0
 
             # armazena a árvore do nó de carga
             # armazenado na variável nó
@@ -191,18 +185,18 @@ def _varrer_alimentador(alimentador):
             # se não houverem o nó de carga analisado
             # é o último do ramo.
             if vizinhos_jusante == []:
-                no.potencia_eq.real += no.potencia.real / 3.0
-                no.potencia_eq.imag += no.potencia.imag / 3.0
+                no.potencia_eq.r += no.potencia.r / 3.0
+                no.potencia_eq.i += no.potencia.i / 3.0
             else:
                 # soma a potencia da carga associada ao nó atual
-                no.potencia_eq.real += no.potencia.real / 3.0
-                no.potencia_eq.imag += no.potencia.imag / 3.0
+                no.potencia_eq.r += no.potencia.r / 3.0
+                no.potencia_eq.i += no.potencia.i / 3.0
 
                 # acrescenta à potência do nó atual
                 # as potências dos nós a jusante
                 for no_jus in vizinhos_jusante:
-                    no.potencia_eq.real += no_jus.potencia_eq.real
-                    no.potencia_eq.imag += no_jus.potencia_eq.imag
+                    no.potencia_eq.r += no_jus.potencia_eq.r
+                    no.potencia_eq.i += no_jus.potencia_eq.i
 
                     # chama a função busca_trecho para definir
                     # quais trechos estão entre o nó atual e o nó a jusante
@@ -221,10 +215,10 @@ def _varrer_alimentador(alimentador):
                     else:
                         r, x = trecho.calcula_impedancia()
                         # calculo das potências dos nós de carga a jusante.
-                    no.potencia_eq.real += r * (no_jus.potencia_eq.mod ** 2) / \
-                        no_jus.tensao.mod ** 2
-                    no.potencia_eq.imag += x * (no_jus.potencia_eq.mod ** 2) / \
-                        no_jus.tensao.mod ** 2
+                    no.potencia_eq.r += r * (no_jus.potencia_eq.m ** 2) / \
+                        no_jus.tensao.m ** 2
+                    no.potencia_eq.i += x * (no_jus.potencia_eq.m ** 2) / \
+                        no_jus.tensao.m ** 2
 
     prof = 0
     # seção do cálculo de atualização das tensões
@@ -263,14 +257,14 @@ def _varrer_alimentador(alimentador):
             else:
                 r, x = trecho.calcula_impedancia()
 
-            v_mon = no_mon.tensao.mod
+            v_mon = no_mon.tensao.m
 
-            p = no.potencia_eq.real
-            q = no.potencia_eq.imag
+            p = no.potencia_eq.r
+            q = no.potencia_eq.i
 
             # parcela de perdas
-            p += r * (no.potencia_eq.mod ** 2) / no.tensao.mod ** 2
-            q += x * (no.potencia_eq.mod ** 2) / no.tensao.mod ** 2
+            p += r * (no.potencia_eq.m ** 2) / no.tensao.m ** 2
+            q += x * (no.potencia_eq.m ** 2) / no.tensao.m ** 2
 
             v_jus = v_mon ** 2 - 2 * (r * p + x * q) + \
                 (r ** 2 + x ** 2) * (p ** 2 + q ** 2) / v_mon ** 2
@@ -279,30 +273,23 @@ def _varrer_alimentador(alimentador):
             k1 = (p * x - q * r) / v_mon
             k2 = v_mon - (p * r - q * x) / v_mon
 
-            ang = no_mon.tensao.ang * np.pi / 180.0 - np.arctan(k1 / k2)
+            ang = no_mon.tensao.a * np.pi / 180.0 - np.arctan(k1 / k2)
 
             no.tensao.mod = v_jus
-            no.tensao.ang = ang * 180.0 / np.pi
+            no.tensao.a = ang * 180.0 / np.pi
 
             print 'Tensao do no {nome}: {tens}'.format(
                 nome=no.nome,
-                tens=no.tensao.mod * np.sqrt(3) / 1e3)
+                tens=no.tensao.m * np.sqrt(3) / 1e3)
 
             # calcula o fluxo de corrente passante no trecho
-            corrente = no.tensao.real - no_mon.tensao.real
-            corrente += (no.tensao.imag - no_mon.tensao.imag) * 1.0j
-            corrente /= (r + x * 1.0j)
+            z = R(r, x)
+            corrente = (no.tensao - no_mon.tensao) / z
             # se houver chaves, ou seja, há dois trechos a mesma corrente
             # é atribuida
             if not isinstance(trecho, Trecho):
-                trecho[0].fluxo = Fasor(real=corrente.real,
-                                        imag=corrente.imag,
-                                        tipo=Fasor.Corrente)
-                trecho[1].fluxo = Fasor(real=corrente.real,
-                                        imag=corrente.imag,
-                                        tipo=Fasor.Corrente)
+                trecho[0].fluxo = corrente
+                trecho[1].fluxo = corrente
             else:
-                trecho.fluxo = Fasor(real=corrente.real,
-                                     imag=corrente.imag,
-                                     tipo=Fasor.Corrente)
+                trecho.fluxo = corrente
         prof += 1

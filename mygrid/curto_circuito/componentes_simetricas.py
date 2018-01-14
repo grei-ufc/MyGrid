@@ -1,13 +1,21 @@
 #! coding: utf-8
 
-from mygrid.util import Fasor, Base
+from mygrid.util import P, R, Base
+from mygrid.rede import Chave
 
-
-def config_objects(subestacao):
+def config_objects(subestacao,
+                   impedancia_eq_positiva=0.0,
+                   impedancia_eq_zero=0.0):
+    """conifg_objects: configura os objetos da substecao para calculo 
+    de curto-circuito."""
+    subestacao.impedancia_positiva = impedancia_eq_positiva
+    subestacao.impedancia_zero = impedancia_eq_zero
+    subestacao.impedancia_equivalente_positiva = impedancia_eq_positiva
+    subestacao.impedancia_equivalente_zero = impedancia_eq_zero
 
     for transformador in subestacao.transformadores.values():
-        subestacao.base_sub = Base(transformador.tensao_secundario.mod,
-                                   transformador.potencia.mod)
+        subestacao.base_sub = Base(transformador.tensao_secundario.m,
+                                   transformador.potencia.m)
         break
 
     for alimentador in subestacao.alimentadores.values():
@@ -15,14 +23,16 @@ def config_objects(subestacao):
             trecho.impedancia_positiva = (trecho.condutor.rp + trecho.condutor.xp * 1j) * trecho.comprimento
             trecho.impedancia_zero = (trecho.condutor.rz + trecho.condutor.xz * 1j) * trecho.comprimento
 
-            trecho.resistencia_contato = 100
+            trecho.resistencia_contato = 100.0
 
             trecho.base = subestacao.base_sub
 
             trecho.impedancia_equivalente_positiva = trecho.impedancia_positiva / trecho.base.impedancia
             trecho.impedancia_equivalente_zero = trecho.impedancia_zero / trecho.base.impedancia
 
-            trecho.fluxo = Fasor(real=0.0, imag=0.0, tipo=Fasor.Corrente)
+            trecho.fluxo = R(r=0.0, i=0.0)
+
+    calculaimpedanciaeq(subestacao)
 
 
 def calculacurto(subestacao, tipo):
@@ -32,7 +42,10 @@ def calculacurto(subestacao, tipo):
         for alimentador_atual, r in subestacao.alimentadores.iteritems():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_trifasico(trecho)
-                curto_trifasico.append([trecho.nome,str(curto.pu),str(curto.mod)])
+                curto_trifasico.append([trecho.nome,
+                                        str(curto.pu),
+                                        str(curto.m)])
+
         return curto_trifasico
 
     elif tipo == 'monofasico':
@@ -40,7 +53,10 @@ def calculacurto(subestacao, tipo):
         for alimentador_atual, r in subestacao.alimentadores.iteritems():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_monofasico(trecho)
-                curto_monofasico.append([trecho.nome,str(curto.pu),str(curto.mod)])
+                curto_monofasico.append([trecho.nome,
+                                         str(curto.pu),
+                                         str(curto.m)])
+
         return curto_monofasico
 
     elif tipo == 'bifasico':
@@ -48,7 +64,10 @@ def calculacurto(subestacao, tipo):
         for alimentador_atual, r in subestacao.alimentadores.iteritems():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_bifasico(trecho)
-                curto_bifasico.append([trecho.nome,str(curto.pu),str(curto.mod)])
+                curto_bifasico.append([trecho.nome,
+                                       str(curto.pu),
+                                       str(curto.m)])
+
         return curto_bifasico
 
     elif tipo == 'monofasico_minimo':
@@ -56,8 +75,12 @@ def calculacurto(subestacao, tipo):
         for alimentador_atual, r in subestacao.alimentadores.iteritems():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_monofasico_minimo(trecho)
-                curto_monofasico_minimo.append([trecho.nome,str(curto.pu),str(curto.mod)])
+                curto_monofasico_minimo.append([trecho.nome,
+                                                str(curto.pu),
+                                                str(curto.m)])
+
         return curto_monofasico_minimo
+
 
 def calculaimpedanciaeq(subestacao):
 
@@ -72,7 +95,7 @@ def calculaimpedanciaeq(subestacao):
             break
         break
 
-    _calculaimpedanciaeq(trechoatual, alimentador_atual, trechosvisitados)
+    _calculaimpedanciaeq(subestacao, trechoatual, prox_no, alimentador_atual, trechosvisitados)
 
 
 def _calculaimpedanciaeq(subestacao, trecho_anterior, no_atual, alimentador_atual, trechosvisitados):
@@ -98,7 +121,7 @@ def _calculaimpedanciaeq(subestacao, trecho_anterior, no_atual, alimentador_atua
             else:
                 prox_no = i.n1
 
-            _calculaimpedanciaeq(trecho_atual, prox_no, alimentador_atual, trechosvisitados)
+            _calculaimpedanciaeq(subestacao, trecho_atual, prox_no, alimentador_atual, trechosvisitados)
         else:
             pass
     return
@@ -111,27 +134,27 @@ def _calcula_impedancia(trecho):
 
 def _calcula_curto_monofasico(trecho):
     curto1 = (3.0) * trecho.base.corrente / (2 * trecho.impedancia_equivalente_positiva + trecho.impedancia_equivalente_zero)
-    correntecc = Fasor(real=curto1.real, imag=curto1.imag, tipo=Fasor.Corrente)
-    correntecc.base = trecho.base
+    correntecc = R(curto1.real, curto1.imag)
+    correntecc.base = trecho.base.corrente
     return correntecc
 
 
 def _calcula_curto_bifasico(trecho):
     curto2 = (3 ** 0.5) * trecho.base.corrente / (2 * trecho.impedancia_equivalente_positiva)
-    correntecc = Fasor(real=curto2.real, imag=curto2.imag, tipo=Fasor.Corrente)
-    correntecc.base = trecho.base
+    correntecc = R(curto2.real, curto2.imag)
+    correntecc.base = trecho.base.corrente
     return correntecc
 
 
 def _calcula_curto_trifasico(trecho):
     curto3 = 1.0 * trecho.base.corrente / (trecho.impedancia_equivalente_positiva)
-    correntecc = Fasor(real=curto3.real, imag=curto3.imag, tipo=Fasor.Corrente)
-    correntecc.base = trecho.base
+    correntecc = R(curto3.real, curto3.imag)
+    correntecc.base = trecho.base.corrente
     return correntecc
 
 
 def _calcula_curto_monofasico_minimo(trecho):
     curto1m = 3.0 * trecho.base.corrente / (2 * trecho.impedancia_equivalente_positiva + trecho.impedancia_equivalente_zero+3*trecho.resistencia_contato/trecho.base.impedancia)
-    correntecc = Fasor(real=curto1m.real, imag=curto1m.imag, tipo=Fasor.Corrente)
-    correntecc.base = trecho.base
+    correntecc = R(curto1m.real, curto1m.imag)
+    correntecc.base = trecho.base.corrente
     return correntecc

@@ -3,7 +3,7 @@ from terminaltables import AsciiTable
 import numpy as np
 from random import randint
 from rnp import Arvore, Aresta
-from util import Fasor, Base
+from util import Phasor, P, R, Base
 
 
 class Setor(Arvore):
@@ -54,7 +54,7 @@ class Setor(Arvore):
 
     def calcular_potencia(self):
 
-        potencia = Fasor(real=0.0, imag=0.0, tipo=Fasor.Potencia)
+        potencia = R(0.0, 0.0)
         for no in self.nos_de_carga.values():
             potencia = potencia + no.potencia
 
@@ -68,8 +68,8 @@ class NoDeCarga(object):
     def __init__(self,
                  nome,
                  vizinhos,
-                 potencia=Fasor(real=0.0, imag=0.0, tipo=Fasor.Potencia),
-                 tensao=Fasor(real=0.0, imag=0.0, tipo=Fasor.Tensao),
+                 potencia=R(0.0, 0.0),
+                 tensao=R(0.0, 0.0),
                  chaves=None):
         assert isinstance(nome, str), 'O parâmetro nome da classe NoDeCarga' \
                                       ' deve ser do tipo string'
@@ -79,7 +79,7 @@ class NoDeCarga(object):
         self.nome = nome
         self.vizinhos = vizinhos
         self.potencia = potencia
-        self.potencia_eq = Fasor(real=0.0, imag=0.0, tipo=Fasor.Potencia)
+        self.potencia_eq = R(0.0, 0.0)
         self.tensao = tensao
         if chaves is not None:
             assert isinstance(chaves, list), 'O parâmetro chaves da classe NoDeCarga' \
@@ -362,7 +362,7 @@ class Alimentador(Arvore):
                                                      n2=self.nos_de_carga[n_2])
 
     def calcular_potencia(self):
-        potencia = Fasor(real=0.0, imag=0.0, tipo=Fasor.Potencia)
+        potencia = R(0.0, 0.0)
         for no in self.nos_de_carga.values():
             potencia = potencia + no.potencia
 
@@ -508,10 +508,10 @@ class Chave(Aresta):
 class Transformador(object):
     def __init__(self, nome, tensao_primario, tensao_secundario, potencia, impedancia):
         assert isinstance(nome, str), 'O parâmetro nome deve ser do tipo str'
-        assert isinstance(tensao_secundario, Fasor), 'O parâmetro tensao_secundario deve ser do tipo Fasor'
-        assert isinstance(tensao_primario, Fasor), 'O parâmetro tensao_primario deve ser do tipo Fasor'
-        assert isinstance(potencia, Fasor), 'O parâmetro potencia deve ser do tipo Fasor'
-        assert isinstance(impedancia, Fasor), 'O parâmetro impedancia deve ser do tipo Fasor'
+        assert isinstance(tensao_secundario, Phasor), 'O parâmetro tensao_secundario deve ser do tipo Fasor'
+        assert isinstance(tensao_primario, Phasor), 'O parâmetro tensao_primario deve ser do tipo Fasor'
+        assert isinstance(potencia, Phasor), 'O parâmetro potencia deve ser do tipo Fasor'
+        assert isinstance(impedancia, Phasor), 'O parâmetro impedancia deve ser do tipo Fasor'
 
         self.nome = nome
         self.tensao_primario = tensao_primario
