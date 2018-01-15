@@ -167,17 +167,13 @@ class Phasor(object):
         return Phasor(m=self.m * other,
                  a=self.a)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if not isinstance(other, Phasor):
             raise TypeError('O objeto deve ser do tipo Phasor \
                 para proceder a divisao!')
         else:
             return Phasor(m=self.m / other.m,
                      a=self.a - other.a)
-
-    def __rdiv__(self, other):
-        return Phasor(m=self.m / other,
-                 a=self.a)
 
     def __repr__(self):
         if self.__polar:

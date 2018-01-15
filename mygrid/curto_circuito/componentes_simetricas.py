@@ -39,7 +39,7 @@ def calculacurto(subestacao, tipo):
 
     if tipo == 'trifasico':
         curto_trifasico = [['Trecho 3fasico', 'Curto pu', 'Curto A']]
-        for alimentador_atual, r in subestacao.alimentadores.iteritems():
+        for alimentador_atual, r in subestacao.alimentadores.items():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_trifasico(trecho)
                 curto_trifasico.append([trecho.nome,
@@ -50,7 +50,7 @@ def calculacurto(subestacao, tipo):
 
     elif tipo == 'monofasico':
         curto_monofasico = [['Trecho 1fasico', 'Curto pu', 'Curto A']]
-        for alimentador_atual, r in subestacao.alimentadores.iteritems():
+        for alimentador_atual, r in subestacao.alimentadores.items():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_monofasico(trecho)
                 curto_monofasico.append([trecho.nome,
@@ -61,7 +61,7 @@ def calculacurto(subestacao, tipo):
 
     elif tipo == 'bifasico':
         curto_bifasico = [['Trecho 2fasico', 'Curto pu', 'Curto A']]
-        for alimentador_atual, r in subestacao.alimentadores.iteritems():
+        for alimentador_atual, r in subestacao.alimentadores.items():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_bifasico(trecho)
                 curto_bifasico.append([trecho.nome,
@@ -72,7 +72,7 @@ def calculacurto(subestacao, tipo):
 
     elif tipo == 'monofasico_minimo':
         curto_monofasico_minimo = [['Trecho 1fasico min', 'Curto pu', 'Curto A']]
-        for alimentador_atual, r in subestacao.alimentadores.iteritems():
+        for alimentador_atual, r in subestacao.alimentadores.items():
             for trecho in subestacao.alimentadores[alimentador_atual].trechos.values():
                 curto = _calcula_curto_monofasico_minimo(trecho)
                 curto_monofasico_minimo.append([trecho.nome,
@@ -86,7 +86,7 @@ def calculaimpedanciaeq(subestacao):
 
     trechosvisitados = []  # guarda os trechos em que já foram calculados a impedância equivalente
 
-    for alimentador_atual, r in subestacao.alimentadores.iteritems():  # procura o nó inicial(raiz) do alimentador
+    for alimentador_atual, r in subestacao.alimentadores.items():  # procura o nó inicial(raiz) do alimentador
         for i in subestacao.alimentadores[alimentador_atual].trechos.values():
             for j in subestacao.alimentadores[alimentador_atual].setores[r.arvore_nos_de_carga.raiz].nos_de_carga.keys():
                 prox_no = subestacao.alimentadores[alimentador_atual].setores[r.arvore_nos_de_carga.raiz].nos_de_carga[j]  # nó a partir do qual será procurado trechos conectados a ele

@@ -1,5 +1,3 @@
-#! coding: utf-8
-
 from mygrid.rede import Subestacao, Alimentador, Setor, Chave
 from mygrid.rede import Trecho, NoDeCarga, Transformador, Condutor
 from mygrid.util import R, P
@@ -282,7 +280,7 @@ config_objects(sub_1)
 
 curto_trifasico = calculacurto(sub_1, 'trifasico')
 tabela = AsciiTable(curto_trifasico)
-print tabela.table
+print(tabela.table)
 
 calculacurto(sub_1, 'monofasico')
 calculacurto(sub_1, 'bifasico')

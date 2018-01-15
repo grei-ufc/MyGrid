@@ -1,9 +1,8 @@
-# coding=utf-8
 from terminaltables import AsciiTable
 import numpy as np
 from random import randint
-from rnp import Arvore, Aresta
-from util import Phasor, P, R, Base
+from mygrid.rnp import Arvore, Aresta
+from mygrid.util import Phasor, P, R, Base
 
 
 class Setor(Arvore):
@@ -39,8 +38,8 @@ class Setor(Arvore):
     def _gera_arvore_do_setor(self):
         arvore_do_setor = dict()
         # for percorre os nós de carga do setor
-        for i, j in self.nos_de_carga.iteritems():
-            print '%-12s vizinhos %s' % (str(j), j.vizinhos)
+        for i, j in self.nos_de_carga.items():
+            
             vizinhos = list()
             # for percorre os vizinhos do nó de carga
             for k in j.vizinhos:
@@ -175,7 +174,6 @@ class Alimentador(Arvore):
             self.trechos[trecho.nome] = trecho
 
         for setor in self.setores.values():
-            print 'Setor: ', setor.nome
             setores_vizinhos = list()
             for chave in self.chaves.values():
                 if chave.n1 is setor:
@@ -184,7 +182,6 @@ class Alimentador(Arvore):
                     setores_vizinhos.append(chave.n1)
 
             for setor_vizinho in setores_vizinhos:
-                print 'Setor Vizinho: ', setor_vizinho.nome
                 nos_de_ligacao = list()
                 for i in setor.nos_de_carga.values():
                     for j in setor_vizinho.nos_de_carga.values():
@@ -195,7 +192,6 @@ class Alimentador(Arvore):
                     setor.ordenar(no[1].nome)
                     setor.rnp_associadas[setor_vizinho.nome] = (no[0],
                                                                 setor.rnp)
-                    print 'RNP: ', setor.rnp
 
         _arvore_da_rede = self._gera_arvore_da_rede()
 
@@ -323,7 +319,6 @@ class Alimentador(Arvore):
                 n_2 = str(self.arvore_nos_de_carga.rnp[1, i])
                 setor_1 = None
                 setor_2 = None
-                print 'Trecho: ' + n_1 + '-' + n_2
 
                 # verifica quais os nós de carga existentes nas extremidades do trecho
                 # e se existe uma chave no trecho
@@ -472,7 +467,7 @@ class Alimentador(Arvore):
                         chaves_de_lig[j] = (i, w)
 
         if not chaves_de_lig:
-            print 'A insersao não foi possível pois nenhuma chave de fronteira foi encontrada!'
+            print('A insersao não foi possível pois nenhuma chave de fronteira foi encontrada!')
             return
 
         i = randint(0, len(chaves_de_lig) - 1)

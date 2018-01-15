@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 módulo de representação nó profundidade
 """
@@ -175,7 +174,6 @@ class Arvore(object):
 
         for i in range(indice + 1, size(self.rnp, axis=1)):
             prox = self.rnp[:, i]
-            print prox
             prox = reshape(prox, (2, 1))
             if int(prox[0, 0]) > int(prof):
                 rnp = concatenate((rnp, prox), axis=1)
@@ -391,8 +389,8 @@ if __name__ == '__main__':
 
     # ordenação da arvore a1
     arv_1.ordenar(raiz=3)
-    print 'Representação RNP da arvore 1'
-    print arv_1.rnp
+    print('Representação RNP da arvore 1')
+    print(arv_1.rnp)
 
     # definição da arvore a2
     arv_2 = Arvore(nos2)
@@ -400,22 +398,19 @@ if __name__ == '__main__':
     # ordenação da arvore a2
     arv_2.ordenar(raiz=14)
 
-    print 'Representação RNP da arvore 2'
-    print arv_2.rnp
+    print('Representação RNP da arvore 2')
+    print(arv_2.rnp)
 
     # operação de poda
     poda = arv_1.podar(7, alterar_rnp=True)
-    print 'Ramo Podado da arvore 1'
-    print poda
+    print('Ramo Podado da arvore 1')
+    print(poda)
 
-    print 'Representação RNP da arvore 1 depois da poda'
-    print arv_1.rnp
-
-    # print arv_1.caminho_no_para_raiz(no=12, sentido=1)
-    # print arv_1.caminho_no_para_no(n1=13, n2=2, sentido=1)
+    print('Representação RNP da arvore 1 depois da poda')
+    print(arv_1.rnp)
 
     # operação de inserção
     arv_2.inserir_ramo(19, poda, 7)
 
-    print 'Representação RNP da arvore 2 depois da inserção do ramo podado da arvore 1'
-    print arv_2.rnp
+    print('Representação RNP da arvore 2 depois da inserção do ramo podado da arvore 1')
+    print(arv_2.rnp)

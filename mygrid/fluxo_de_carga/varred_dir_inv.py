@@ -21,16 +21,16 @@ def calcular_fluxo_de_carga(subestacao):
             converg = 1e6
             iter = 0
 
-            print '============================'
-            print 'Varredura no alimentador {al}'.format(al=alimentador.nome)
+            print('============================')
+            print('Varredura no alimentador {al}'.format(al=alimentador.nome))
             converg_nos = dict()
             for no in alimentador.nos_de_carga.values():
                 converg_nos[no.nome] = 1e6
 
             while iter <= max_iteracaoes and converg > criterio_converg:
                 iter += 1
-                print '-------------------------'
-                print 'Iteração: {iter}'.format(iter=iter)
+                print('-------------------------')
+                print('Iteração: {iter}'.format(iter=iter))
 
                 tensao_nos = dict()
                 for no in alimentador.nos_de_carga.values():
@@ -43,7 +43,7 @@ def calcular_fluxo_de_carga(subestacao):
                                                no.tensao.m)
 
                 converg = max(converg_nos.values())
-                print 'Max. diferença de tensões: {conv}'.format(conv=converg)
+                print('Max. diferença de tensões: {conv}'.format(conv=converg))
 
         # for atualiza os valores das tensões dos nós de carga para valores
         # de tensão de linha
@@ -278,9 +278,9 @@ def _varrer_alimentador(alimentador):
             no.tensao.mod = v_jus
             no.tensao.a = ang * 180.0 / np.pi
 
-            print 'Tensao do no {nome}: {tens}'.format(
+            print('Tensao do no {nome}: {tens}'.format(
                 nome=no.nome,
-                tens=no.tensao.m * np.sqrt(3) / 1e3)
+                tens=no.tensao.m * np.sqrt(3) / 1e3))
 
             # calcula o fluxo de corrente passante no trecho
             z = R(r, x)
