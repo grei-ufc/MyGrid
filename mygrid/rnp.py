@@ -262,7 +262,7 @@ class Tree(object):
         else:
             return depth, indice
 
-    def path_node_to_root(self, no, direction=1):
+    def node_to_root_path(self, no, direction=1):
         if issubclass(self.dtype, int):
             assert isinstance(no, int), 'O parâmetro no deve ser do tipo inteiro'
         else:
@@ -322,8 +322,8 @@ class Tree(object):
             else:
                 # raise AttributeError('Os nós n1 e n2
                 # não pertencem ao mesmo ramo!')
-                a1 = self.path_node_to_root(n2, direction=1)
-                a2 = self.path_node_to_root(n1, direction=0)
+                a1 = self.node_to_root_path(n2, direction=1)
+                a2 = self.node_to_root_path(n1, direction=0)
 
                 list_commom_nodes = [i for i in a2[1, :] if i in a1[1, :]]
                 commom_node_depth = 0
@@ -398,7 +398,7 @@ if __name__ == '__main__':
     print('RNP representation of tree 1 after prune')
     print(tree_1.rnp)
 
-    # print tree_1.path_node_to_root(no=12, direction=1)
+    # print tree_1.node_to_root_path(no=12, direction=1)
     # print tree_1.node_to_node_path(n1=13, n2=2, direction=1)
 
     # operação de inserção
