@@ -223,7 +223,7 @@ class Feeder(Tree):
         # define os nós de carga do sector root da subestação como os primeiros
         # nós de carga a povoarem a tree nós de carga e a rnp nós de carga
         root_sector = self.sectors[self.rnp[1][0]]
-        self.load_nodes_tree = Arvore(tree=root_sector._generates_tree_sector(),
+        self.load_nodes_tree = Tree(tree=root_sector._generates_tree_sector(),
                                           dtype=str)
         self.load_nodes_tree.order(root=root_sector.rnp[1][0])
 
