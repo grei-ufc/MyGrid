@@ -78,7 +78,7 @@ class LoadNode(object):
         self.name = name
         self.neighbors = neighbors
         self.power = power
-        self.power_eq = R(0.0, 0.0)
+        self.equivalent_power = R(0.0, 0.0)
         self.voltage = voltage
         if switchs is not None:
             assert isinstance(switchs, list), 'O parâmetro switchs da classe LoadNode' \

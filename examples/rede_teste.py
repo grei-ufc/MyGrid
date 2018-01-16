@@ -1,10 +1,9 @@
-from mygrid.rede import Substation, Feeder, Sector, Switch
-from mygrid.rede import Section, LoadNode, Transformer, Conductor
+from mygrid.grid import Substation, Feeder, Sector, Switch
+from mygrid.grid import Section, LoadNode, Transformer, Conductor
 from mygrid.util import R, P
 
-# from mygrid.fluxo_de_carga.varred_dir_inv import calcular_fluxo_de_carga
-# from mygrid.curto_circuito.componentes_simetricas import config_objects, calculaimpedanciaeq, calculacurto
-
+from mygrid.power_flow.backward_forward_sweep import calc_power_flow
+from mygrid.short_circuit.symmetrical_components import config_objects, calc_equivalent_impedance, calc_short_circuit
 
 from terminaltables import AsciiTable
 
@@ -268,20 +267,20 @@ sub_2_al_1.order(root='S2')
 sub_1_al_1.generate_load_nodes_tree()
 sub_2_al_1.generate_load_nodes_tree()
 
-# # calculos com a subestacao 1
+# calculos com a subestacao 1
 
-# # calculo de fluxo de carga
+# calculo de fluxo de carga
 
-# calcular_fluxo_de_carga(sub_1)
+calc_power_flow(sub_1)
 
-# # calculo de curto circuito
+# calculo de curto circuito
 
-# config_objects(sub_1)
+config_objects(sub_1)
 
-# curto_trifasico = calculacurto(sub_1, 'trifasico')
-# tabela = AsciiTable(curto_trifasico)
-# print(tabela.table)
+three_phase_sc = calc_short_circuit(sub_1, 'three-phase')
+tabela = AsciiTable(three_phase_sc)
+print(tabela.table)
 
-# calculacurto(sub_1, 'monofasico')
-# calculacurto(sub_1, 'bifasico')
-# calculacurto(sub_1, 'monofasico_minimo')
+calc_short_circuit(sub_1, 'line-to-ground')
+calc_short_circuit(sub_1, 'line-to-line')
+calc_short_circuit(sub_1, 'line-to-ground-min')

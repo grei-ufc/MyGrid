@@ -202,12 +202,12 @@ class P(Phasor):
 
 
 class Base(object):
-    def __init__(self, tensao, potencia):
-        self.tensao = tensao
-        self.potencia = potencia
-        self.corrente = self.potencia / (np.sqrt(3) * self.tensao)
-        self.impedancia = self.tensao ** 2 / self.potencia
+    def __init__(self, voltage, power):
+        self.voltage = voltage
+        self.power = power
+        self.current = self.power / (np.sqrt(3) * self.voltage)
+        self.impedance = self.voltage ** 2 / self.power
 
     def __repr__(self):
-        return 'Base de {tensao} V e potencia {potencia} VA'.format(
-            tensao=self.tensao, potencia=self.potencia)
+        return 'Voltage Base {voltage} V and Power Base {power} VA'.format(
+            voltage=self.voltage, power=self.power)
