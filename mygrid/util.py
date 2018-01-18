@@ -27,7 +27,7 @@ class Phasor(object):
                 self.__m = np.absolute(self.__r + self.__i * 1.0j)
                 self.__a = np.angle(self.__r + self.__i * 1.0j, deg=1)
             else:
-                raise Exception('O parâmetro i esta vazio!')
+                raise Exception('The parameter i is empty!')
         elif m is not None:
             if a is not None:
                 self.__m = m
@@ -35,10 +35,9 @@ class Phasor(object):
                 self.__r = self.__m * np.cos(np.pi / 180.0 * self.__a)
                 self.__i = self.__m * np.sin(np.pi / 180.0 * self.__a)
             else:
-                raise Exception('O parâmetro a esta vazio!')
+                raise Exception('The parameter a is empty!')
         else:
-            raise Exception('O parâmetro r ou o parâmetro m prescisam \
-                ser passados!')
+            raise Exception('The parameters r or m need to be given!)
 
     def conj(self):
         f = Phasor(r=self.__r, i=-self.__i)
@@ -53,7 +52,7 @@ class Phasor(object):
     @nome.setter
     def nome(self, value):
         if type(value) is not str:
-            raise Exception('O parâmetro nome deve ser do tipo string')
+            raise Exception('The parameter name need to be String')
         else:
             self.__nome = value
 
@@ -64,28 +63,28 @@ class Phasor(object):
     @polar.setter
     def polar(self, value):
         if type(value) is not bool:
-            raise Exception('O parâmetro polar deve ser do tipo bool')
+            raise Exception('The parameter polar need to be bool')
         else:
             self.__polar = value
 
     @property
     def base(self):
         if self.__base is None:
-            raise Exception('Nenhuma Base está associada ao Phasor!')
+            raise Exception('No Base is associated to Phasor!')
         else:
             return self.__base
 
     @base.setter
     def base(self, valor):
         if not isinstance(valor, float) and not isinstance(valor, int):
-            raise TypeError('O parâmetro base deve ser do tipo float ou int!')
+            raise TypeError('The parameter base need to be float or int!')
         else:
             self.__base = valor
 
     @property
     def pu(self):
         if self.__base is None:
-            raise Exception('Uma base deve estar associada ao Phasor!')
+            raise Exception('A base must be associated with a Phasor!')
         else:
             f = Phasor(m=self.m / self.base, a=self.a)
             f.polar = True
@@ -93,7 +92,7 @@ class Phasor(object):
 
     @pu.setter
     def pu(self, valor):
-        raise Exception('Esse valor não pode ser alterado!')
+        raise Exception('This value can not be changed!')
 
     @property
     def r(self):
@@ -137,24 +136,21 @@ class Phasor(object):
 
     def __add__(self, other):
         if not isinstance(other, Phasor):
-            raise TypeError('O objeto deve ser do tipo Phasor \
-                para proceder a soma!')
+            raise TypeError('The object needs to be Phasor to sum!')
         else:
             return Phasor(r=self.r + other.r,
                      i=self.i + other.i)
 
     def __sub__(self, other):
         if not isinstance(other, Phasor):
-            raise TypeError('O objeto deve ser do tipo Phasor \
-                para proceder a subtracao!')
+            raise TypeError('The object needs to be Phasor to subtract!')
         else:
             return Phasor(r=self.r - other.r,
                      i=self.i - other.i)
 
     def __mul__(self, other):
         if not isinstance(other, Phasor):
-            raise TypeError('O objeto deve ser do tipo Phasor \
-                para proceder a multiplicacao!')
+            raise TypeError('The object needs to be Phasor to multiply!')
         else:
             f = Phasor(m=self.m * other.m, a=self.a + other.a)
 
@@ -169,8 +165,7 @@ class Phasor(object):
 
     def __truediv__(self, other):
         if not isinstance(other, Phasor):
-            raise TypeError('O objeto deve ser do tipo Phasor \
-                para proceder a divisao!')
+            raise TypeError('The object need to be a Phasor to divide!')
         else:
             return Phasor(m=self.m / other.m,
                      a=self.a - other.a)
@@ -187,7 +182,7 @@ class Phasor(object):
 class R(Phasor):
     def __init__(self, r=None, i=None, nom=None):
         if r is None or i is None:
-            raise Exception('Os parâmetros r e i precisam ser passados!')
+            raise Exception('The parameters r e i need to be given!')
         else:
             super(R, self).__init__(r=r, i=i, nom=nom)
 
@@ -195,7 +190,7 @@ class R(Phasor):
 class P(Phasor):
     def __init__(self, m=None, a=None, nom=None):
         if m is None or a is None:
-            raise Exception('Os parâmetros m e a precisam ser passados!')
+            raise Exception('The parameters m e a need to be given!')
         else:
             super(P, self).__init__(m=m, a=a, nom=nom)
             self.polar = True
