@@ -182,7 +182,7 @@ class Phasor(object):
 class R(Phasor):
     def __init__(self, r=None, i=None, nom=None):
         if r is None or i is None:
-            raise Exception('The parameters r e i need to be given!')
+            raise Exception('The parameters r and i need to be given!')
         else:
             super(R, self).__init__(r=r, i=i, nom=nom)
 
@@ -190,7 +190,7 @@ class R(Phasor):
 class P(Phasor):
     def __init__(self, m=None, a=None, nom=None):
         if m is None or a is None:
-            raise Exception('The parameters m e a need to be given!')
+            raise Exception('The parameters m and a need to be given!')
         else:
             super(P, self).__init__(m=m, a=a, nom=nom)
             self.polar = True
