@@ -1,1 +1,0 @@
-from mygrid.fluxo_de_carga import varred_dir_inv
