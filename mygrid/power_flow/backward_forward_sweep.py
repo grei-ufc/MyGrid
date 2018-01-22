@@ -275,7 +275,7 @@ def _feeder_sweep(feeder):
 
             ang = upstream_node.voltage.a * np.pi / 180.0 - np.arctan(k1 / k2)
 
-            node.voltage.mod = v_jus
+            node.voltage.m = v_jus
             node.voltage.a = ang * 180.0 / np.pi
 
             print('Node Voltage {name}: {tens}'.format(
