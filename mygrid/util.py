@@ -37,7 +37,7 @@ class Phasor(object):
             else:
                 raise Exception('The parameter a is empty!')
         else:
-            raise Exception('The parameters r or m need to be given!)
+            raise Exception('The parameters r or m need to be given!')
 
     def conj(self):
         f = Phasor(r=self.__r, i=-self.__i)
