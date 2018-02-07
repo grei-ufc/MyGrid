@@ -37,7 +37,7 @@ class Phasor(object):
             else:
                 raise Exception('The parameter a is empty!')
         else:
-            raise Exception('The parameters r or m need to be given!)
+            raise Exception('The parameters r or m need to be given!')
 
     def conj(self):
         f = Phasor(r=self.__r, i=-self.__i)
@@ -161,14 +161,26 @@ class Phasor(object):
 
     def __rmul__(self, other):
         return Phasor(m=self.m * other,
-                 a=self.a)
+                      a=self.a)
 
     def __truediv__(self, other):
-        if not isinstance(other, Phasor):
-            raise TypeError('The object need to be a Phasor to divide!')
-        else:
+        if isinstance(other, Phasor):
             return Phasor(m=self.m / other.m,
-                     a=self.a - other.a)
+                          a=self.a - other.a)
+        elif isinstance(other, float):
+            if other > 0:
+                return Phasor(m=self.m / other,
+                              a=self.a)
+            else:
+                return Phasor(m=self.m / other,
+                              a=self.a-180.0)
+        else:
+            raise TypeError('The object need to be a Phasor to divide!')
+
+    def __pow__(self, other):
+        if isinstance(other, int):
+            return Phasor(m=self.m**other,
+                          a=self.a*other)
 
     def __repr__(self):
         if self.__polar:
@@ -206,3 +218,15 @@ class Base(object):
     def __repr__(self):
         return 'Voltage Base {voltage} V and Power Base {power} VA'.format(
             voltage=self.voltage, power=self.power)
+
+
+def p2r(m, a):
+    x = m * np.cos(a*np.pi/180.0)
+    y = m * np.sin(a*np.pi/180.0)
+    return x + 1j * y
+
+    
+def r2p(z):
+    m = np.absolute(z)
+    a = np.angle(z) * 180.0 / np.pi
+    return (m, a)
