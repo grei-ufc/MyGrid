@@ -3,7 +3,8 @@ import numpy as np
 from random import randint
 from mygrid.rnp import Tree, Edge
 from mygrid.util import Phasor, P, R, Base
-
+from mygrid.util import p2r, r2p
+import os
 
 class Sector(Tree):
 
@@ -66,20 +67,25 @@ class Sector(Tree):
 class LoadNode(object):
     def __init__(self,
                  name,
-                 neighbors,
-                 power=R(0.0, 0.0),
-                 voltage=R(0.0, 0.0),
+                 neighbors=None,
+                 power=0.0+0.0j,
+                 voltage=0.0+2j,
+                 generation=None,
                  switchs=None):
         assert isinstance(name, str), 'O parâmetro name da classe LoadNode' \
                                       ' deve ser do tipo string'
-        assert isinstance(neighbors, list), 'O parâmetro neighbors da classe' \
-                                           ' Barra deve ser do tipo string'
 
         self.name = name
         self.neighbors = neighbors
-        self.power = power
-        self.equivalent_power = R(0.0, 0.0)
-        self.voltage = voltage
+
+        self._vp = np.zeros((3, 1), dtype=complex)
+        self._pp = np.zeros((3, 1), dtype=complex)
+        self.i = np.zeros((3, 1), dtype=complex)
+        self._ip = np.zeros((3, 1), dtype=complex)
+
+        self.config_load(power=power)
+        self.config_voltage(voltage=voltage)
+
         if switchs is not None:
             assert isinstance(switchs, list), 'O parâmetro switchs da classe LoadNode' \
                                              ' deve ser do tipo list'
@@ -88,6 +94,157 @@ class LoadNode(object):
             self.switchs = list()
 
         self.sector = None
+
+    def config_load(self,
+                    ppa=0.0+0.0j,
+                    ppb=0.0+0.0j,
+                    ppc=0.0+0.0j,
+                    power=None,
+                    zipmodel=[1.0, 0.0, 0.0]):
+        if power is not None:
+            self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
+        else:
+            self.ppa = ppa
+            self.ppb = ppb
+            self.ppc = ppc
+
+        self.zipmodel = np.array(zipmodel)
+
+    def config_voltage(self,
+                       vpa=0.0+0.0j,
+                       vpb=0.0+0.0j,
+                       vpc=0.0+0.0j,
+                       voltage=None):
+        if voltage is not None:
+            v = abs(voltage) / np.sqrt(3)
+            self.vpa = p2r(v, 0.0)
+            self.vpb = p2r(v, -120.0)
+            self.vpc = p2r(v, 120.0)
+        else:
+            self.vpa = vpa
+            self.vpb = vpb
+            self.vpc = vpc
+
+        self._calc_currents()
+
+    def _calc_currents(self):
+        if self.pp.all() == 0.0+0.0j:
+            self.i = np.zeros((3, 1), dtype=complex)
+        else:
+            self.ipq = self.zipmodel[0] * np.conjugate(self.pp / self.vp)
+            self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
+            self.iz = self.zipmodel[1] * (self.vp / self.z)
+            self.ii = self.zipmodel[2] * self.vp / self.z
+            self.i =  self.ipq + self.iz + self.ii
+            self.i.shape = (3, 1)
+
+    @property
+    def VI(self):
+        return self._VI
+
+    @VI.setter
+    def VI(self, valor):
+        self._VI = valor
+        self._vp = valor[:3, 0]
+        self._vp.shape = (3, 1)
+        aux = valor[3:, 0]
+        aux.shape = (3, 1)
+        self._ip += aux
+        self._ip.shape = (3, 1)
+
+    @property
+    def ip(self):
+        return self._ip
+    
+    @ip.setter
+    def ip(self, valor):
+        self._ip = valor
+        self._ip.shape = (3, 1)
+        self._VI = np.concatenate((self._vp, self._ip))
+
+    @property
+    def vp(self):
+        return self._vp
+
+    @vp.setter
+    def vp(self, valor):
+        self._vp = valor
+        self._vp.shape = (3, 1)
+
+        self._vpa = valor[0]
+        self._vpb = valor[1]
+        self._vpc = valor[2]
+
+        self._VI = np.concatenate((self._vp, self._ip))
+
+        self.config_voltage(vpa=self._vp[0, 0],
+                            vpb=self._vp[1, 0],
+                            vpc=self._vp[2, 0])
+
+    @property
+    def vpa(self):
+        return self._vpa
+
+    @vpa.setter
+    def vpa(self, valor):
+        self._vpa = valor
+        self._vp[0] = valor
+
+    @property
+    def vpb(self):
+        return self._vpb
+
+    @vpb.setter
+    def vpb(self, valor):
+        self._vpb = valor
+        self._vp[1] = valor
+
+    @property
+    def vpc(self):
+        return self._vpc
+
+    @vpc.setter
+    def vpc(self, valor):
+        self._vpc = valor
+        self._vp[2] = valor
+
+    @property
+    def pp(self):
+        return self._pp
+
+    @pp.setter
+    def pp(self, valor):
+        self._pp = valor
+        self._ppa = valor[0]
+        self._ppb = valor[1]
+        self._ppc = valor[2]
+
+    @property
+    def ppa(self):
+        return self._ppa
+
+    @ppa.setter
+    def ppa(self, valor):
+        self._ppa = valor
+        self._pp[0] = valor
+
+    @property
+    def ppb(self):
+        return self._ppb
+
+    @ppb.setter
+    def ppb(self, valor):
+        self._ppb = valor
+        self._pp[1] = valor
+
+    @property
+    def ppc(self):
+        return self._ppc
+
+    @ppc.setter
+    def ppc(self, valor):
+        self._ppc = valor
+        self._pp[2] = valor
 
     def __str__(self):
         return 'Load Node: ' + self.name
@@ -120,6 +277,7 @@ class Section(Edge):
                  n1,
                  n2,
                  conductor=None,
+                 line_model=None,
                  length=None):
         assert isinstance(name, str), 'O parametro name da classe Section ' \
                                       'deve ser do tipo str'
@@ -137,13 +295,197 @@ class Section(Edge):
         self.downstream_node = None
         self.conductor = conductor
         self.length = length
+        self.line_model = line_model
+        self._set_line_model(line_model)
+
+    def _set_line_model(self, line_model):
+        self.Z = line_model.z * self.length
+        self.Y = line_model.y * 1e-6 * self.length
+
+        A = np.array([[1.0, 1.0, 1.0],
+                      [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
+                      [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
+        self.Z012 = np.dot(np.linalg.inv(A), np.dot(self.Z, A))
+
+        self.a = np.identity(3) + 0.5 * self.Z * self.Y
+        self.b = self.Z
+        self.c = self.Y + 0.25 * self.Y * self.Z * self.Y
+        self.d = np.identity(3) + 0.5 * self.Z * self.Y
+
+        ab = np.concatenate((self.a, self.b), axis=1)
+        cd = np.concatenate((self.c, self.d), axis=1)
+        self.abcd = np.concatenate((ab, cd), axis=0)
 
     def calc_impedance(self):
         return (self.length * self.conductor.rp,
                 self.length * self.conductor.xp)
 
+    def __add__(self, other):
+        if not isinstance(other, Section):
+            raise TypeError('The object needs to be Secion to add!')
+        else:
+            s = Section(name=self.name + other.name,
+                        n1=self.n1,
+                        n2=self.n2,
+                        line_model=self.line_model,
+                        length=self.length + other.length)
+            return s
+
     def __repr__(self):
         return 'Section: %s' % self.name
+
+class LineModel(object):
+    
+    def __init__(self,
+                 loc_a=0.0+0.0j,
+                 loc_b=0.0+0.0j,
+                 loc_c=0.0+0.0j,
+                 loc_n=0.0+0.0j,
+                 neutral=False,
+                 conductor=None,
+                 neutral_conductor=None,
+                 units='Imperial'):
+        
+        self.loc_a = loc_a
+        self.loc_b = loc_b
+        self.loc_c = loc_c
+
+        if neutral:
+            self.loc = [loc_a, loc_b, loc_c, loc_n]
+        else:
+            self.loc = [loc_a, loc_b, loc_c]
+        
+        self.conductor = conductor
+        self.neutral_conductor = neutral_conductor
+
+        # --------------------------------------
+        # Series Impedance Z matrix calculation
+        # --------------------------------------
+
+        # primitive matriz calculation
+        self.z = np.array(self._calc_primitive_z_matrix(self.loc))
+
+        # kron reduction, if there is neutral
+        if np.shape(self.z) == (4, 4):
+            self.z = self._calc_phase_impedance_matrix(self.z)
+
+        # convert the Z matrix units to ohms/kilometers if units in SI
+        if units == 'SI':
+            self.z = 1.0 / 1.60934 * self.z
+
+        # calculation of sequence series impedance Z012 matrix
+        A = np.array([[1.0, 1.0, 1.0],
+                      [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
+                      [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
+        self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
+
+        # --------------------------------------
+        # Shunt Admittance Y matrix calculation
+        # --------------------------------------
+
+        # S distance matrix calculation
+        self.p = np.array(self._calc_potencial_primitive_matrix(self.loc))
+        
+        # kron reduction, if there is neutral
+        if np.shape(self.p) == (4, 4):
+            self.p = self._calc_potential_coefficient_matrix(self.p)
+
+        # shunt capacitance matrix calculation
+        self.c = np.linalg.inv(self.p)
+        
+        # shunt admittance matrix calculation
+        self.y = 1j * 2.0 * np.pi * 60.0 * self.c
+
+        # generalized line matrices calculation
+        self.a = np.identity(3) + 0.5 * self.z * self.y * 1e-6
+        self.b = self.z
+        self.c = self.y * 1e-6 + 0.25 * self.y * self.z * self.y * 1e-12
+        self.d = np.identity(3) + 0.5 * self.z * self.y * 1e-6
+
+        ab = np.concatenate((self.a, self.b), axis=1)
+        cd = np.concatenate((self.c, self.d), axis=1)
+        self.abcd = np.concatenate((ab, cd), axis=0)
+
+    def _calc_primitive_z_matrix(self, loc):
+        # carson equations reference:
+        # William Kersting: Distribution System Modeling and Analysis
+        # 1th edition, pag. 85
+        Z = list()
+        r = self.conductor.conductor_data['resistence']['value']
+        gmr = self.conductor.conductor_data['gmr']['value']
+        rn = self.neutral_conductor.conductor_data['resistence']['value']
+        gmrn = self.neutral_conductor.conductor_data['gmr']['value'] 
+        for i in range(len(loc)):
+            z = list()
+            for j in range(len(loc)):
+                if i == j:
+                    if i == 3:
+                        zij = rn + 0.09530  + 1j * 0.12134 * (np.log(1.0/gmrn) + 7.93402)
+                    else:
+                        zij = r + 0.09530 + 1j *  0.12134 * (np.log(1.0/gmr) + 7.93402)
+                else:
+                    l = loc[i] - loc[j]
+                    zij = 0.09530 + 1j * 0.12134 * (np.log(1.0/abs(l)) + 7.93402)
+                z.append(zij)
+            Z.append(z)
+
+        return Z
+
+    def _calc_potencial_primitive_matrix(self, loc):
+        P = list()
+        r = self.conductor.conductor_data['diameter']['value'] / 2.0
+        rn = self.neutral_conductor.conductor_data['diameter']['value'] / 2.0
+        
+        # inch to feet conversion
+        r = r * 0.0833
+        rn = rn * 0.0833
+        for i in range(len(loc)):
+            p = list()
+            for j in range(len(loc)):
+                s = abs(loc[i] - loc[j].conjugate())
+                d = abs(loc[i] - loc[j])
+                if i == j:
+                    # conductor neutral case
+                    if i == 3:
+                        pij = 11.17689 * np.log(s/rn)
+                    # no conductor neutral case
+                    else:
+                        pij = 11.17689 * np.log(s/r)
+                else:
+                    pij = 11.17689 * np.log(s/d)
+                p.append(pij)
+            P.append(p)
+        return P
+
+    def _calc_phase_impedance_matrix(self, Z):
+        # Kron Reduction
+        i, j = np.shape(Z)
+
+        zij = Z[:3, :3]
+        zij.shape = (3, 3)
+        zin = Z[:i - 1, 3:j]
+        zin.shape = (3, 1)
+        znn = Z[3:, 3:]
+        znn.shape = (1, 1)
+        znj = Z[3:i, :j - 1]
+        znj.shape = (1, 3)
+        Z = zij - np.dot(np.dot(zin, np.linalg.inv(znn)), znj)
+        return Z
+
+    def _calc_potential_coefficient_matrix(self, P):
+        # Kron Reduction
+        i, j = np.shape(P)
+
+        pij = P[:3, :3]
+        pij.shape = (3, 3)
+        pin = P[:i - 1, 3:j]
+        pin.shape = (3, 1)
+        pnn = P[3:, 3:]
+        pnn.shape = (1, 1)
+        pnj = P[3:i, :j - 1]
+        pnj.shape = (1, 3)
+        P = pij - np.dot(np.dot(pin, np.linalg.inv(pnn)), pnj)
+        return P
 
 
 class Feeder(Tree):
@@ -490,7 +832,7 @@ class Feeder(Tree):
 class Switch(Edge):
     def __init__(self, name, state=1):
         assert state == 1 or state == 0, 'O parametro state deve ser um inteiro de valor 1 ou 0'
-        super(Switch, self).__init__(name)
+        super(Switch, self).__init__(name=name)
         self.state = state
 
     def __str__(self):
@@ -516,14 +858,27 @@ class Transformer(object):
 
 
 class Conductor(object):
-    def __init__(self, name, rp, xp, rz, xz, ampacity):
-        self.name = name
-        self.rp = float(rp)
-        self.xp = float(xp)
-        self.rz = float(rz)
-        self.xz = float(xz)
-        self.ampacity = float(ampacity)
-
+    def __init__(self,
+                 name=None,
+                 id=None,
+                 rp=None,
+                 xp=None,
+                 rz=None,
+                 xz=None,
+                 ampacity=None):
+        if name is not None: 
+            self.name = name
+            self.rp = float(rp)
+            self.xp = float(xp)
+            self.rz = float(rz)
+            self.xz = float(xz)
+            self.ampacity = float(ampacity)
+        elif id is not None:
+            import json
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            fp = open(os.path.join(basedir, 'data/conductors.json'))
+            conductors_data = json.load(fp)
+            self.conductor_data = conductors_data[id]
 
 if __name__ == '__main__':
     pass
