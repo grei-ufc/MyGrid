@@ -1,5 +1,6 @@
-from mygrid.grid import Substation, Feeder, Sector, Switch, LineModel
-from mygrid.grid import Section, LoadNode, Transformer, Conductor
+from mygrid.grid import GridElements, ExternalGrid
+from mygrid.grid import Substation, Sector, Switch, LineModel
+from mygrid.grid import Section, LoadNode, TransformerModel, Conductor
 from mygrid.util import R, P
 from mygrid.util import p2r, r2p
 
@@ -45,15 +46,21 @@ from terminaltables import AsciiTable
 # representam um ramo da rede elétrica, como switchs, sectors,
 # nós de carga e sections;
 
-# switchs do alimentador de S1
+
+# switchs do alimentador 1 de S1
 ch1 = Switch(name='1', state=1)
 ch2 = Switch(name='2', state=1)
 ch3 = Switch(name='3', state=1)
+
+# Switchs do alimentador 2 de S1
+ch9 = Switch(name='9', state=1)
+ch10 = Switch(name='10', state=1)
 
 # switchs de Fronteira
 ch4 = Switch(name='4', state=0)
 ch5 = Switch(name='5', state=0)
 ch8 = Switch(name='8', state=0)
+ch11 = Switch(name='11', state=0)
 
 # switchs do alimentador de S2
 ch6 = Switch(name='6', state=1)
@@ -61,91 +68,91 @@ ch7 = Switch(name='7', state=1)
 
 # tensao nominal
 
-vll = p2r(13.8e3, 0.0)
+vll_mt = p2r(13.8e3, 0.0)
+vll_bt = p2r(380.0, 0.0)
+
+# transformers
+t1 = TransformerModel(name="T1",
+                      primary_voltage=vll_mt,
+                      secondary_voltage=vll_bt,
+                      power=225e3,
+                      impedance=0.01 + 0.2j)
+
+eg1 = ExternalGrid(name='extern grid 1', vll=vll_mt)
 
 # Nos de carga do alimentador S1_AL1
 s1 = LoadNode(name='S1',
-              neighbors=['A2'],
-              voltage=vll,
-              switchs=['1'])
+              voltage=vll_mt,
+              external_grid=eg1)
 a1 = LoadNode(name='A1',
-              neighbors=['A2'],
-              power=160.0e3 + 120.0e3j,
-              voltage=vll)
+              power=0.0 + 0.0j,
+              voltage=vll_mt)
 a2 = LoadNode(name='A2',
-              neighbors=['S1', 'A1', 'A3', 'C1'],
               power=150.0e3 + 110.0e3j,
-              voltage=vll,
-              switchs=['1', '3'])
+              voltage=vll_mt)
 a3 = LoadNode(name='A3',
-              neighbors=['A2', 'B1'],
               power=100.0e3 + 80.0e3j,
-              voltage=vll,
-              switchs=['2'])
+              voltage=vll_mt)
 b1 = LoadNode(name='B1',
-              neighbors=['B2', 'A3'],
               power=200.0e3 + 140.0e3j,
-              voltage=vll,
-              switchs=['2'])
+              voltage=vll_mt)
 b2 = LoadNode(name='B2',
-              neighbors=['B1', 'B3', 'E2'],
               power=150.0e3 + 110.0e3j,
-              voltage=vll,
-              switchs=['4'])
+              voltage=vll_mt)
 b3 = LoadNode(name='B3',
-              neighbors=['B2', 'C3'],
               power=100.0e3 + 80.0e3j,
-              voltage=vll,
-              switchs=['5'])
+              voltage=vll_mt)
 c1 = LoadNode(name='C1',
-              neighbors=['C2', 'C3', 'A2'],
               power=200.0e3 + 140.0e3j,
-              voltage=vll,
-              switchs=['3'])
+              voltage=vll_mt)
 c2 = LoadNode(name='C2',
-              neighbors=['C1'],
               power=150.0e3 + 110.0e3j,
-              voltage=vll)
-c3 = LoadNode(name=  'C3',
-              neighbors=['C1', 'E3', 'B3'],
+              voltage=vll_mt)
+c3 = LoadNode(name='C3',
               power=100.0e3 + 80.0e3j,
-              voltage=vll,
-              switchs=['5', '8'])
+              voltage=vll_mt)
+
+# Nos de carga do alimentador S1_AL1
+f1 = LoadNode(name='F1',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+g1 = LoadNode(name='G1',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
 
 # Nos de carga do alimentador S2_AL1
 s2 = LoadNode(name='S2',
-              neighbors=['D1'],
-              power=0.0 + 0.0j,
-              voltage=vll,
-              switchs=['6'])
+              voltage=vll_mt,
+              external_grid=eg1)
 d1 = LoadNode(name='D1',
-              neighbors=['S2', 'D2', 'D3', 'E1'],
               power=200.0e3 + 160.0e3j,
-              voltage=vll,
-              switchs=['6', '7'])
+              voltage=vll_mt)
 d2 = LoadNode(name='D2',
-              neighbors=['D1'],
               power=900.0e3 + 40.0e3j,
-              voltage=vll)
-d3 = LoadNode(name=  'D3',
-              neighbors=['D1'],
+              voltage=vll_mt)
+d3 = LoadNode(name='D3',
               power=100.0e3 + 80.0e3j,
-              voltage=vll,)
-e1 = LoadNode(name=  'E1',
-              neighbors=['E3', 'E2', 'D1'],
+              voltage=vll_mt,)
+e1 = LoadNode(name='E1',
               power=100.0e3 + 40.0e3j,
-              voltage=vll,
-              switchs=['7'])
+              voltage=vll_mt)
 e2 = LoadNode(name='E2',
-              neighbors=['E1', 'B2'],
               power=110.0e3 + 70.0e3j,
-              voltage=vll,
-              switchs=['4'])
+              voltage=vll_mt)
 e3 = LoadNode(name='E3',
-              neighbors=['E1', 'C3'],
               power=150.0e3 + 80.0e3j,
-              voltage=vll,
-              switchs = ['8'])
+              voltage=vll_mt)
+
+# Subgrid load-nodes connecteds to A1
+aa1 = LoadNode(name='AA1',
+               power=0.0 + 0.0j,
+               voltage=vll_bt)
+aa2 = LoadNode(name='AA2',
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
+aa3 = LoadNode(name='AA3',
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
 
 phase_conduct = Conductor(id=57)
 neutral_conduct = Conductor(id=44)
@@ -156,147 +163,182 @@ line_model_a = LineModel(loc_a=0.0 + 29.0j,
                          loc_n=4.0 + 25.0j,
                          conductor=phase_conduct,
                          neutral_conductor=neutral_conduct,
-                         neutral=True)
+                         neutral=False)
+
+phase_conduct_bt = Conductor(id=32)
+line_model_b = LineModel(loc_a=0.0 + 29.0j,
+                         loc_b=2.5 + 29.0j,
+                         loc_c=7.0 + 29.0j,
+                         loc_n=4.0 + 25.0j,
+                         conductor=phase_conduct_bt,
+                         neutral_conductor=neutral_conduct,
+                         neutral=False)
 
 # # Trechos do alimentador S1_AL1
-s1_ch1 = Section(name='S1CH1', n1=s1, n2=ch1, line_model=line_model_a, length=0.01)
+s1_a2 = Section(name='S1A2',
+                n1=s1,
+                n2=a2,
+                switch=ch1,
+                line_model=line_model_a,
+                length=1.0)
+a2_a1 = Section(name='A2A1',
+                n1=a2,
+                n2=a1,
+                line_model=line_model_a,
+                length=1.0)
+a2_a3 = Section(name='A2A3',
+                n1=a2,
+                n2=a3,
+                line_model=line_model_a,
+                length=1.0)
+a2_c1 = Section(name='A2C1',
+                n1=a2,
+                n2=c1,
+                switch=ch3,
+                line_model=line_model_a,
+                length=1.0)
 
-ch1_a2 = Section(name='CH1A2', n1=ch1, n2=a2, line_model=line_model_a, length=1.0)
-a2_a1 = Section(name='A2A1', n1=a2, n2=a1, line_model=line_model_a, length=1.0)
-a2_a3 = Section(name='A2A3', n1=a2, n2=a3, line_model=line_model_a, length=1.0)
-a2_ch3 = Section(name='A2CH3', n1=a2, n2=ch3, line_model=line_model_a, length=0.5)
-a3_ch2 = Section(name='A3CH2', n1=a3, n2=ch2, line_model=line_model_a, length=0.5)
+c1_c2 = Section(name='C1C2',
+                n1=c1,
+                n2=c2,
+                line_model=line_model_a,
+                length=1.0)
+c1_c3 = Section(name='C1C3',
+                n1=c1,
+                n2=c3,
+                line_model=line_model_a,
+                length=1.0)
 
-ch3_c1 = Section(name='CH3C1', n1=ch3, n2=c1, line_model=line_model_a, length=0.5)
-c1_c2 = Section(name='C1C2', n1=c1, n2=c2, line_model=line_model_a, length=1.0)
-c1_c3 = Section(name='C1C3', n1=c1, n2=c3, line_model=line_model_a, length=1.0)
-c3_ch8 = Section(name='C3CH8', n1=c3, n2=ch8, line_model=line_model_a, length=0.5)
-c3_ch5 = Section(name='C3CH5', n1=c3, n2=ch5, line_model=line_model_a, length=0.5)
+a3_b1 = Section(name='A3B1',
+                n1=a3,
+                n2=b1,
+                switch=ch2,
+                line_model=line_model_a,
+                length=1.0)
 
-ch2_b1 = Section(name='CH2B1', n1=ch2, n2=b1, line_model=line_model_a, length=0.5)
-b1_b2 = Section(name='B1B2', n1=b1, n2=b2, line_model=line_model_a, length=1.0)
-b2_ch4 = Section(name='B2CH4', n1=b2, n2=ch4, line_model=line_model_a, length=0.5)
-b2_b3 = Section(name='B2B3', n1=b2, n2=b3, line_model=line_model_a, length=1.0)
-b3_ch5 = Section(name='B3CH5', n1=b3, n2=ch5, line_model=line_model_a, length=0.5)
+b1_b2 = Section(name='B1B2',
+                n1=b1,
+                n2=b2,
+                line_model=line_model_a,
+                length=1.0)
+b2_b3 = Section(name='B2B3',
+                n1=b2,
+                n2=b3,
+                line_model=line_model_a,
+                length=1.0)
+
+# Trechos do alimentador S1_AL2
+s1_f1 = Section(name='S1F1',
+                n1=s1,
+                n2=f1,
+                switch=ch9,
+                line_model=line_model_a,
+                length=1.0)
+f1_g1 = Section(name='F1G1',
+                n1=f1,
+                n2=g1,
+                switch=ch10,
+                line_model=line_model_a,
+                length=1.0)
+g1_d2 = Section(name='G1D2',
+                n1=g1,
+                n2=d2,
+                switch=ch11,
+                line_model=line_model_a,
+                length=1.0)
 
 # Trechos do alimentador S2_AL1
-s2_ch6 = Section(name='S2CH6', n1=s2, n2=ch6, line_model=line_model_a, length=0.01)
+s2_d1 = Section(name='S2D1',
+                n1=s2,
+                n2=d1,
+                switch=ch6,
+                line_model=line_model_a,
+                length=1.0)
 
-ch6_d1 = Section(name='CH6D1', n1=ch6, n2=d1, line_model=line_model_a, length=1.0)
-d1_d2 = Section(name='D1D2', n1=d1, n2=d2, line_model=line_model_a, length=1.0)
-d1_d3 = Section(name='D1D3', n1=d1, n2=d3, line_model=line_model_a, length=1.0)
-d1_ch7 = Section(name='D1CH7', n1=d1, n2=ch7, line_model=line_model_a, length=0.5)
+d1_d2 = Section(name='D1D2',
+                n1=d1,
+                n2=d2,
+                line_model=line_model_a,
+                length=1.0)
+d1_d3 = Section(name='D1D3',
+                n1=d1,
+                n2=d3,
+                line_model=line_model_a,
+                length=1.0)
+d1_e1 = Section(name='D1E1',
+                n1=d1,
+                n2=e1,
+                switch=ch7,
+                line_model=line_model_a,
+                length=1.0)
+e1_e2 = Section(name='E1E2',
+                n1=e1,
+                n2=e2,
+                line_model=line_model_a,
+                length=1.0)
+e1_e3 = Section(name='E1E3',
+                n1=e1,
+                n2=e3,
+                line_model=line_model_a,
+                length=1.0)
 
-ch7_e1 = Section(name='CH7E1', n1=ch7, n2=e1, line_model=line_model_a, length=0.5)
-e1_e2 = Section(name='E1E2', n1=e1, n2=e2, line_model=line_model_a, length=1.0)
-e2_ch4 = Section(name='E2CH4', n1=e2, n2=ch4, line_model=line_model_a, length=0.5)
-e1_e3 = Section(name='E1E3', n1=e1, n2=e3, line_model=line_model_a, length=1.0)
-e3_ch8 = Section(name='E3CH8', n1=e3, n2=ch8, line_model=line_model_a, length=0.5)
+# Sections de encontro de alimentador
+c3_e3 = Section(name='C3E3',
+                n1=c3,
+                n2=e3,
+                switch=ch8,
+                line_model=line_model_a,
+                length=1.0)
+b2_e2 = Section(name='B2E2',
+                n1=b2,
+                n2=e2,
+                switch=ch4,
+                line_model=line_model_a,
+                length=1.0)
 
-# Sector S1
-st1 = Sector(name='S1',
-             neighbors=['A'],
-             load_nodes=[s1])
+b3_c3 = Section(name='B3C3',
+                n1=b3,
+                n2=c3,
+                switch=ch5,
+                line_model=line_model_a,
+                length=0.5)
 
-# setor A
-stA = Sector(name='A',
-             neighbors=['S1', 'B', 'C'],
-             load_nodes=[a1, a2, a3])
 
-# Sector B
-stB = Sector(name='B',
-             neighbors=['A', 'C', 'E'],
-             load_nodes=[b1, b2, b3])
+# subgrid sections connecteds to A1
+a1_aa1 = Section(name='A1AA1',
+                 n1=a1,
+                 n2=aa1,
+                 transformer=t1,
+                 length=3.0e-2)
+aa1_aa2 = Section(name='AA1AA2',
+                  n1=aa1,
+                  n2=aa2,
+                  line_model=line_model_b,
+                  length=3.0e-2)
+aa2_aa3 = Section(name='AA2AA3',
+                  n1=aa2,
+                  n2=aa3,
+                  line_model=line_model_b,
+                  length=3.0e-2)
 
-# Sector C
-stC = Sector(name='C',
-             neighbors=['A', 'B', 'E'],
-             load_nodes=[c1, c2, c3])
+load_nodes = [s1, a1, a2, a3, b1, b2, b3, c1, c2, c3,
+              s2, d1, d2, d3, e1, e2, e3, f1, g1, aa1, aa2, aa3]
+sections = [s1_a2, a2_a1, a2_a3, a2_c1, c1_c2, c1_c3, c3_e3, a3_b1, b1_b2, b2_b3, b2_e2,
+            b3_c3, s2_d1, d1_d2, d1_d3, d1_e1, e1_e2, e1_e3, s1_f1, f1_g1, g1_d2,
+            a1_aa1, aa1_aa2, aa2_aa3]
+switchs = [ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11]
 
-# Sector S2
-st2 = Sector(name='S2',
-             neighbors=['D'],
-             load_nodes=[s2])
+grid_elements = GridElements(name='my_grid_elements')
 
-# Sector D
-stD = Sector(name='D',
-             neighbors=['S2', 'E'],
-             load_nodes=[d1, d2, d3])
+grid_elements.add_switch(switchs)
+grid_elements.add_load_node(load_nodes)
+grid_elements.add_section(sections)
 
-# Sector E
-stE = Sector(name='E',
-             neighbors=['D', 'B', 'C'],
-             load_nodes=[e1, e2, e3])
-
-# ligação das switchs com os respectivos sectors
-ch1.n1 = st1
-ch1.n2 = stA
-
-ch2.n1 = stA
-ch2.n2 = stB
-
-ch3.n1 = stA
-ch3.n2 = stC
-
-ch4.n1 = stB
-ch4.n2 = stE
-
-ch5.n1 = stB
-ch5.n2 = stC
-
-ch6.n1 = st2
-ch6.n2 = stD
-
-ch7.n1 = stD
-ch7.n2 = stE
-
-ch8.n1 = stC
-ch8.n2 = stE
-
-# Feeder 1 de S1
-taux = [s1_ch1, ch1_a2, a2_a1, a2_a3, a2_ch3, ch3_c1, c1_c2, c1_c3, c3_ch5,
-         c3_ch8, a3_ch2, ch2_b1, b1_b2, b2_ch4, b2_b3, b3_ch5]
-sub_1_al_1 = Feeder(name='S1_AL1',
-                         sectors=[st1, stA, stB, stC],
-                         sections=taux,
-                         switchs=[ch1, ch2, ch3, ch4, ch5, ch8])
-
-# Feeder 1 de S2
-taux = [s2_ch6, ch6_d1, d1_d2, d1_d3, d1_ch7, ch7_e1, e1_e2, e2_ch4, e1_e3, e3_ch8]
-sub_2_al_1 = Feeder(name='S2_AL1',
-                         sectors=[st2, stD, stE],
-                         sections=taux,
-                         switchs=[ch6, ch7, ch4, ch8])
-
-t1 = Transformer(name='S1_T1',
-                   primary_voltage=P(69e3, 0.0),
-                   secondary_voltage=P(13.8e3, 0.0),
-                   power=P(10e6, 0.0),
-                   impedance=R(0.5, 0.2))
-
-t2 = Transformer(name='S2_T1',
-                   primary_voltage=P(69e3, 0.0),
-                   secondary_voltage=P(13.8e3, 0.0),
-                   power=P(10e6, 0.0),
-                   impedance=R(0.5, 0.2))
-
-sub_1 = Substation(name='S1', feeders=[sub_1_al_1], transformers=[t1])
-
-sub_2 = Substation(name='S2', feeders=[sub_2_al_1], transformers=[t2])
-
-_substations = {sub_1_al_1.name: sub_1_al_1, sub_2_al_1.name: sub_2_al_1}
-
-sub_1_al_1.order(root='S1')
-sub_2_al_1.order(root='S2')
-
-sub_1_al_1.generate_load_nodes_tree()
-sub_2_al_1.generate_load_nodes_tree()
-
-# calculos com a subestacao 1
+grid_elements.create_grid()
 
 # calculo de fluxo de carga
 
-calc_power_flow(sub_1)
+calc_power_flow(grid_elements.dist_grids['F0'])
 
 # # calculo de curto circuito
 

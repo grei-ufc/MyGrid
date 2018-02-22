@@ -230,3 +230,10 @@ def r2p(z):
     m = np.absolute(z)
     a = np.angle(z) * 180.0 / np.pi
     return (m, a)
+
+def disp_vect(v):
+    v = r2p(v)
+    m = v[0]
+    a = v[1]
+    for i, j in zip(m, a):
+        print('{r} ∠ {i}º'.format(r=round(i[0], 2), i=round(j[0], 2)))

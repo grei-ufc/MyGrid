@@ -4,65 +4,58 @@ from mygrid.grid import Section
 import numpy as np
 
 
-def calc_power_flow(substation):
+def calc_power_flow(dist_grid):
 
-        # ---------------------------
-        # loop in substation feeders
-        # ---------------------------
-        for feeder in substation.feeders.values():
-            
-            # -------------------------
-            # variables declarations
-            # -------------------------
-            max_iterations = 50
-            converg_crt = 0.001
-            converg = 1e6
-            iter = 0
+    # -------------------------
+    # variables declarations
+    # -------------------------
+    max_iterations = 100
+    converg_crt = 0.001
+    converg = 1e6
+    iter = 0
 
-            print('============================')
-            print('Feeder {al} Sweep'.format(al=feeder.name))
-            
-            nodes_converg = dict()
-            for node in feeder.load_nodes.values():
-                nodes_converg[node.name] = 1e6
+    print('============================')
+    print('Distribution Grid {dg} Sweep'.format(dg=dist_grid.name))
+    
+    nodes_converg = dict()
+    for node in dist_grid.load_nodes.values():
+        nodes_converg[node.name] = 1e6
 
-            # -------------------------------------
-            # main loop for power flow calculation
-            # -------------------------------------
-            while iter <= max_iterations and converg > converg_crt:
-                iter += 1
-                print('<<<<-----------BFS------------>>>>')
-                print('Iteration: {iter}'.format(iter=iter))
+    # -------------------------------------
+    # main loop for power flow calculation
+    # -------------------------------------
+    while iter <= max_iterations and converg > converg_crt:
+        iter += 1
+        print('<<<<-----------BFS------------>>>>')
+        print('Iteration: {iter}'.format(iter=iter))
 
-                voltage_nodes = dict()
-                for node in feeder.load_nodes.values():
-                    voltage_nodes[node.name] = node.vp
+        voltage_nodes = dict()
+        for node in dist_grid.load_nodes.values():
+            voltage_nodes[node.name] = node.vp
 
-                # ----------------------------------
-                # back-forward sweep implementation
-                # ----------------------------------
-                _feeder_sweep(feeder)
+        # ----------------------------------
+        # back-forward sweep implementation
+        # ----------------------------------
+        _dist_grid_sweep(dist_grid)
 
-                # -------------------------
-                # convergence verification
-                # -------------------------
-                for node in feeder.load_nodes.values():
-                    nodes_converg[node.name] = abs(np.mean(voltage_nodes[node.name]) -
-                                                   np.mean(node.vp))
-
-                converg = max(nodes_converg.values())
-                print('Max. diff between load nodes voltage values: {conv}'.format(conv=converg))
+        # -------------------------
+        # convergence verification
+        # -------------------------
+        for node in dist_grid.load_nodes.values():
+            nodes_converg[node.name] = np.mean(abs(voltage_nodes[node.name] - node.vp))
+        converg = max(nodes_converg.values())
+        print('Max. diff between load nodes voltage values: {conv}'.format(conv=converg))
 
 
-def _feeder_sweep(feeder):
-    """ Função que varre os feeders pelo
+def _dist_grid_sweep(dist_grid):
+    """ Função que varre a dist_grid pelo
     método varredura direta/inversa"""
 
-    feeder_rnp = feeder.load_nodes_tree.rnp
-    load_nodes_tree = feeder.load_nodes_tree.tree
+    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
+    load_nodes_tree = dist_grid.load_nodes_tree.tree
 
     # depth and max_depth recebem a profundidae maxima
-    depth = max_depth = _get_feeder_max_depth(feeder)
+    depth = max_depth = _get_dist_grid_max_depth(dist_grid)
 
     # ----------------------------------------------
     # Inicio da varredura inversa
@@ -72,8 +65,8 @@ def _feeder_sweep(feeder):
     # nós com maiores profundidades até o nó raíz
     while depth >= 0:
         # guarda os nós com maiores profundidades.
-        nodes = [feeder.load_nodes[node_depth[1]]
-               for node_depth in feeder_rnp.transpose() if
+        nodes = [dist_grid.load_nodes[node_depth[1]]
+               for node_depth in dist_grid_rnp.transpose() if
                int(node_depth[0]) == depth]
 
         # decrementodo da profundidade.
@@ -83,108 +76,92 @@ def _feeder_sweep(feeder):
         # armazenada na variável depth
         for node in nodes:
 
-            # zera as potências para que na próxima
-            # iteração do fluxo de carga não ocorra acúmulo.
-            node.ip = np.zeros((3, 1), dtype=complex)
+            # atualiza o valor de corrente passante com o valor
+            # da corente da carga para que na prox. iteração 
+            # do fluxo de carga não ocorra acúmulo.
+            node.ip = node.i
 
-            downstream_neighbors = _get_downstream_neighbors_nodes(node, feeder)
+            downstream_neighbors = _get_downstream_neighbors_nodes(node, dist_grid)
 
             # verifica se não há neighbor a jusante,
             # se não houverem o nó de carga analisado
             # é o último do ramo.
             if downstream_neighbors == []:
-                node.ip = node.i
+                continue
             else:
-                # soma a power da carga associada ao nó atual
-                node.ip = node.i
-                # acrescenta à potência do nó atual
-                # as potências dos nós a jusante
+                # precorre os nos a jusante do no atual
+                # para calculo de fluxos passantes
                 for downstream_node in downstream_neighbors:
                     # chama a função busca_trecho para definir
                     # quais sections estão entre o nó atual e o nó a jusante
-                    section = _search_section(feeder,
-                                              node.name,
-                                              downstream_node.name)
-                    # se o section não for uma instancia da classe
-                    # Section(quando há switch entre nós de cargas)
-                    # a impedância é calculada
-                    if not isinstance(section, Section):
-                        section = section[0] + section[1]
-                    # se o section atual for uma instancia da classe section
-                    else:
-                        pass
+                    section = _search_section(dist_grid,
+                                              node,
+                                              downstream_node)
+                    
+                    # ------------------------------------
+                    # Equacionamento: Calculo de corretes
+                    # ------------------------------------
+                    node.ip += np.dot(section.c, downstream_node.vp) + \
+                               np.dot(section.d, downstream_node.ip)
 
-                    VI = np.dot(section.abcd,
-                                downstream_node.VI)
-                    aux = VI[3:, 0]
-                    aux.shape = (3, 1)
-                    node.ip += aux
+                    # -------------------------------------
 
                     print(node.name + '<<<---' + downstream_node.name)
 
     print('Forward Sweep phase ---------->>>>')
 
-    depth = 0
+    depth = 1
     # seção do cálculo de atualização das tensões
     while depth <= max_depth:
         # salva os nós de carga a montante
-        nodes = [feeder.load_nodes[col_depth_node[1]]
-                 for col_depth_node in feeder_rnp.transpose()
-                 if int(col_depth_node[0]) == depth + 1]
+        nodes = [dist_grid.load_nodes[col_depth_node[1]]
+                 for col_depth_node in dist_grid_rnp.transpose()
+                 if int(col_depth_node[0]) == depth]
 
         # percorre os nós para guardar a árvore do nó requerido
         for node in nodes:
 
-            upstream_node = _get_upstream_neighbor_node(feeder, node)
-            
-            section = _search_section(feeder, node.name, upstream_node.name)
+            upstream_node = _get_upstream_neighbor_node(dist_grid, node)
+            section = _search_section(dist_grid, node, upstream_node)
 
-            # se existir switch, soma a resistência dos dois sections
-            if not isinstance(section, Section):
-                section = section[0] + section[1]
-            # caso não exista, a resistência é a do próprio section
-            else:
-                pass
-
-            VI = np.dot(np.linalg.inv(section.abcd),
-                        upstream_node.VI)
-            node.vp = VI[:3, 0]
-            if depth == 0:
-                upstream_node.vp = upstream_node.vp
-
+            # ------------------------------------
+            # Equacionamento: Calculo de tensoes
+            # ------------------------------------
+            node.vp = np.dot(section.A, upstream_node.vp) - np.dot(section.B, node.ip)
+            # ------------------------------------
             print(upstream_node.name + '--->>>' + node.name)
         depth += 1
 
 
-def _get_feeder_max_depth(feeder):
+def _get_dist_grid_max_depth(dist_grid):
     
-    feeder_nodes = feeder.load_nodes.values()
-    feeder_rnp = feeder.load_nodes_tree.rnp
+    dist_grid_nodes = dist_grid.load_nodes.values()
+    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
     
     max_depth = 0
 
     # for percorre a rnp dos nós de carga tomando valores
     # em pares (profundidade, nó).
-    for node_depth in feeder_rnp.transpose():
+    for node_depth in dist_grid_rnp.transpose():
         # obtem os nomes dos nos de carga.
-        feeder_nodes_names = [node.name for node in feeder_nodes]
+        dist_grid_nodes_names = [node.name for node in dist_grid_nodes]
 
         # verifica se a profundidade do nó é maior do que a
-        # profundidade máxima e se ele está na lista de nós do feeder.
+        # profundidade máxima e se ele está na lista de nós do dist_grid.
         if (int(node_depth[0]) > max_depth) \
-           and (node_depth[1] in feeder_nodes_names):
+           and (node_depth[1] in dist_grid_nodes_names):
             max_depth = int(node_depth[0])
 
     return max_depth
 
 
-def _get_downstream_neighbors_nodes(node, feeder):
+def _get_downstream_neighbors_nodes(node, dist_grid):
 
-    feeder_rnp = feeder.load_nodes_tree.rnp
-    load_nodes_tree = feeder.load_nodes_tree.tree
+    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
+    load_nodes_tree = dist_grid.load_nodes_tree.tree
 
     # guarda os pares (profundidade, nó)
-    node_depth = [node_depth for node_depth in feeder_rnp.transpose()
+    node_depth = [node_depth for node_depth in dist_grid_rnp.transpose()
                   if node_depth[1] == node.name]
 
     neighbors = load_nodes_tree[node.name]
@@ -197,80 +174,48 @@ def _get_downstream_neighbors_nodes(node, feeder):
 
         # verifica quem é neighbor do nó desejado.
         depth_neighbor = [n_depth for n_depth in
-                          feeder_rnp.transpose()
+                          dist_grid_rnp.transpose()
                           if n_depth[1] == neighbor]
 
         # verifica se a profundidade do neighbor é maior
         if int(depth_neighbor[0][0]) > int(node_depth[0][0]):
             # armazena os neighbors a jusante.
             downstream_neighbors.append(
-                feeder.load_nodes[depth_neighbor[0][1]])
+                dist_grid.load_nodes[depth_neighbor[0][1]])
 
     return downstream_neighbors
 
 
-def _get_upstream_neighbor_node(feeder, node):
+def _get_upstream_neighbor_node(dist_grid, node):
     
-    feeder_rnp = feeder.load_nodes_tree.rnp
-    load_nodes_tree = feeder.load_nodes_tree.tree
+    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
+    load_nodes_tree = dist_grid.load_nodes_tree.tree
 
     neighbors = load_nodes_tree[node.name]
     # guarda os pares (profundidade,nó)
     node_depth = [col_depth_node
-               for col_depth_node in feeder_rnp.transpose()
+               for col_depth_node in dist_grid_rnp.transpose()
                if col_depth_node[1] == node.name]
     upstream_neighbors = list()
     # verifica quem é neighbor do nó desejado.
     for neighbor in neighbors:
         depth_neighbor = [n_depth
-                        for n_depth in feeder_rnp.transpose()
+                        for n_depth in dist_grid_rnp.transpose()
                         if n_depth[1] == neighbor]
         if int(depth_neighbor[0][0]) < int(node_depth[0][0]):
             # armazena os neighbors a montante.
             upstream_neighbors.append(
-                feeder.load_nodes[depth_neighbor[0][1]])
+                dist_grid.load_nodes[depth_neighbor[0][1]])
 
     # retorna o primeiro neighbor a montante
     return upstream_neighbors[0]
 
 
-def _search_section(feeder, n1, n2):
-        """Função que busca sections em um alimendador entre os nós/switchs
-          n1 e n2"""
-        # for pecorre os nodes de carga do feeder
-        for node in feeder.load_nodes.keys():
+def _search_section(dist_grid, n1, n2):
+    """Função que busca sections em um alimendador entre os nos
+      n1 e n2"""
 
-            # cria conjuntos das switchs ligadas ao node
-            switchs_n1 = set(feeder.load_nodes[n1].switchs)
-            switchs_n2 = set(feeder.load_nodes[n2].switchs)
-
-            # verifica se existem switchs comuns aos nodes
-            intersection_switchs = switchs_n1.intersection(switchs_n2)
-
-            if intersection_switchs != set():
-                # verifica quais sections estão ligados a switch
-                # comum as nós.
-                switch = intersection_switchs.pop()
-                sections_switchs = []
-                # identificação dos sections requeridos
-                for section in feeder.sections.values():
-                    if section.n1.name == switch:
-                        if section.n2.name == n1 or section.n2.name == n2:
-                            sections_switchs.append(section)
-                    elif section.n2.name == switch:
-                        if section.n1.name == n1 or section.n1.name == n2:
-                            sections_switchs.append(section)
-                # caso o comprimento da lista seja dois, ou seja, há switch
-                # entre dois ós de carga, a função retorna os sections.
-                if len(sections_switchs) == 2:
-                    return sections_switchs
-            else:
-                # se não existirem switchs comuns, verifica qual section
-                # tem os nodes n1 e n2 como extremidade
-                for section in feeder.sections.values():
-                    if section.n1.name == n1:
-                        if section.n2.name == n2:
-                            return section
-                    elif section.n1.name == n2:
-                        if section.n2.name == n1:
-                            return section
+    for section in dist_grid.sections.values():
+        nodes = list([section.n1, section.n2])
+        if (n1 in nodes) and (n2 in nodes):
+            return section
