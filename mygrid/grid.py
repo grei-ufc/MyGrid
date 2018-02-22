@@ -77,14 +77,26 @@ class LoadNode(object):
 
         self.name = name
         self.neighbors = neighbors
+        self.generation=generation
+
 
         self._vp = np.zeros((3, 1), dtype=complex)
         self._pp = np.zeros((3, 1), dtype=complex)
         self.i = np.zeros((3, 1), dtype=complex)
         self._ip = np.zeros((3, 1), dtype=complex)
+        self.iin = np.zeros((3, 1), dtype=complex)
+        
+
+        if self.generation != None and self.generation.type=="PV":
+            self.voltage=voltage*self.generation.Vspecified
+        else:
+            self.voltage=voltage
+
+        self.voltage_nom=voltage
+
 
         self.config_load(power=power)
-        self.config_voltage(voltage=voltage)
+        self.config_voltage(voltage=self.voltage)
 
         if switchs is not None:
             assert isinstance(switchs, list), 'O parâmetro switchs da classe LoadNode' \
@@ -102,11 +114,24 @@ class LoadNode(object):
                     power=None,
                     zipmodel=[1.0, 0.0, 0.0]):
         if power is not None:
-            self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
+            if self.generation is not None:
+                self.ppa = self.ppb = self.ppc = 1.0/3.0 * power +self.generation.P/3
+                print(self.ppa,self.ppb ,self.ppc)
+            
+            else:
+                self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
+
         else:
-            self.ppa = ppa
-            self.ppb = ppb
-            self.ppc = ppc
+
+            if self.generation is not None:
+                self.ppa = ppa+self.generation.Pa
+                self.ppb = ppb+self.generation.Pb
+                self.ppc = ppc+self.generation.Pc
+
+            else:
+                self.ppa = ppa
+                self.ppb = ppb
+                self.ppc = pcc
 
         self.zipmodel = np.array(zipmodel)
 
@@ -115,6 +140,7 @@ class LoadNode(object):
                        vpb=0.0+0.0j,
                        vpc=0.0+0.0j,
                        voltage=None):
+
         if voltage is not None:
             v = abs(voltage) / np.sqrt(3)
             self.vpa = p2r(v, 0.0)
@@ -131,12 +157,29 @@ class LoadNode(object):
         if self.pp.all() == 0.0+0.0j:
             self.i = np.zeros((3, 1), dtype=complex)
         else:
-            self.ipq = self.zipmodel[0] * np.conjugate(self.pp / self.vp)
-            self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
-            self.iz = self.zipmodel[1] * (self.vp / self.z)
-            self.ii = self.zipmodel[2] * self.vp / self.z
-            self.i =  self.ipq + self.iz + self.ii
-            self.i.shape = (3, 1)
+
+            if self.generation !=  None:
+
+                ppdg = np.zeros((3, 1), dtype=complex)
+                ppdg[0,0]=self.generation.Pa
+                ppdg[1,0]=self.generation.Pb
+                ppdg[2,0]=self.generation.Pc
+
+                self.ipq = self.zipmodel[0] * np.conjugate((self.pp + ppdg) / self.vp)
+                self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
+                self.iz = self.zipmodel[1] * (self.vp / self.z)
+                self.ii = self.zipmodel[2] * self.vp / self.z
+                self.i =  self.ipq + self.iz + self.ii
+                self.i.shape = (3, 1)
+
+            else:
+
+                self.ipq = self.zipmodel[0] * np.conjugate(self.pp / self.vp)
+                self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
+                self.iz = self.zipmodel[1] * (self.vp / self.z)
+                self.ii = self.zipmodel[2] * self.vp / self.z
+                self.i =  self.ipq + self.iz + self.ii
+                self.i.shape = (3, 1)
 
     @property
     def VI(self):
@@ -250,6 +293,97 @@ class LoadNode(object):
         return 'Load Node: ' + self.name
 
 
+class PV(object):
+    def __init__(self,name,Pa=0.0+0.0j,Pb=0.0+0.0j,Pc=0.0+0.0j,
+                 P=None,Qmin=0.0+0.0j,Qmax=0.0+0.0j,
+                 Vmin=0.95,Vmax=1.05,Vspecified=None,DV_presc=0.005):
+    
+        self.PV_Provides=False
+        self.PV_Consumes=False
+        self.name=name
+        self.type="PV"
+        self.no_limit_PV=True
+        self.DV_presc=DV_presc
+
+        if P is not None:
+            self.P=-P
+            self.Pa=self.Pb=self.Pc=1.0/3.0 *self.P
+            self.phase_a_gd=True
+            self.phase_b_gd=True
+            self.phase_c_gd=True
+            self.gd_type_phase="three"
+
+        else:
+            self.Pa=-Pa
+            self.Pb=-Pb
+            self.Pc=-Pc
+            self.P=P
+            self.gd_type_phase="mono"
+
+        self.Qmin=Qmin
+        self.Qmax=Qmax
+
+        self.Vmin=Vmin
+        self.Vmax=Vmax
+
+        if Vspecified is None:
+            self.Vspecified=(Vmin+Vmax)/2
+
+        else:
+            self.Vspecified=Vspecified
+
+    def update_Q(self,Qa,Qb,Qc):
+
+        self.Qa=Qa
+        self.Qb=Qb
+        self.Qc=Qc
+        self.Pa= Qa+self.Pa
+        self.Pb= Qb+self.Pb
+        self.Pc= Qc+self.Pc
+        self.P=  (Qa+Qb+Qc)+self.P
+
+        
+
+        if np.imag(-self.P)>3*np.imag(self.Qmax):
+            
+
+            self.P=self.P.real-self.Qmax*3
+            self.Pa=self.Pb=self.Pc=self.P/3
+            self.no_limit_PV=False
+            self.type=None
+
+        elif np.imag(-self.P)<3*np.imag(self.Qmin):
+            
+            self.P=self.P.real-self.Qmin*3
+            self.Pa=self.Pb=self.Pc=self.P/3
+            self.no_limit_PV=False
+            self.type=None
+
+
+
+
+    pass
+
+class PQ(object):
+    def __init__(self,name,P=None,Pa=0.0+0.0j,Pb=0.0+0.0j,Pc=0.0+0.0j):
+
+        self.name=name
+        self.type="PQ"
+
+        if P is not None:
+
+            self.P=-P
+            self.Pa=self.Pb=self.Pc=-P/3
+        else:
+            self.Pa=-Pa
+            self.Pb=-Pb
+            self.Pc=-Pc
+            self.P=P
+
+        
+
+    pass
+
 class Substation(object):
 
     def __init__(self, name, feeders, transformers):
@@ -269,6 +403,77 @@ class Substation(object):
         self.transformers = dict()
         for transformer in transformers:
             self.transformers[transformer.name] = transformer
+
+    def nodes_table_voltage(self,type_volts="pu"):
+        if type_volts=="pu":
+            v="pu"
+            va_name="Va (p.u)"
+            vb_name="Vb (p.u)"
+            vc_name="Vc (p.u)"
+
+        elif type_volts=="module":
+            v=1
+            va_name="Va (V)"
+            vb_name="Vb (V)"
+            vc_name="Vc (V)"
+
+
+        for name_feeder in self.feeders:
+            
+            title=name_feeder
+            node_data=[["node name",
+                         va_name,
+                         vb_name,
+                         vc_name,
+                         "Load_Pa (kVA)",
+                         "Load_Pb (kVA)",
+                         "Load_Pc (kVA)",
+                         "DG_Pa (kW +KVar)",
+                         "DG_Pb (kW +KVar)",
+                         "DG_Pc (kW +KVar)"
+                         ]]
+            for node in self.feeders[name_feeder].load_nodes.values():
+                node_data.append([node.name,
+
+                                   str(round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                    if v =="pu" else 1),4)) +\
+                                        "∠"+str(round(np.angle(node.vpa, deg=True),2))+"°",
+                                   str(round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                    if v =="pu" else 1),4)) +\
+                                        "∠"+str(round(np.angle(node.vpb, deg=True),2))+"°",
+                                   str(round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                    if v =="pu" else 1),4)) +\
+                                        "∠"+str(round(np.angle(node.vpc, deg=True),2))+"°",
+
+                                   str(round(np.abs(node.ppa)/1000,2))+u"∠"\
+                                   +str(round(np.angle(node.ppa, deg=True),2))+"°",
+                                   str(round(np.abs(node.ppb)/1000,2))+u"∠"\
+                                   +str(round(np.angle(node.ppb, deg=True),2))+"°",
+                                   str(round(np.abs(node.ppc)/1000,2))+u"∠"\
+                                   +str(round(np.angle(node.ppc, deg=True),2))+"°",
+
+                                   str(round(node.generation.Pa.real/1000,2))\
+                                   +("+" if node.generation != None and \
+                                   node.generation.Pa.imag > 0 else "")+\
+                                   str(round(node.generation.Pa.imag/1000,2))+"j"\
+                                   if node.generation != None else "",
+
+                                   str(round(node.generation.Pb.real/1000,2))\
+                                   +("+" if node.generation != None and \
+                                   node.generation.Pb.imag > 0 else "")+\
+                                   str(round(node.generation.Pb.imag/1000,2))+"j"\
+                                   if node.generation != None else "",
+
+                                   str(round(node.generation.Pc.real/1000,2))\
+                                   +("+" if node.generation != None and \
+                                   node.generation.Pc.imag > 0 else "")+\
+                                   str(round(node.generation.Pc.imag/1000,2))+"j"\
+                                   if node.generation != None else ""])
+
+            table=AsciiTable(node_data)
+            table.title=title
+            print(table.table)
+
 
 
 class Section(Edge):
@@ -378,6 +583,7 @@ class LineModel(object):
                       [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
                       [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
         self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
+        print(self.z012)
 
         # --------------------------------------
         # Shunt Admittance Y matrix calculation
@@ -855,6 +1061,13 @@ class Transformer(object):
         self.secondary_voltage = secondary_voltage
         self.power = power
         self.impedance = impedance
+
+class auto_trafo(object):
+    """docstring for auto_trafo"""
+    def __init__(self, n):
+        super(auto_trafo, self).__init__()
+        self.n = n
+        
 
 
 class Conductor(object):

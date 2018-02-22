@@ -4,8 +4,11 @@ from mygrid.grid import Section
 import numpy as np
 
 
-def calc_power_flow(substation):
 
+def calc_power_flow(substation,Vnom):
+
+        flag=0
+        Vnom=Vnom/np.sqrt(3)
         # ---------------------------
         # loop in substation feeders
         # ---------------------------
@@ -41,7 +44,8 @@ def calc_power_flow(substation):
                 # ----------------------------------
                 # back-forward sweep implementation
                 # ----------------------------------
-                _feeder_sweep(feeder)
+
+                _feeder_sweep(feeder,Vnom)
 
                 # -------------------------
                 # convergence verification
@@ -51,10 +55,38 @@ def calc_power_flow(substation):
                                                    np.mean(node.vp))
 
                 converg = max(nodes_converg.values())
+        
                 print('Max. diff between load nodes voltage values: {conv}'.format(conv=converg))
 
 
-def _feeder_sweep(feeder):
+        DG_unconv_=nodes_out_limit(substation,Vnom)
+
+        if DG_unconv_ !=[]:
+            define_power_insertion(DG_unconv_,feeder,Vnom)
+            flag=1
+
+        if flag != 0:
+            substation.nodes_table_voltage()
+            for feeder in substation.feeders.values():
+                for node in feeder.load_nodes.values():
+                    node.config_voltage(voltage=node.voltage)
+            
+            calc_power_flow(substation,Vnom*np.sqrt(3))
+            return
+
+        else:
+            #substation.nodes_table_voltage()
+            return
+
+
+
+
+
+
+
+
+def _feeder_sweep(feeder,Vnom):
+    
     """ Função que varre os feeders pelo
     método varredura direta/inversa"""
 
@@ -71,6 +103,7 @@ def _feeder_sweep(feeder):
     # seção do cálculo das potências partindo dos
     # nós com maiores profundidades até o nó raíz
     while depth >= 0:
+        DG_unconv_=[]
         # guarda os nós com maiores profundidades.
         nodes = [feeder.load_nodes[node_depth[1]]
                for node_depth in feeder_rnp.transpose() if
@@ -119,9 +152,11 @@ def _feeder_sweep(feeder):
                     aux = VI[3:, 0]
                     aux.shape = (3, 1)
                     node.ip += aux
-
+                    downstream_node.iin=aux
+                    print(node.name,np.abs(downstream_node.VI),np.abs(VI))
                     print(node.name + '<<<---' + downstream_node.name)
 
+            
     print('Forward Sweep phase ---------->>>>')
 
     depth = 0
@@ -146,14 +181,84 @@ def _feeder_sweep(feeder):
             else:
                 pass
 
+            V_2=upstream_node.VI[:3,0]
+            V_2.shape = (3, 1)
+            I_2=node.iin
+            I_2.shape = (3, 1)
+            VI_2=np.concatenate((V_2, I_2))
+           
+            print(np.abs(VI_2)) 
             VI = np.dot(np.linalg.inv(section.abcd),
-                        upstream_node.VI)
+                        VI_2)
+            
+
             node.vp = VI[:3, 0]
+
+
             if depth == 0:
                 upstream_node.vp = upstream_node.vp
 
             print(upstream_node.name + '--->>>' + node.name)
         depth += 1
+    
+
+
+
+
+def nodes_out_limit(substation,Vnom):
+    DG_unconv_=[]
+    for feeder in substation.feeders.values():
+        for node in feeder.load_nodes.values():
+
+            vaa=np.abs(node.vp[0])/Vnom
+            vbb=np.abs(node.vp[1])/Vnom
+            vcc=np.abs(node.vp[2])/Vnom
+
+            vphase_max=max([vaa,vbb,vcc])
+            vphase_min=min([vaa,vbb,vcc])
+
+            if (node.generation!=None and node.generation.type=="PV")\
+             and (node.generation.no_limit_PV \
+                or (vphase_max)>node.generation.Vmax):
+                
+                node.generation.no_limit_PV=True
+                
+                if (vphase_min < node.generation.Vmin) and \
+                    (vphase_max > node.generation.Vmax) or \
+                    (node.generation.PV_Provides and node.generation.PV_Consumes):
+
+                    if (vphase_min < node.generation.Vmin) and \
+                        (vphase_max > node.generation.Vmax):
+
+                        print("It is not possible to use a three-phase PV type generation" \
+                                 +" to correct voltage levels by phase.")
+                    else:
+                        # node.generation.Pa-=node.generation.Qa
+                        # node.generation.Pb-=node.generation.Qb
+                        # node.generation.Pc-=node.generation.Qc
+
+                        pass
+                    
+                elif ((vphase_min)<node.generation.Vmin or \
+                    ((node.generation.Vspecified - (vphase_min)) \
+                        > node.generation.DV_presc and\
+                        (node.generation.PV_Provides))):
+
+                    node.generation.PV_Provides=True
+                    DG_unconv_.append(node)
+                    
+
+                elif ((vphase_max)>node.generation.Vmax or \
+                    ((node.generation.Vspecified - (vphase_min)) \
+                        < node.generation.DV_presc and\
+                        (node.generation.PV_Consumes))):
+
+                    node.generation.PV_Consumes=True
+                    DG_unconv_.append(node)
+            
+    return DG_unconv_
+
+    
 
 
 def _get_feeder_max_depth(feeder):
@@ -274,3 +379,100 @@ def _search_section(feeder, n1, n2):
                     elif section.n1.name == n2:
                         if section.n2.name == n1:
                             return section
+
+def define_power_insertion(DG_unconv_,feeder,Vnom):
+
+    z_base=(Vnom)**2/100e6
+    I_base=100e6/Vnom
+    reactan_mat_=np.ones((len(DG_unconv_),len(DG_unconv_)))*(0.0+1.0j)
+    equal_section_={}
+
+    for i in range(len(DG_unconv_)):
+
+        section_list=list()
+        reactan_mat_[i,i]=sum_ind_react(feeder, DG_unconv_[i].name,section_list)
+        equal_section_[i]=section_list
+
+    for i in range(len(equal_section_)):
+        for j in range(i+1,len(equal_section_)):
+            reactan_mat_[i,j]=reactan_mat_[j,i]=sum_com_react(i,j,equal_section_)
+    
+    
+    inv_X=np.linalg.inv(reactan_mat_/z_base)
+    delta_I={}
+    for j in range(3):
+        delta_V=np.ones((len(DG_unconv_),1))
+        for i in range(len(DG_unconv_)):
+            if DG_unconv_[i].generation.PV_Provides:
+                if  DG_unconv_[i].generation.gd_type_phase != "mono":
+                    Vcurrent=np.min([np.abs(x) for x in DG_unconv_[i].vp])/Vnom
+                else:
+                    Vcurrent=(np.abs(x) for x in DG_unconv_[i].vp[j])/Vnom
+
+            elif DG_unconv_[i].generation.PV_Consumes:
+                if  DG_unconv_[i].generation.gd_type_phase != "mono":
+                    Vcurrent=np.max([np.abs(x) for x in DG_unconv_[i].vp])/Vnom
+                else:
+                    Vcurrent=(np.abs(x) for x in DG_unconv_[i].vp[j])/Vnom
+
+            delta_V[i,0]=DG_unconv_[i].generation.Vspecified - \
+             (Vcurrent)
+        delta_Q=inv_X.dot(delta_V)*100e6
+        delta_I[j]=inv_X.dot(delta_V)*I_base
+
+    
+    
+
+    # print(delta_V)
+    # print(inv_X)
+    # print(delta_Q)
+    print(delta_I[0])
+    print(delta_I[1])
+    print(delta_I[2])
+    
+    for i in range(len(DG_unconv_)):
+        vmin_dg=np.min([np.abs(x) for x in DG_unconv_[i].vp])
+        DG_unconv_[i].generation.update_Q(delta_I[0][i][0]*vmin_dg,\
+         delta_I[0][i][0]*vmin_dg, delta_I[0][i][0]*vmin_dg)
+
+
+
+ 
+def sum_com_react(i,j,equal_section_):
+    reat_comm=0
+    for x in equal_section_[i]:
+        if x  in equal_section_[j]:
+            reat_comm += np.imag(x.line_model.z012[1,1])*x.length*1.0j
+
+    # for x in equal_section_[j]:
+    #     if x not in equal_section_[i]:
+    #         reat_comm += np.imag(x.line_model.z012[1,1])*x.length*1.0j
+
+    # for x in equal_section_[j]:
+    #     if x in equal_section_[i]:
+    #         reat_comm += np.imag(x.line_model.z012[1,1])*x.length*1.0j
+    return reat_comm
+
+def sum_ind_react(feeder, n2,section_list):
+
+    if feeder.root==n2:
+        return 0
+
+    for section in feeder.sections.values():
+
+        if section.n1.name == n2:
+
+            section_list.append(section)
+            return sum_ind_react(feeder,section.n2.name,section_list)+ \
+            np.imag(section.line_model.z012[1,1])*section.length*1.0j
+
+        elif section.n2.name == n2:
+
+            section_list.append(section)
+            return sum_ind_react(feeder,section.n1.name,section_list)+ \
+            np.imag(section.line_model.z012[1,1])*section.length*1.0j
+
+def define_power_phase(a,b,c):
+    power_phases=[]
+
+    return power_phases
