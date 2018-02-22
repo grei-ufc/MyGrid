@@ -6,13 +6,274 @@ from mygrid.util import Phasor, P, R, Base
 from mygrid.util import p2r, r2p
 import os
 
+class GridElements(object):
+    def __init__(self, name):
+        self.load_nodes = dict()
+        self.switchs = dict()
+        self.sections = dict()
+
+    def add_load_node(self, load_node):
+        if isinstance(load_node, LoadNode):
+            self.load_nodes[load_node.name] = load_node
+        elif isinstance(load_node, list):
+            for ln in load_node:
+                self.load_nodes[ln.name] = ln
+
+    def add_switch(self, switch):
+        if isinstance(switch, Switch):
+            self.switchs[switch.name] = switch
+        elif isinstance(switch, list):
+            for sw in switch:
+                self.switchs[sw.name] = sw
+
+    def add_section(self, section):
+        if isinstance(section, Section):
+            self.sections[section.name] = section
+        elif isinstance(section, list):
+            for sc in section:
+                self.sections[sc.name] = sc
+
+    def add_sector(self, sector):
+        if isinstance(sector, Sector):
+            self.sectors[sector.name] = sector
+        elif isinstance(sector, list):
+            for sc in sector:
+                self.sectors[sc.name] = sc
+
+    def add_grid_dist(self, grid_dist):
+        if isinstance(grid_dist, DistGrid):
+            self.grid_dist[grid_dist.name] = grid_dist
+        elif isinstance(grid_dist, list):
+            for gd in grid_dist:
+                self.grid_dist[gd.name] = gd
+
+    def create_grid(self):
+
+        # ----------------------------------
+        # determinacao de setores
+        # ----------------------------------
+        self.sectors = dict()
+        visitados = list()
+        i = 0
+        for load_node in self.load_nodes.values():
+            if load_node not in visitados:
+                sector_load_nodes = list([load_node])
+                neighbors = list()
+                stack = list()
+                visitados.append(load_node)
+                stack.append(load_node)
+                visitados, sector_load_nodes = self.search_sectors(load_node,
+                                                                   self.load_nodes.values(),
+                                                                   self.sections.values(),
+                                                                   visitados,
+                                                                   sector_load_nodes,
+                                                                   stack)
+                
+                s = Sector(name='S' + str(i), load_nodes=sector_load_nodes)
+                i += 1
+                self.sectors[s.name] = s
+
+        # ----------------------------------
+        # determinacao dos vizinhos 
+        # dos nos de carga
+        # ----------------------------------
+        for load_node in self.load_nodes.values():
+            neighbors = list()
+            for section in self.sections.values():
+                if section.n1 == load_node:
+                    neighbors.append(section.n2)
+                if section.n2 == load_node:
+                    neighbors.append(section.n1)
+            load_node.set_neighbors(neighbors)
+
+        # ----------------------------------
+        # determinacao dos vizinhos 
+        # dos setores
+        # ----------------------------------
+        for sector in self.sectors.values():
+            neighbors = list()
+            for load_node in sector.load_nodes.values():
+                for section in self.sections.values():
+                    if section.n1 == load_node:
+                        if section.switch is not None:
+                            neighbors.append(section.n2.sector)
+                    if section.n2 == load_node:
+                        if section.switch is not None:
+                            neighbors.append(section.n1.sector)
+            sector.set_neighbors(neighbors)
+
+        # ----------------------------------
+        # determinacao dos setores 
+        # vizinhos das chaves
+        # ----------------------------------
+        for section in self.sections.values():
+            if section.switch is not None:
+                for sector in self.sectors.values():
+                    if section.n1 in sector.load_nodes.values():
+                        section.switch.set_sector(sector)
+                    if section.n2 in sector.load_nodes.values():
+                        section.switch.set_sector(sector)
+
+        # ----------------------------------
+        # busca dos setores de cada DistGrid
+        # ----------------------------------
+        visitados = list()
+        dist_grid_sectors_list = list()
+        for sector in self.sectors.values():
+            if sector not in visitados:
+                grid_dist_sectors = list([sector])
+                neighbors = list()
+                stack = list()
+                visitados.append(sector)
+                stack.append(sector)
+                visitados, grid_dist_sectors = self.search_grid_dist_sectors(sector,
+                                                                       self.sectors.values(),
+                                                                       self.switchs.values(),
+                                                                       visitados,
+                                                                       grid_dist_sectors,
+                                                                       stack)
+                dist_grid_sectors_list.append(grid_dist_sectors)
+
+        # ----------------------------------
+        # busca das sections de cada alimentador
+        # ----------------------------------
+        visitados = list()
+        dist_grid_sections_list = list()
+        for load_node in self.load_nodes.values():
+            if load_node not in visitados:
+                grid_dist_sections = list()
+                neighbors = list()
+                stack = list()
+                visitados.append(load_node)
+                stack.append(load_node)
+                visitados, grid_dist_sections = self.search_grid_dist_sections(load_node,
+                                                                         self.load_nodes.values(),
+                                                                         self.sections.values(),
+                                                                         visitados,
+                                                                         grid_dist_sections,
+                                                                         stack)
+                dist_grid_sections_list.append(grid_dist_sections)
+
+        # ----------------------------------
+        # busca dos nos raiz de cada alimentador
+        # ----------------------------------
+        root_sectors = list()
+        for sector in self.sectors.values():
+            for load_node in sector.load_nodes.values():
+                if load_node.external_grid is not None:
+                    root_sectors.append(sector)
+
+        # ----------------------------------
+        # instanciamento das DistGrids
+        # ----------------------------------
+        self.dist_grids = dict()
+        i = 0
+        aux = 0
+        for root_sector in root_sectors:
+            for dg_sectors in dist_grid_sectors_list:
+                if root_sector in dg_sectors:
+                    rs_load_node = list(root_sector.load_nodes.values())[0]
+                    for section in self.sections.values():
+                        if aux != i:
+                            aux+=1
+                            break
+                        elif ((rs_load_node is section.n1) or (rs_load_node is section.n2)) and (section.switch.state is not 0):
+                            for dg_sections in dist_grid_sections_list:
+                                if section in dg_sections:
+                                    dg = DistGrid(name='F' + str(i),
+                                                  sectors=dg_sectors,
+                                                  sections=dg_sections)
+                                    i+=1
+                                    dg.order(root=root_sector.name)
+                                    dg.generate_load_nodes_tree()
+                                    self.dist_grids[dg.name] = dg
+                                    break
+
+
+
+    def search_sectors(self, load_node, load_nodes, sections, visitados, sector_load_nodes, stack):
+        for section in sections:
+            if section.n1 == load_node:
+                if section.switch == None and section.n2 not in visitados:
+                    visitados.append(section.n2)
+                    stack.append(section.n2)
+                    sector_load_nodes.append(section.n2)
+                    return self.search_sectors(section.n2, load_nodes, sections, visitados, sector_load_nodes, stack)
+            if section.n2 == load_node:
+                if section.switch == None and section.n1 not in visitados:
+                    visitados.append(section.n1)
+                    stack.append(section.n1)
+                    sector_load_nodes.append(section.n1)
+                    return self.search_sectors(section.n1, load_nodes, sections, visitados, sector_load_nodes, stack)
+        else:
+            stack.pop()
+            if stack == []:
+                return visitados, sector_load_nodes
+            else:
+                return self.search_sectors(stack[len(stack)-1], load_nodes, sections, visitados, sector_load_nodes, stack)
+
+
+    def search_grid_dist_sectors(self, sector, sectors, switchs, visitados, grid_dist_sectors, stack):
+        for switch in switchs:
+            if switch.n1 == sector:
+                if switch.state == 1 and switch.n2 not in visitados:
+                    visitados.append(switch.n2)
+                    stack.append(switch.n2)
+                    grid_dist_sectors.append(switch.n2)
+                    return self.search_grid_dist_sectors(switch.n2, sectors, switchs, visitados, grid_dist_sectors, stack)
+            if switch.n2 == sector:
+                if switch.state == 1 and switch.n1 not in visitados:
+                    visitados.append(switch.n1)
+                    stack.append(switch.n1)
+                    grid_dist_sectors.append(switch.n1)
+                    return self.search_grid_dist_sectors(switch.n1, sectors, switchs, visitados, grid_dist_sectors, stack)
+        else:
+            stack.pop()
+            if stack == []:
+                return visitados, grid_dist_sectors
+            else:
+                return self.search_grid_dist_sectors(stack[len(stack)-1], sectors, switchs, visitados, grid_dist_sectors, stack)
+
+    def search_grid_dist_sections(self, load_node, load_nodes, sections, visitados, grid_dist_sections, stack):
+        for section in sections:
+            if section.n1 == load_node:
+                if section.switch is not None:
+                    if section.switch.state == 0:
+                        grid_dist_sections.append(section)    
+                        continue
+                if section.n2 not in visitados:
+                    visitados.append(section.n2)
+                    stack.append(section.n2)
+                    grid_dist_sections.append(section)
+                    return self.search_grid_dist_sections(section.n2, load_nodes, sections, visitados, grid_dist_sections, stack)
+            if section.n2 == load_node:
+                if section.switch is not None:
+                    if section.switch.state == 0:
+                        grid_dist_sections.append(section)
+                        continue
+                if section.n1 not in visitados:
+                    visitados.append(section.n1)
+                    stack.append(section.n1)
+                    grid_dist_sectors.append(section)
+                    return self.search_grid_dist_sections(section.n1, load_nodes, sections, visitados, grid_dist_sections, stack)
+        else:
+            stack.pop()
+            if stack == []:
+                return visitados, grid_dist_sections
+            else:
+                return self.search_grid_dist_sections(stack[len(stack)-1], load_nodes, sections, visitados, grid_dist_sections, stack)
+
+
+class ExternalGrid(object):
+    def __init__(self, name, vll):
+        self.vll = vll
+
+
 class Sector(Tree):
 
-    def __init__(self, name, neighbors, load_nodes, priority=0):
+    def __init__(self, name, load_nodes, priority=0):
         assert isinstance(name, str), 'O parametro name da classe' \
                                       'Sector deve ser do tipo string'
-        assert isinstance(neighbors, list), 'O parametro neighbors da classe' \
-                                           ' Sector deve ser do tipo list'
         assert isinstance(load_nodes, list), 'O parametro load_nodes da classe' \
                                                'Sector deve ser do tipo list'
         assert (priority >= 0 and priority <= 10), 'O valo de priority'\
@@ -22,16 +283,17 @@ class Sector(Tree):
         #                                    'Sector deve ser do tipo int'
         self.name = name
         self.priority = priority
-        self.neighbors = neighbors
-
-        self.associated_rnp = {i: None for i in self.neighbors}
 
         self.load_nodes = dict()
         for node in load_nodes:
-            node.sector = self.name
+            node.sector = self
             self.load_nodes[node.name] = node
 
         self.link_node = None
+
+    def set_neighbors(self, neighbors):
+        self.neighbors = neighbors
+        self.associated_rnp = {i.name: None for i in self.neighbors}
 
         tree_sector = self._generates_tree_sector()
         super(Sector, self).__init__(tree_sector, str)
@@ -46,8 +308,8 @@ class Sector(Tree):
             for k in j.neighbors:
                 # condição só considera vizinho o nó de carga que está
                 # node mesmo sector que o nó de carga analisado
-                if k in self.load_nodes.keys():
-                    neighbors.append(k)
+                if k in self.load_nodes.values():
+                    neighbors.append(k.name)
             tree_sector[i] = neighbors
 
         return tree_sector
@@ -60,23 +322,20 @@ class Sector(Tree):
 
         return power
 
-    def __str__(self):
+    def __repr__(self):
         return 'Sector: ' + self.name
 
 
 class LoadNode(object):
     def __init__(self,
                  name,
-                 neighbors=None,
                  power=0.0+0.0j,
-                 voltage=0.0+2j,
-                 generation=None,
-                 switchs=None):
+                 voltage=0.0+0.0j,
+                 external_grid=None):
         assert isinstance(name, str), 'O parâmetro name da classe LoadNode' \
                                       ' deve ser do tipo string'
 
         self.name = name
-        self.neighbors = neighbors
 
         self._vp = np.zeros((3, 1), dtype=complex)
         self._pp = np.zeros((3, 1), dtype=complex)
@@ -86,14 +345,12 @@ class LoadNode(object):
         self.config_load(power=power)
         self.config_voltage(voltage=voltage)
 
-        if switchs is not None:
-            assert isinstance(switchs, list), 'O parâmetro switchs da classe LoadNode' \
-                                             ' deve ser do tipo list'
-            self.switchs = switchs
-        else:
-            self.switchs = list()
-
+        self.switchs = list()
         self.sector = None
+        self.external_grid = external_grid
+
+    def set_neighbors(self, neighbors):
+        self.neighbors = neighbors
 
     def config_load(self,
                     ppa=0.0+0.0j,
@@ -246,7 +503,7 @@ class LoadNode(object):
         self._ppc = valor
         self._pp[2] = valor
 
-    def __str__(self):
+    def __repr__(self):
         return 'Load Node: ' + self.name
 
 
@@ -263,8 +520,8 @@ class Substation(object):
         self.name = name
 
         self.feeders = dict()
-        for feeder in feeders:
-            self.feeders[feeder.name] = feeder
+        for grid_dist in feeders:
+            self.feeders[grid_dist.name] = grid_dist
 
         self.transformers = dict()
         for transformer in transformers:
@@ -276,27 +533,38 @@ class Section(Edge):
                  name,
                  n1,
                  n2,
+                 switch=None,
+                 transformer=None,
                  conductor=None,
                  line_model=None,
                  length=None):
         assert isinstance(name, str), 'O parametro name da classe Section ' \
                                       'deve ser do tipo str'
-        assert isinstance(n1, LoadNode) or isinstance(n1, Switch), 'O parametro n1 da classe Section ' \
-                                                                   'deve ser do tipo No de carga ' \
-                                                                   'ou do tipo Switch'
-        assert isinstance(n2, LoadNode) or isinstance(n2, Switch), 'O parâmetro n2 da classe Section ' \
-                                                                   'deve ser do tipo No de carga ' \
-                                                                   'ou do tipo Switch'
+        assert isinstance(n1, LoadNode), 'O parametro n1 da classe Section ' \
+                                                                   'deve ser do tipo No de carga '
+        assert isinstance(n2, LoadNode), 'O parâmetro n2 da classe Section ' \
+                                                                   'deve ser do tipo No de carga '
 
         super(Section, self).__init__(name)
         self.n1 = n1
         self.n2 = n2
+        self.switch = switch
+
+        if switch is not None:
+            self.n1.switchs.append(self.switch)
+            self.n2.switchs.append(self.switch)
+
         self.upstream_node = None
         self.downstream_node = None
-        self.conductor = conductor
-        self.length = length
-        self.line_model = line_model
-        self._set_line_model(line_model)
+
+        if transformer is not None:
+            self.transformer = transformer
+            self._set_transformer_model(transformer)
+        else:
+            self.conductor = conductor
+            self.length = length
+            self.line_model = line_model
+            self._set_line_model(line_model)
 
     def _set_line_model(self, line_model):
         self.Z = line_model.z * self.length
@@ -316,6 +584,19 @@ class Section(Edge):
         cd = np.concatenate((self.c, self.d), axis=1)
         self.abcd = np.concatenate((ab, cd), axis=0)
 
+        self.A = np.linalg.inv(self.a)
+        self.B = np.dot(self.A, self.b)
+
+    def _set_transformer_model(self, transformer):
+        self.a = transformer.a
+        self.b = transformer.b
+        self.c = transformer.c
+        self.d = transformer.d
+        self.abcd = transformer.abcd
+        self.A = transformer.A
+        self.B = transformer.B
+
+    # Em breve este metodo sera removido!!!!
     def calc_impedance(self):
         return (self.length * self.conductor.rp,
                 self.length * self.conductor.xp)
@@ -333,6 +614,7 @@ class Section(Edge):
 
     def __repr__(self):
         return 'Section: %s' % self.name
+
 
 class LineModel(object):
     
@@ -405,6 +687,9 @@ class LineModel(object):
         ab = np.concatenate((self.a, self.b), axis=1)
         cd = np.concatenate((self.c, self.d), axis=1)
         self.abcd = np.concatenate((ab, cd), axis=0)
+
+        self.A = np.linalg.inv(self.a)
+        self.B = np.dot(self.A, self.b)
 
     def _calc_primitive_z_matrix(self, loc):
         # carson equations reference:
@@ -488,23 +773,82 @@ class LineModel(object):
         return P
 
 
-class Feeder(Tree):
-    def __init__(self, name, sectors, sections, switchs):
-        assert isinstance(name, str), 'O parametro name da classe Feeder' \
+class TransformerModel(object):
+    def __init__(self,
+                 name,
+                 primary_voltage,
+                 secondary_voltage,
+                 power,
+                 impedance,
+                 connection='Dyn'):
+        assert isinstance(name, str), 'O parâmetro name deve ser do tipo str'
+        
+        self.name = name
+        self.connection = connection
+        self.power = power
+        self.zt = impedance
+
+        if self.connection == 'Dyn':
+            self.VLL = primary_voltage
+            self.Vll = secondary_voltage
+            self.at = self.VLL / self.Vll
+            self.nt = self.VLL / (self.Vll / np.sqrt(3.0))
+
+            self.a = - self.nt / 3.0 * np.array([[0.0, 2.0, 1.0],
+                                                 [1.0, 0.0, 2.0],
+                                                 [2.0, 1.0, 0.0]])
+            self.b = - self.nt / 3.0 * np.array([[0.0, 2.0 * self.zt, self.zt],
+                                                 [self.zt, 0.0, 2.0 * self.zt],
+                                                 [2.0 * self.zt, self.zt, 0.0]])
+            self.c = np.zeros((3, 3))
+            self.d = 1.0 / self.nt * np.array([[1.0, -1.0, 0.0],
+                                               [0.0, 1.0, -1.0],
+                                               [-1.0, 0.0, 1.0]])
+            ab = np.concatenate((self.a, self.b), axis=1)
+            cd = np.concatenate((self.c, self.d), axis=1)
+            self.abcd = np.concatenate((ab, cd), axis=0)
+
+            self.A = 1 / self.nt * np.array([[1.0, 0.0, -1.0],
+                                             [-1.0, 1.0, 0.0],
+                                             [0.0, -1.0, 1.0]])
+            self.B = self.zt * np.identity(3)
+
+
+class Switch(Edge):
+    def __init__(self, name, state=1):
+        assert state == 1 or state == 0, 'O parametro state deve ser um inteiro de valor 1 ou 0'
+        super(Switch, self).__init__(name=name)
+        self.state = state
+        self.n1 = None
+        self.n2 = None
+
+    def set_sector(self, sector):
+        if self.n1 is None:
+            self.n1 = sector
+        elif self.n2 is None:
+            self.n2 = sector
+        else:
+            raise Exception('Switch sectors are defined!')
+
+    def __repr__(self):
+        if self.n1 is not None and self.n2 is not None:
+            return 'Switch: %s - n1: %s, n2: %s' % (self.name, self.n1.name, self.n2.name)
+        else:
+            return 'Switch: %s' % self.name
+
+
+class DistGrid(Tree):
+
+    def __init__(self, name, sectors, sections):
+        assert isinstance(name, str), 'O parametro name da classe DistGrid' \
                                       'deve ser do tipo string'
         assert isinstance(sectors, list), 'O parametro sectors da classe' \
-                                          'Feeder deve ser do tipo list'
-        assert isinstance(switchs, list), 'O parametro switchs da classe' \
-                                         'Feeder deve ser do tipo list'
+                                          'DistGrid deve ser do tipo list'
         self.name = name
 
         self.sectors = dict()
         for sector in sectors:
             self.sectors[sector.name] = sector
-
-        self.switchs = dict()
-        for switch in switchs:
-            self.switchs[switch.name] = switch
 
         self.load_nodes = dict()
         for sector in sectors:
@@ -515,6 +859,28 @@ class Feeder(Tree):
         for section in sections:
             self.sections[section.name] = section
 
+        self.switchs = dict()
+        for section in sections:
+            if section.switch is not None:
+                self.switchs[section.switch.name] = section.switch       
+
+    def order(self, root):
+
+        _grid_tree = self._generate_grid_tree()
+        super(DistGrid, self).__init__(_grid_tree, str)
+
+        super(DistGrid, self).order(root)
+
+        self._associate_rnp()
+
+        for sector in self.sectors.values():
+            path = self.node_to_root_path(sector.name)
+            if sector.name != root:
+                downstream_sector = path[1, 1]
+                sector.rnp = sector.associated_rnp[downstream_sector][1]
+
+    def _associate_rnp(self):
+        # RNP assotiated determination
         for sector in self.sectors.values():
             neighbors_sectors = list()
             for switch in self.switchs.values():
@@ -527,7 +893,7 @@ class Feeder(Tree):
                 link_nodes = list()
                 for i in sector.load_nodes.values():
                     for j in neighbor_sector.load_nodes.values():
-                        if i.name in j.neighbors:
+                        if i in j.neighbors:
                             link_nodes.append((j, i))
 
                 for node in link_nodes:
@@ -535,21 +901,9 @@ class Feeder(Tree):
                     sector.associated_rnp[neighbor_sector.name] = (node[0],
                                                                 sector.rnp)
 
-        _grid_tree = self._generate_grid_tree()
-
-        super(Feeder, self).__init__(_grid_tree, str)
-
-    def order(self, root):
-        super(Feeder, self).order(root)
-
-        for sector in self.sectors.values():
-            path = self.node_to_root_path(sector.name)
-            if sector.name != root:
-                downstream_sector = path[1, 1]
-                sector.rnp = sector.associated_rnp[downstream_sector][1]
-
     def _generate_grid_tree(self):
-
+        """
+        """
         grid_tree = {i: list() for i in self.sectors.keys()}
 
         for switch in self.switchs.values():
@@ -566,7 +920,7 @@ class Feeder(Tree):
         # nós de carga a povoarem a tree nós de carga e a rnp nós de carga
         root_sector = self.sectors[self.rnp[1][0]]
         self.load_nodes_tree = Tree(tree=root_sector._generates_tree_sector(),
-                                          dtype=str)
+                                    dtype=str)
         self.load_nodes_tree.order(root=root_sector.rnp[1][0])
 
         # define as listas visited e stack, necessárias ao
@@ -582,8 +936,8 @@ class Feeder(Tree):
     def _generate_load_nodes_tree(self, sector, visited, stack):
 
         # atualiza as listas de recursão
-        visited.append(sector.name)
-        stack.append(sector.name)
+        visited.append(sector)
+        stack.append(sector)
 
         # for percorre os sectors neighbors ao sector atual
         # que ainda não tenham sido visited
@@ -594,14 +948,14 @@ class Feeder(Tree):
             # entre os sectors de uma mesma subestação, mas
             # que possuem uma switch normalmente aberta entre eles.
             # caso isto seja constatado o laço for é interrompido.
-            if i not in visited and i in self.sectors.keys():
+            if i not in visited and i in self.sectors.values():
                 for c in self.switchs.values():
-                    if c.n1.name == sector.name and c.n2.name == i:
+                    if c.n1 == sector and c.n2 == i:
                         if c.state == 1:
                             break
                         else:
                             pass
-                    elif c.n2.name == sector.name and c.n1.name == i:
+                    elif c.n2 == sector and c.n1 == i:
                         if c.state == 1:
                             break
                         else:
@@ -609,7 +963,7 @@ class Feeder(Tree):
                 else:
                     continue
                 next_ = i
-                neighbor_sector = self.sectors[i]
+                neighbor_sector = self.sectors[i.name]
                 insertion_node, insertion_rnp = neighbor_sector.associated_rnp[sector.name]
                 insertion_tree = neighbor_sector._generates_tree_sector()
 
@@ -629,11 +983,11 @@ class Feeder(Tree):
             stack.pop()
             if stack:
                 previous = stack.pop()
-                return self._generate_load_nodes_tree(self.sectors[previous],
+                return self._generate_load_nodes_tree(self.sectors[previous.name],
                                                        visited, stack)
             else:
                 return
-        return self._generate_load_nodes_tree(self.sectors[next_],
+        return self._generate_load_nodes_tree(self.sectors[next_.name],
                                                visited,
                                                stack)
 
@@ -706,7 +1060,7 @@ class Feeder(Tree):
         return power
 
     def prune(self, node, change_rnp=True):
-        prune = super(Feeder, self).prune(node, change_rnp)
+        prune = super(DistGrid, self).prune(node, change_rnp)
         sectors_rnp = prune[0]
         sectors_tree = prune[1]
 
@@ -776,16 +1130,16 @@ class Feeder(Tree):
          load_nodes, load_nodes_tree, load_nodes_rnp,
          switchs, sections) = prune
 
-        # atualiza sectors do feeder
+        # atualiza sectors do grid_dist
         self.sectors.update(sectors)
 
-        # atualiza os nos de carga do feeder
+        # atualiza os nos de carga do grid_dist
         self.load_nodes.update(load_nodes)
 
-        # atualiza as switchs do feeder
+        # atualiza as switchs do grid_dist
         self.switchs.update(switchs)
 
-        # atualiza os sections do feeder
+        # atualiza os sections do grid_dist
         self.sections.update(sections)
 
         if root_node is None:
@@ -818,43 +1172,15 @@ class Feeder(Tree):
         self.switchs[link_switchs.keys()[i]].state = 1
 
         if insert_to_sector.name == sectors[sectors_rnp[1, 0]].name:
-            super(Feeder, self).insert_branch(node, (sectors_rnp, sectors_tree))
+            super(DistGrid, self).insert_branch(node, (sectors_rnp, sectors_tree))
         else:
-            super(Feeder, self).insert_branch(node, (sectors_rnp, sectors_tree), root_node)
+            super(DistGrid, self).insert_branch(node, (sectors_rnp, sectors_tree), root_node)
 
-        # atualiza a tree de sectors do feeder
+        # atualiza a tree de sectors do grid_dist
         self.update_grid_tree()
 
-        # atualiza a tree de nos de carga do feeder
+        # atualiza a tree de nos de carga do grid_dist
         self.generate_load_nodes_tree()
-
-
-class Switch(Edge):
-    def __init__(self, name, state=1):
-        assert state == 1 or state == 0, 'O parametro state deve ser um inteiro de valor 1 ou 0'
-        super(Switch, self).__init__(name=name)
-        self.state = state
-
-    def __str__(self):
-        if self.n1 is not None and self.n2 is not None:
-            return 'Switch: %s - n1: %s, n2: %s' % (self.name, self.n1.name, self.n2.name)
-        else:
-            return 'Switch: %s' % self.name
-
-
-class Transformer(object):
-    def __init__(self, name, primary_voltage, secondary_voltage, power, impedance):
-        assert isinstance(name, str), 'O parâmetro name deve ser do tipo str'
-        assert isinstance(secondary_voltage, Phasor), 'O parâmetro secondary_voltage deve ser do tipo Fasor'
-        assert isinstance(primary_voltage, Phasor), 'O parâmetro primary_voltage deve ser do tipo Fasor'
-        assert isinstance(power, Phasor), 'O parâmetro power deve ser do tipo Fasor'
-        assert isinstance(impedance, Phasor), 'O parâmetro impedance deve ser do tipo Fasor'
-
-        self.name = name
-        self.primary_voltage = primary_voltage
-        self.secondary_voltage = secondary_voltage
-        self.power = power
-        self.impedance = impedance
 
 
 class Conductor(object):
@@ -879,6 +1205,7 @@ class Conductor(object):
             fp = open(os.path.join(basedir, 'data/conductors.json'))
             conductors_data = json.load(fp)
             self.conductor_data = conductors_data[id]
+
 
 if __name__ == '__main__':
     pass
