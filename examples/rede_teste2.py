@@ -1,4 +1,4 @@
-from mygrid.grid import GridElements, ExternalGrid
+from mygrid.grid import GridElements, ExternalGrid, PV, PQ
 from mygrid.grid import Substation, Sector, Switch, LineModel
 from mygrid.grid import Section, LoadNode, TransformerModel, Conductor
 from mygrid.util import R, P
@@ -80,6 +80,35 @@ t1 = TransformerModel(name="T1",
 
 eg1 = ExternalGrid(name='extern grid 1', vll=vll_mt)
 
+# Definição GD's
+
+c2_PV=PV(name="c2_PV",
+         P=10e3 + 0j,
+         Qmin=-200.0e3j,
+         Qmax=200.0e3j,
+         Vmin=0.95,
+         Vmax=1.05,
+         Vspecified=0.98,
+         DV_presc=0.002)
+c3_PV=PV(name="c3_PV",
+         P=10e3 + 0j,
+         Qmin=-200.0e3j,
+         Qmax=200.0e3j,
+         Vmin=0.95,
+         Vmax=1.05,
+         Vspecified=0.98,
+         DV_presc=0.002)
+b2_PV=PV(name="b2_PV",
+         P=10e3 + 0j,
+         Qmin=-200.0e3j,
+         Qmax=200.0e3j,
+         Vmin=0.95,
+         Vmax=1.05,
+         Vspecified=0.98,
+         DV_presc=0.002)
+b1_PQ=PQ(name="b1_PV",
+         P=500e3+300e3j)
+
 # Nos de carga do alimentador S1_AL1
 s1 = LoadNode(name='S1',
               voltage=vll_mt,
@@ -95,9 +124,11 @@ a3 = LoadNode(name='A3',
               voltage=vll_mt)
 b1 = LoadNode(name='B1',
               power=200.0e3 + 140.0e3j,
+              generation=b1_PQ,
               voltage=vll_mt)
 b2 = LoadNode(name='B2',
               power=150.0e3 + 110.0e3j,
+              generation=b2_PV,
               voltage=vll_mt)
 b3 = LoadNode(name='B3',
               power=100.0e3 + 80.0e3j,
@@ -107,9 +138,11 @@ c1 = LoadNode(name='C1',
               voltage=vll_mt)
 c2 = LoadNode(name='C2',
               power=150.0e3 + 110.0e3j,
+              generation=c2_PV,
               voltage=vll_mt)
 c3 = LoadNode(name='C3',
               power=100.0e3 + 80.0e3j,
+              generation=c3_PV,
               voltage=vll_mt)
 
 # Nos de carga do alimentador S1_AL1
@@ -338,7 +371,7 @@ grid_elements.create_grid()
 
 # calculo de fluxo de carga
 
-calc_power_flow(grid_elements.dist_grids['F0'])
+calc_power_flow(grid_elements.dist_grids['F0'], 13.8e3)
 
 # # calculo de curto circuito
 
