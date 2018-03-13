@@ -264,6 +264,81 @@ class GridElements(object):
                 return self.search_grid_dist_sections(stack[len(stack)-1], load_nodes, sections, visitados, grid_dist_sections, stack)
 
 
+    def nodes_table_voltage(self,type_volts="pu"):
+        if type_volts=="pu":
+            v="pu"
+            va_name="Va (p.u)"
+            vb_name="Vb (p.u)"
+            vc_name="Vc (p.u)"
+
+        elif type_volts=="module":
+            v=1
+            va_name="Va (V)"
+            vb_name="Vb (V)"
+            vc_name="Vc (V)"
+
+
+        
+
+        for i in self.dist_grids:
+            load_nodes=self.dist_grids[i].load_nodes
+            title="Grid_Name: "+ i
+            node_data=[["node name",
+                     va_name,
+                     vb_name,
+                     vc_name,
+                     "Load_Pa (kVA)",
+                     "Load_Pb (kVA)",
+                     "Load_Pc (kVA)",
+                     "DG_Pa (kW +KVar)",
+                     "DG_Pb (kW +KVar)",
+                     "DG_Pc (kW +KVar)"
+                     ]]
+            for name_node in load_nodes:
+                
+
+                node=self.load_nodes[name_node]
+                node_data.append([node.name,
+
+                                   str(round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                    if v =="pu" else 1),4)) +\
+                                        "∠"+str(round(np.angle(node.vpa, deg=True),2))+"°",
+                                   str(round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                    if v =="pu" else 1),4)) +\
+                                        "∠"+str(round(np.angle(node.vpb, deg=True),2))+"°",
+                                   str(round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                    if v =="pu" else 1),4)) +\
+                                        "∠"+str(round(np.angle(node.vpc, deg=True),2))+"°",
+
+                                   str(round(np.abs(node.ppa)/1000,2))+u"∠"\
+                                   +str(round(np.angle(node.ppa, deg=True),2))+"°",
+                                   str(round(np.abs(node.ppb)/1000,2))+u"∠"\
+                                   +str(round(np.angle(node.ppb, deg=True),2))+"°",
+                                   str(round(np.abs(node.ppc)/1000,2))+u"∠"\
+                                   +str(round(np.angle(node.ppc, deg=True),2))+"°",
+
+                                   str(round(node.generation.Pa.real/1000,2))\
+                                   +("+" if node.generation != None and \
+                                   node.generation.Pa.imag > 0 else "")+\
+                                   str(round(node.generation.Pa.imag/1000,2))+"j"\
+                                   if node.generation != None else "",
+
+                                   str(round(node.generation.Pb.real/1000,2))\
+                                   +("+" if node.generation != None and \
+                                   node.generation.Pb.imag > 0 else "")+\
+                                   str(round(node.generation.Pb.imag/1000,2))+"j"\
+                                   if node.generation != None else "",
+
+                                   str(round(node.generation.Pc.real/1000,2))\
+                                   +("+" if node.generation != None and \
+                                   node.generation.Pc.imag > 0 else "")+\
+                                   str(round(node.generation.Pc.imag/1000,2))+"j"\
+                                   if node.generation != None else ""])
+
+            table=AsciiTable(node_data)
+            table.title=title
+            print(table.table)
+
 class ExternalGrid(object):
     def __init__(self, name, vll):
         self.vll = vll
@@ -325,35 +400,44 @@ class Sector(Tree):
     def __repr__(self):
         return 'Sector: ' + self.name
 
+    
+
 
 class LoadNode(object):
     def __init__(self,
                  name,
-                 power=0.0+0.0j,
+                 power=None,
+                 ppa=0.0+0.0j,
+                 ppb=0.0+0.0j,
+                 ppc=0.0+0.0j,
                  voltage=0.0+0.0j,
                  generation=None,
+                 type_connection="wye",
+                 shunt_capacitor=None,
                  external_grid=None):
         assert isinstance(name, str), 'O parâmetro name da classe LoadNode' \
                                       ' deve ser do tipo string'
 
         self.name = name
         self.generation = generation
-
+        self.type_connection=type_connection
+        self.shunt_capacitor=shunt_capacitor
+   
         self._vp = np.zeros((3, 1), dtype=complex)
         self._pp = np.zeros((3, 1), dtype=complex)
         self.i = np.zeros((3, 1), dtype=complex)
         self._ip = np.zeros((3, 1), dtype=complex)
         self.iin = np.zeros((3, 1), dtype=complex)
+        self.ineu=self._ip.sum()
+        self.D=np.array([[1,-1,0],[0,1,-1],[-1,0,1]])
+
         
-
-        if self.generation != None and self.generation.type=="PV":
-            self.voltage=voltage*self.generation.Vspecified
-        else:
-            self.voltage=voltage
-
+        self.voltage=voltage
         self.voltage_nom=voltage
 
-
+        self.ppa=ppa
+        self.ppb=ppb
+        self.ppc=ppc
         self.config_load(power=power)
         self.config_voltage(voltage=self.voltage)
 
@@ -373,7 +457,6 @@ class LoadNode(object):
         if power is not None:
             if self.generation is not None:
                 self.ppa = self.ppb = self.ppc = 1.0/3.0 * power + self.generation.P/3
-                print(self.ppa,self.ppb ,self.ppc)
             
             else:
                 self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
@@ -381,14 +464,14 @@ class LoadNode(object):
         else:
 
             if self.generation is not None:
-                self.ppa = ppa + self.generation.Pa
-                self.ppb = ppb + self.generation.Pb
-                self.ppc = ppc + self.generation.Pc
+                self.ppa = self.ppa + self.generation.Pa
+                self.ppb = self.ppb + self.generation.Pb
+                self.ppc = self.ppc + self.generation.Pc
 
             else:
-                self.ppa = ppa
-                self.ppb = ppb
-                self.ppc = pcc
+                self.ppa = self.ppa
+                self.ppb = self.ppb
+                self.ppc = self.ppc
 
         self.zipmodel = np.array(zipmodel)
 
@@ -408,36 +491,49 @@ class LoadNode(object):
             self.vpb = vpb
             self.vpc = vpc
 
+        self.vpl=np.dot(self.D,self._vp)
         self._calc_currents()
 
     def _calc_currents(self):
+        if self.type_connection=="delta":
+            self.vpm=self.vpl
+
+        elif self.type_connection=="wye":
+            self.vpm=self.vp
+            
         if self.pp.all() == 0.0+0.0j:
             self.i = np.zeros((3, 1), dtype=complex)
+
         else:
 
-            if self.generation !=  None:
-
-                ppdg = np.zeros((3, 1), dtype=complex)
-                ppdg[0,0] = self.generation.Pa
-                ppdg[1,0] = self.generation.Pb
-                ppdg[2,0] = self.generation.Pc
-
-                self.ipq = self.zipmodel[0] * np.conjugate((self.pp + ppdg) / self.vp)
-                self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
-                self.iz = self.zipmodel[1] * (self.vp / self.z)
-                self.ii = self.zipmodel[2] * self.vp / self.z
-                self.i =  self.ipq + self.iz + self.ii
-                self.i.shape = (3, 1)
+            if self.shunt_capacitor is not None:
+                i_shunt_C=self.shunt_capacitor.calc_currents(self.vpa,self.vpb,self.vpc)
 
             else:
+                i_shunt_C=0
 
-                self.ipq = self.zipmodel[0] * np.conjugate(self.pp / self.vp)
-                self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
-                self.iz = self.zipmodel[1] * (self.vp / self.z)
-                self.ii = self.zipmodel[2] * self.vp / self.z
-                self.i =  self.ipq + self.iz + self.ii
-                self.i.shape = (3, 1)
 
+            if self.generation !=  None:
+                if self.generation.type_connection=="wye":
+                    i_gd=np.conjugate(self.generation.pp/self.vp)
+                elif self.generation.type_connection=="delta":
+                    i_gd=np.conjugate(self.generation.pp/self.vpl)
+                    i_gd=np.dot(self.D.T,i_gd)
+
+            else:
+                i_gd=0
+
+
+            self.ipq = self.zipmodel[0] * np.conjugate((self.pp) / self.vpm)
+            self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
+            self.iz = self.zipmodel[1] * (self.vpm / self.z)
+            self.ii = self.zipmodel[2] * self.vpm / self.z
+            self.i =  self.ipq + self.iz + self.ii
+            self.i.shape = (3, 1)
+            if self.type_connection=="delta":
+                self.i=np.dot(self.D.T,self.i) + i_shunt_C+i_gd
+            elif self.type_connection=="wye":
+                self.i=self.i + i_shunt_C+i_gd
     @property
     def VI(self):
         return self._VI
@@ -550,54 +646,107 @@ class LoadNode(object):
         return 'Load Node: ' + self.name
 
 
-class PV(object):
+class Generation(object):
+    """ Modelo of PV or PQ generation.
+
+    Parameters:
+    ----------
+    name : str
+        generation name
+    Pa : float
+        complex power in phase a
+    Pb : float
+        complex power in phase b
+    Pc : float
+        complex power in phase c
+    P : float
+        three phase power
+    Qmin : float
+        minimum VAr
+    Qmax : float
+        maximum VAr
+    Vmin : float
+        minimum voltage in p.u
+    Vmax : float
+        maximum voltage in p.u
+    Vspecified : float
+        specified voltage in p.u
+    DV_presc : float
+        precision on p.u
+    generation_type: str
+        'PV' or 'PQ'
+    type_connection : str
+        'wye' or 'delta'
+    """
     def __init__(self,name,Pa=0.0+0.0j,Pb=0.0+0.0j,Pc=0.0+0.0j,
                  P=None,Qmin=0.0+0.0j,Qmax=0.0+0.0j,
-                 Vmin=0.95,Vmax=1.05,Vspecified=None,DV_presc=0.005):
-    
-        self.PV_Provides = False
-        self.PV_Consumes = False
-        self.name = name
-        self.type = "PV"
-        self.no_limit_PV = True
-        self.DV_presc = DV_presc
+                 Vmin=0.95,Vmax=1.05,Vspecified=None,DV_presc=0.005,generation_type="PQ",
+                 type_connection="wye"):
 
-        if P is not None:
-            self.P = -P
-            self.Pa = self.Pb = self.Pc = 1.0/3.0 *self.P
-            self.phase_a_gd = True
-            self.phase_b_gd = True
-            self.phase_c_gd = True
-            self.gd_type_phase = "three"
 
-        else:
-            self.Pa = -Pa
-            self.Pb = -Pb
-            self.Pc = -Pc
-            self.P = P
-            self.gd_type_phase = "mono"
+        self.type_connection=type_connection
+        if generation_type=="PV":
+            self.PV_Provides=False
+            self.PV_Consumes=False
+            self.name=name
+            self.type="PV"
+            self.no_limit_PV=True
+            self.DV_presc=DV_presc
 
-        self.Qmin = Qmin
-        self.Qmax = Qmax
+            if P is not None:
+                self.P=-P
+                self.Pa=self.Pb=self.Pc=1.0/3.0 *self.P
+                self.phase_a_gd=True
+                self.phase_b_gd=True
+                self.phase_c_gd=True
+                self.gd_type_phase="three"
 
-        self.Vmin = Vmin
-        self.Vmax = Vmax
+            else:
+                self.Pa=-Pa
+                self.Pb=-Pb
+                self.Pc=-Pc
+                self.P=P
+                self.gd_type_phase="mono"
 
-        if Vspecified is None:
-            self.Vspecified = (Vmin + Vmax) / 2.0
+            self.Qmin=Qmin
+            self.Qmax=Qmax
 
-        else:
-            self.Vspecified = Vspecified
+            self.Vmin=Vmin
+            self.Vmax=Vmax
 
-    def update_Q(self,Qa,Qb,Qc):
+            if Vspecified is None:
+                self.Vspecified=(Vmin+Vmax)/2
 
-        self.Qa=Qa
-        self.Qb=Qb
-        self.Qc=Qc
-        self.Pa= Qa+self.Pa
-        self.Pb= Qb+self.Pb
-        self.Pc= Qc+self.Pc
-        self.P=  (Qa+Qb+Qc)+self.P
+            else:
+                self.Vspecified=Vspecified
+
+
+
+        elif generation_type=="PQ":
+
+            self.name=name
+            self.type="PQ"
+
+            if P is not None:
+
+                self.P=-P
+                self.Pa=self.Pb=self.Pc=-P/3
+            else:
+                self.Pa=-Pa
+                self.Pb=-Pb
+                self.Pc=-Pc
+                self.P=P
+
+        self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
+
+    def update_Q(self,Q):
+
+        self.Qa= self.Qb=self.Qc=Q
+        self.Pa= self.Qa+self.Pa
+        self.Pb= self.Qb+self.Pb
+        self.Pc= self.Qc+self.Pc
+        self.P=  (self.Qa+self.Qb+self.Qc)+self.P
+
 
         
 
@@ -616,27 +765,8 @@ class PV(object):
             self.no_limit_PV=False
             self.type=None
 
+        self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
 
-class PQ(object):
-    def __init__(self,
-                 name,
-                 P=None,
-                 Pa=0.0+0.0j,
-                 Pb=0.0+0.0j,
-                 Pc=0.0+0.0j):
-
-        self.name=name
-        self.type="PQ"
-
-        if P is not None:
-
-            self.P = -P
-            self.Pa = self.Pb = self.Pc = -P/3
-        else:
-            self.Pa = -Pa
-            self.Pb = -Pb
-            self.Pc = -Pc
-            self.P = P
 
 
 class Substation(object):
@@ -659,75 +789,7 @@ class Substation(object):
         for transformer in transformers:
             self.transformers[transformer.name] = transformer
 
-    def nodes_table_voltage(self,type_volts="pu"):
-        if type_volts=="pu":
-            v="pu"
-            va_name="Va (p.u)"
-            vb_name="Vb (p.u)"
-            vc_name="Vc (p.u)"
 
-        elif type_volts=="module":
-            v=1
-            va_name="Va (V)"
-            vb_name="Vb (V)"
-            vc_name="Vc (V)"
-
-
-        for name_feeder in self.feeders:
-            
-            title=name_feeder
-            node_data=[["node name",
-                         va_name,
-                         vb_name,
-                         vc_name,
-                         "Load_Pa (kVA)",
-                         "Load_Pb (kVA)",
-                         "Load_Pc (kVA)",
-                         "DG_Pa (kW +KVar)",
-                         "DG_Pb (kW +KVar)",
-                         "DG_Pc (kW +KVar)"
-                         ]]
-            for node in self.feeders[name_feeder].load_nodes.values():
-                node_data.append([node.name,
-
-                                   str(round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
-                                    if v =="pu" else 1),4)) +\
-                                        "∠"+str(round(np.angle(node.vpa, deg=True),2))+"°",
-                                   str(round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
-                                    if v =="pu" else 1),4)) +\
-                                        "∠"+str(round(np.angle(node.vpb, deg=True),2))+"°",
-                                   str(round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
-                                    if v =="pu" else 1),4)) +\
-                                        "∠"+str(round(np.angle(node.vpc, deg=True),2))+"°",
-
-                                   str(round(np.abs(node.ppa)/1000,2))+u"∠"\
-                                   +str(round(np.angle(node.ppa, deg=True),2))+"°",
-                                   str(round(np.abs(node.ppb)/1000,2))+u"∠"\
-                                   +str(round(np.angle(node.ppb, deg=True),2))+"°",
-                                   str(round(np.abs(node.ppc)/1000,2))+u"∠"\
-                                   +str(round(np.angle(node.ppc, deg=True),2))+"°",
-
-                                   str(round(node.generation.Pa.real/1000,2))\
-                                   +("+" if node.generation != None and \
-                                   node.generation.Pa.imag > 0 else "")+\
-                                   str(round(node.generation.Pa.imag/1000,2))+"j"\
-                                   if node.generation != None else "",
-
-                                   str(round(node.generation.Pb.real/1000,2))\
-                                   +("+" if node.generation != None and \
-                                   node.generation.Pb.imag > 0 else "")+\
-                                   str(round(node.generation.Pb.imag/1000,2))+"j"\
-                                   if node.generation != None else "",
-
-                                   str(round(node.generation.Pc.real/1000,2))\
-                                   +("+" if node.generation != None and \
-                                   node.generation.Pc.imag > 0 else "")+\
-                                   str(round(node.generation.Pc.imag/1000,2))+"j"\
-                                   if node.generation != None else ""])
-
-            table=AsciiTable(node_data)
-            table.title=title
-            print(table.table)
 
 
 
@@ -752,6 +814,7 @@ class Section(Edge):
         self.n1 = n1
         self.n2 = n2
         self.switch = switch
+        self.transformer = transformer
 
         if switch is not None:
             self.n1.switchs.append(self.switch)
@@ -761,8 +824,9 @@ class Section(Edge):
         self.downstream_node = None
 
         if transformer is not None:
-            self.transformer = transformer
-            self._set_transformer_model(transformer)
+            self._set_transformer_model()
+            self.transformer_visited=False
+            self.line_model = line_model
         else:
             self.conductor = conductor
             self.length = length
@@ -790,14 +854,14 @@ class Section(Edge):
         self.A = np.linalg.inv(self.a)
         self.B = np.dot(self.A, self.b)
 
-    def _set_transformer_model(self, transformer):
-        self.a = transformer.a
-        self.b = transformer.b
-        self.c = transformer.c
-        self.d = transformer.d
-        self.abcd = transformer.abcd
-        self.A = transformer.A
-        self.B = transformer.B
+    def _set_transformer_model(self):
+        self.a = self.transformer.a
+        self.b = self.transformer.b
+        self.c = self.transformer.c
+        self.d = self.transformer.d
+        self.abcd = self.transformer.abcd
+        self.A = self.transformer.A
+        self.B = self.transformer.B
 
     # Em breve este metodo sera removido!!!!
     def calc_impedance(self):
@@ -863,7 +927,6 @@ class LineModel(object):
                       [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
                       [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
         self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
-        print(self.z012)
 
         # --------------------------------------
         # Shunt Admittance Y matrix calculation
@@ -977,6 +1040,68 @@ class LineModel(object):
         return P
 
 
+class Shunt_Capacitor(object):
+    """ Model of shunt capacitor
+
+        Parameters
+        ----------
+        vll : float
+            line voltage.
+        Qa : float
+            Var in phase a
+        Qc : float
+            Var in phase b
+        Qb : float
+            Var in phase c
+
+        type_connection : str
+            "wye" or "delta"
+
+        """
+    def __init__(self,vll, Qa,Qb,Qc,type_connection):
+        self.vll=vll/1000
+        self.Qa=Qa/1000
+        self.Qb=Qa/1000
+        self.Qc=Qa/1000
+        self.type_connection=type_connection
+
+    def calc_currents(self,va,vb,vc):
+        """ Compute the injected current by shunt capacitor.
+
+        Parameters
+        ----------
+
+        va : float
+            voltage on phase a
+        vb : float
+            voltage on phase b
+        vc : float
+            voltage on phase c
+        """
+
+        if self.type_connection =="wye":
+            self.ba=1j*self.Qa/(((self.vll/np.sqrt(3))**2)*1000)
+            self.bb=1j*self.Qb/(((self.vll/np.sqrt(3))**2)*1000)
+            self.bc=1j*self.Qc/(((self.vll/np.sqrt(3))**2)*1000)
+            self.ia=self.ba*va
+            self.ib=self.bb*vb
+            self.ic=self.bc*vc
+            self.ipc=np.array([[self.ia],[self.ib],[self.ic]])
+            return self.ipc
+
+
+        elif self.type_connection =="delta":
+            self.ba=1j*self.Qa/(((self.vll/np.sqrt(3))**2)*1000)
+            self.bb=1j*self.Qb/(((self.vll/np.sqrt(3))**2)*1000)
+            self.bc=1j*self.Qc/(((self.vll/np.sqrt(3))**2)*1000)
+            self.iab=self.ba*(va-vb)
+            self.ibc=self.bb*(vb-vc)
+            self.ica=self.bc*(vc-va)
+            i_m=np.array([[self.iab],[self.ibc],[self.ica]])
+            _m=np.array([[1,0,-1],[-1,1,0],[0,-1,1]])
+            self.ipc=np.dot(_m,i_m)
+            return self.ipc
+
 class TransformerModel(object):
     def __init__(self,
                  name,
@@ -1016,6 +1141,202 @@ class TransformerModel(object):
                                              [-1.0, 1.0, 0.0],
                                              [0.0, -1.0, 1.0]])
             self.B = self.zt * np.identity(3)
+
+class Auto_TransformerModel(object):
+    """ Model of Autotransformer
+
+        Parameters:
+        ----------
+        name : str
+            Autotransformer name
+        step : float
+            step of regulation
+        tap_max : int
+            limit of steps
+        v_c : float
+            Nominal voltage of regulator,
+        v_c_min : float
+            minimum threshold
+        voltage : float
+            regulation voltage
+        connection : str
+            only 'nYYn'
+        tap_a : float
+            fixed tap to phase 'a'
+        tap_b float
+            fixed tap to phase 'b'
+        tap_c: float
+            fixed tap to phase 'c'
+        CTP : int
+            Rated current on primary CT
+        CTS : int
+            Rated current on secondary CT
+        R : float
+            compensating voltage (real)
+        X : float
+            compensating voltage (image)
+        r : float
+            accumulated resistance
+        x : float
+            accumulated reactance
+
+    """
+    def __init__(self,
+                 name,
+                 step,
+                 tap_max,
+                 v_c,
+                 v_c_min,
+                 voltage,
+                 connection='nYYn',
+                 tap_a=None,
+                 tap_b=None,
+                 tap_c=None,
+                 CTP=None,
+                 CTS=None,
+                 R=None,
+                 X=None,
+                 r=None,
+                 x=None):
+
+    
+        self.visited=False
+        self.name = name
+        self.step=step
+        self.tap_max=tap_max
+        self.v_c=v_c
+        self.v_c_min=v_c_min
+        self.voltage=voltage
+        self.connection = connection
+        self.tap_a=tap_a
+        self.tap_b=tap_b
+        self.tap_c=tap_c
+        self.CTP=CTP
+        self.CTS=CTS
+        self.vn=self.voltage/np.sqrt(3)
+        self.Npt=self.vn/self.v_c
+
+
+        if (R and X) != None:
+            self.R=R
+            self.X=X
+            self.r=self.R/self.CTS
+            self.x=self.X/self.CTS
+            self.z=self.r + self.x*1j
+
+            self.compesator_active=True
+            self.CT=self.CTP/self.CTS
+
+
+        elif (r and x) != None:
+            self.r=r
+            self.x=x
+            self.R=self.r*self.CTP/self.Npt
+            self.X=self.x*self.CTP/self.Npt
+            self.z=self.r + self.x*1j
+
+            self.compesator_active=True
+            self.CT=self.CTP/self.CTS
+
+        else:
+            self.compesator_active=False
+
+
+
+        if (self.tap_a and self.tap_b and self.tap_c) ==None:
+            self.tap_manual=False
+        else:
+            self.tap_manual=True
+
+        
+
+        
+        self.define_parameters(self.vn,self.vn,self.vn)
+
+    def define_parameters(self,va,vb,vc):
+
+        self.step_pu=self.step/self.v_c
+
+        if not(self.tap_manual):
+
+            if self.v_c_min >abs(va/self.Npt):
+                self.tap_a=np.abs(self.v_c_min - abs(va/self.Npt))/self.step
+            else:
+                self.tap_a=0
+            if self.v_c_min >abs(va/self.Npt):
+                self.tap_b=np.abs(self.v_c_min - abs(vb/self.Npt))/self.step
+            else:
+                self.tap_b=0
+
+            if self.v_c_min >abs(va/self.Npt):
+                self.tap_c=np.abs(self.v_c_min - abs(vc/self.Npt))/self.step
+            else:
+                self.tap_c=0
+
+
+            self.define_tap()
+            
+        else:
+            self.define_tap()
+
+
+        
+        
+
+
+        self.a=np.array([[self.aR_a,0,0],
+                         [0,self.aR_b,0],
+                         [0,0,self.aR_c]])
+        self.b=np.zeros((3,3))
+        self.c=np.zeros((3,3))
+        self.d=np.array([[1/self.aR_a,0,0],
+                         [0,1/self.aR_b,0],
+                         [0,0,1/self.aR_c]])
+
+        self.ab = np.concatenate((self.a, self.b), axis=1)
+        self.cd = np.concatenate((self.c, self.d), axis=1)
+        self.abcd = np.concatenate((self.ab, self.cd), axis=0)
+
+        self.A=self.d
+        self.B=np.zeros((3,3))
+
+        
+
+    def define_tap(self):
+
+        self.tap_a=np.round(self.tap_a)
+
+        if self.tap_a < self.tap_max:
+            self.aR_a=float(1-self.step_pu*np.round(self.tap_a))
+        else:
+            self.aR_a=float(1-self.step_pu*np.round(self.tap_max))
+
+        self.tap_b=np.round(self.tap_b)
+
+        if self.tap_b < self.tap_max:
+            self.aR_b=float(1-self.step_pu*np.round(self.tap_b))
+        else:
+            self.aR_b=float(1-self.step_pu*np.round(self.tap_max))
+
+        self.tap_c=np.round(self.tap_c)
+
+        if self.tap_c < self.tap_max:
+            self.aR_c=float(1-self.step_pu*np.round(self.tap_c))
+        else:
+            self.aR_c=float(1-self.step_pu*np.round(self.tap_max))
+
+    
+
+    def controler_voltage(self,ia,ib,ic,va,vb,vc):
+
+        ia,ib,ic=ia/self.CT, ib/self.CT, ic/self.CT
+        va,vb,vc=va-ia*self.z*self.Npt,vb-ib*self.z*self.Npt,vc-ic*self.z*self.Npt
+        return va,vb,vc
+
+
+
+
+
 
 
 class Switch(Edge):

@@ -1,6 +1,6 @@
-from mygrid.grid import GridElements, ExternalGrid, PV, PQ
+from mygrid.grid import GridElements, ExternalGrid,Generation,Shunt_Capacitor
 from mygrid.grid import Substation, Sector, Switch, LineModel
-from mygrid.grid import Section, LoadNode, TransformerModel, Conductor
+from mygrid.grid import Section, LoadNode, TransformerModel, Conductor, Auto_TransformerModel
 from mygrid.util import R, P
 from mygrid.util import p2r, r2p
 
@@ -8,6 +8,7 @@ from mygrid.power_flow.backward_forward_sweep_3p import calc_power_flow
 from mygrid.short_circuit.symmetrical_components import config_objects, calc_equivalent_impedance, calc_short_circuit
 
 from terminaltables import AsciiTable
+import time
 
 # Este trecho do módulo faz parte de sua documentacao e serve
 # como exemplo de como utiliza-lo. Uma pequena rede com duas
@@ -82,49 +83,69 @@ eg1 = ExternalGrid(name='extern grid 1', vll=vll_mt)
 
 # Definição GD's
 
-c2_PV=PV(name="c2_PV",
-         P=10e3 + 0j,
-         Qmin=-200.0e3j,
-         Qmax=200.0e3j,
-         Vmin=0.95,
-         Vmax=1.05,
-         Vspecified=0.98,
-         DV_presc=0.002)
-c3_PV=PV(name="c3_PV",
-         P=10e3 + 0j,
-         Qmin=-200.0e3j,
-         Qmax=200.0e3j,
-         Vmin=0.95,
-         Vmax=1.05,
-         Vspecified=0.98,
-         DV_presc=0.002)
-b2_PV=PV(name="b2_PV",
-         P=10e3 + 0j,
-         Qmin=-200.0e3j,
-         Qmax=200.0e3j,
-         Vmin=0.95,
-         Vmax=1.05,
-         Vspecified=0.98,
-         DV_presc=0.002)
-b1_PQ=PQ(name="b1_PV",
-         P=500e3+300e3j)
+c2_PV=Generation(name="c2_PV",
+          P=10e3+0j,
+          Qmin=-200.0e3j,
+          Qmax=200.0e3j,
+          Vmin=0.95,
+          Vmax=1.05,
+          Vspecified=0.98,
+          DV_presc=0.002,
+          generation_type="PV")
+c3_PV=Generation(name="c3_PV",
+          P=10e3+0j,
+          Qmin=-200.0e3j,
+          Qmax=200.0e3j,
+          Vmin=0.95,
+          Vmax=1.05,
+          Vspecified=0.98,
+          DV_presc=0.002,
+          generation_type="PV")
+b2_PV=Generation(name="b2_PV",
+          P=10e3+0j,
+          Qmin=-200.0e3j,
+          Qmax=200.0e3j,
+          Vmin=0.95,
+          Vmax=1.05,
+          Vspecified=0.98,
+          DV_presc=0.002,
+          generation_type="PV")
+b1_PQ=Generation(name="b2_PV",
+          P=500e3+3000e3j,generation_type="PQ")
+SC_C1=Shunt_Capacitor(vll=13.8e3,
+                       Qa=10e3,Qb=10e3,Qc=10e3,
+                      type_connection="delta")
+
+auto_t1=Auto_TransformerModel(name="auto_t1",
+                              step=0.75,
+                              tap_max=15,
+                              voltage=12.47e3,
+                              # tap_a=0.96,
+                              # tap_b=0.96,
+                              # tap_c=0.96,
+                              v_c=120,
+                              v_c_min=119,
+                              R=5,
+                              X=11,
+                              CTP=600,
+                              CTS=5)
 
 # Nos de carga do alimentador S1_AL1
 s1 = LoadNode(name='S1',
               voltage=vll_mt,
               external_grid=eg1)
 a1 = LoadNode(name='A1',
-              power=0.0 + 0.0j,
+              power=160.0e3 + 120.0e3j,
               voltage=vll_mt)
 a2 = LoadNode(name='A2',
               power=150.0e3 + 110.0e3j,
+              shunt_capacitor=SC_C1,
               voltage=vll_mt)
 a3 = LoadNode(name='A3',
               power=100.0e3 + 80.0e3j,
               voltage=vll_mt)
 b1 = LoadNode(name='B1',
               power=200.0e3 + 140.0e3j,
-              generation=b1_PQ,
               voltage=vll_mt)
 b2 = LoadNode(name='B2',
               power=150.0e3 + 110.0e3j,
@@ -141,7 +162,7 @@ c2 = LoadNode(name='C2',
               generation=c2_PV,
               voltage=vll_mt)
 c3 = LoadNode(name='C3',
-              power=100.0e3 + 80.0e3j,
+              power=150.0e3 + 110.0e3j,
               generation=c3_PV,
               voltage=vll_mt)
 
@@ -213,52 +234,53 @@ s1_a2 = Section(name='S1A2',
                 n2=a2,
                 switch=ch1,
                 line_model=line_model_a,
-                length=1.0)
+                #transformer=auto_t1,
+                length=4.01)
 a2_a1 = Section(name='A2A1',
                 n1=a2,
                 n2=a1,
                 line_model=line_model_a,
-                length=1.0)
+                length=4)
 a2_a3 = Section(name='A2A3',
                 n1=a2,
                 n2=a3,
                 line_model=line_model_a,
-                length=1.0)
+                length=4)
 a2_c1 = Section(name='A2C1',
                 n1=a2,
                 n2=c1,
                 switch=ch3,
                 line_model=line_model_a,
-                length=1.0)
+                length=12)
 
 c1_c2 = Section(name='C1C2',
                 n1=c1,
                 n2=c2,
                 line_model=line_model_a,
-                length=1.0)
+                length=6)
 c1_c3 = Section(name='C1C3',
                 n1=c1,
                 n2=c3,
                 line_model=line_model_a,
-                length=1.0)
+                length=6)
 
 a3_b1 = Section(name='A3B1',
                 n1=a3,
                 n2=b1,
                 switch=ch2,
                 line_model=line_model_a,
-                length=1.0)
+                length=8)
 
 b1_b2 = Section(name='B1B2',
                 n1=b1,
                 n2=b2,
                 line_model=line_model_a,
-                length=1.0)
+                length=4)
 b2_b3 = Section(name='B2B3',
                 n1=b2,
                 n2=b3,
                 line_model=line_model_a,
-                length=1.0)
+                length=4)
 
 # Trechos do alimentador S1_AL2
 s1_f1 = Section(name='S1F1',
@@ -370,8 +392,12 @@ grid_elements.add_section(sections)
 grid_elements.create_grid()
 
 # calculo de fluxo de carga
+inicio = time.time()
+calc_power_flow(grid_elements.dist_grids['F0'])
+fim = time.time()
+print(fim - inicio)
 
-calc_power_flow(grid_elements.dist_grids['F0'], 13.8e3)
+
 
 # # calculo de curto circuito
 
