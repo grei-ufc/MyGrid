@@ -87,7 +87,7 @@ c2_PV=Generation(name="c2_PV",
           P=10e3+0j,
           Qmin=-200.0e3j,
           Qmax=200.0e3j,
-          Vmin=0.95,
+          Vmin=0.975,
           Vmax=1.05,
           Vspecified=0.98,
           DV_presc=0.002,
@@ -96,7 +96,7 @@ c3_PV=Generation(name="c3_PV",
           P=10e3+0j,
           Qmin=-200.0e3j,
           Qmax=200.0e3j,
-          Vmin=0.95,
+          Vmin=0.975,
           Vmax=1.05,
           Vspecified=0.98,
           DV_presc=0.002,
@@ -105,16 +105,19 @@ b2_PV=Generation(name="b2_PV",
           P=10e3+0j,
           Qmin=-200.0e3j,
           Qmax=200.0e3j,
-          Vmin=0.95,
+          Vmin=0.975,
           Vmax=1.05,
           Vspecified=0.98,
           DV_presc=0.002,
           generation_type="PV")
 b1_PQ=Generation(name="b2_PV",
-          P=500e3+3000e3j,generation_type="PQ")
+          Pa=100e3+300e3j,
+          Pb=0.0e3+200.0e3j,
+          Pc=0.0e3+0.0e3j,
+          generation_type="PQ")
 SC_C1=Shunt_Capacitor(vll=13.8e3,
-                       Qa=10e3,Qb=10e3,Qc=10e3,
-                      type_connection="delta")
+                       Qa=100e3,Qb=100e3,Qc=100e3,
+                      type_connection="wye")
 
 auto_t1=Auto_TransformerModel(name="auto_t1",
                               step=0.75,
@@ -135,35 +138,38 @@ s1 = LoadNode(name='S1',
               voltage=vll_mt,
               external_grid=eg1)
 a1 = LoadNode(name='A1',
-              power=160.0e3 + 120.0e3j,
+              power=120+160j,
               voltage=vll_mt)
 a2 = LoadNode(name='A2',
               power=150.0e3 + 110.0e3j,
-              shunt_capacitor=SC_C1,
               voltage=vll_mt)
 a3 = LoadNode(name='A3',
               power=100.0e3 + 80.0e3j,
               voltage=vll_mt)
 b1 = LoadNode(name='B1',
               power=200.0e3 + 140.0e3j,
+              #generation=b1_PQ,
               voltage=vll_mt)
 b2 = LoadNode(name='B2',
               power=150.0e3 + 110.0e3j,
-              generation=b2_PV,
+              #generation=b2_PV,
               voltage=vll_mt)
 b3 = LoadNode(name='B3',
               power=100.0e3 + 80.0e3j,
               voltage=vll_mt)
 c1 = LoadNode(name='C1',
               power=200.0e3 + 140.0e3j,
+              #shunt_capacitor=SC_C1,
               voltage=vll_mt)
 c2 = LoadNode(name='C2',
               power=150.0e3 + 110.0e3j,
-              generation=c2_PV,
+              #generation=c2_PV,
               voltage=vll_mt)
 c3 = LoadNode(name='C3',
-              power=150.0e3 + 110.0e3j,
-              generation=c3_PV,
+              ppa=400.0e3+0.0j,
+              ppb=0.0e3+0.0j,
+              ppc=0.0e3+0.0j,
+              #generation=c3_PV,
               voltage=vll_mt)
 
 # Nos de carga do alimentador S1_AL1
@@ -226,7 +232,7 @@ line_model_b = LineModel(loc_a=0.0 + 29.0j,
                          loc_n=4.0 + 25.0j,
                          conductor=phase_conduct_bt,
                          neutral_conductor=neutral_conduct,
-                         neutral=False)
+                         neutral=True)
 
 # # Trechos do alimentador S1_AL1
 s1_a2 = Section(name='S1A2',
@@ -234,8 +240,7 @@ s1_a2 = Section(name='S1A2',
                 n2=a2,
                 switch=ch1,
                 line_model=line_model_a,
-                #transformer=auto_t1,
-                length=4.01)
+                length=4)
 a2_a1 = Section(name='A2A1',
                 n1=a2,
                 n2=a1,
@@ -251,25 +256,25 @@ a2_c1 = Section(name='A2C1',
                 n2=c1,
                 switch=ch3,
                 line_model=line_model_a,
-                length=12)
+                length=4)
 
 c1_c2 = Section(name='C1C2',
                 n1=c1,
                 n2=c2,
                 line_model=line_model_a,
-                length=6)
+                length=4)
 c1_c3 = Section(name='C1C3',
                 n1=c1,
                 n2=c3,
                 line_model=line_model_a,
-                length=6)
+                length=4)
 
 a3_b1 = Section(name='A3B1',
                 n1=a3,
                 n2=b1,
                 switch=ch2,
                 line_model=line_model_a,
-                length=8)
+                length=4)
 
 b1_b2 = Section(name='B1B2',
                 n1=b1,
@@ -370,8 +375,8 @@ aa1_aa2 = Section(name='AA1AA2',
                   n2=aa2,
                   line_model=line_model_b,
                   length=3.0e-2)
-aa2_aa3 = Section(name='AA2AA3',
-                  n1=aa2,
+aa1_aa3 = Section(name='AA2AA3',
+                  n1=aa1,
                   n2=aa3,
                   line_model=line_model_b,
                   length=3.0e-2)
@@ -380,7 +385,7 @@ load_nodes = [s1, a1, a2, a3, b1, b2, b3, c1, c2, c3,
               s2, d1, d2, d3, e1, e2, e3, f1, g1, aa1, aa2, aa3]
 sections = [s1_a2, a2_a1, a2_a3, a2_c1, c1_c2, c1_c3, c3_e3, a3_b1, b1_b2, b2_b3, b2_e2,
             b3_c3, s2_d1, d1_d2, d1_d3, d1_e1, e1_e2, e1_e3, s1_f1, f1_g1, g1_d2,
-            a1_aa1, aa1_aa2, aa2_aa3]
+            a1_aa1, aa1_aa2, aa1_aa3]
 switchs = [ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11]
 
 grid_elements = GridElements(name='my_grid_elements')
