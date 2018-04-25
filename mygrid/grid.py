@@ -6,6 +6,9 @@ from mygrid.util import Phasor, P, R, Base
 from mygrid.util import p2r, r2p
 import os
 
+np.seterr(divide='ignore')
+np.seterr(invalid='ignore')
+
 class GridElements(object):
     def __init__(self, name):
         self.load_nodes = dict()
@@ -435,10 +438,11 @@ class LoadNode(object):
         self.voltage=voltage
         self.voltage_nom=voltage
 
-        self.ppa=ppa
-        self.ppb=ppb
-        self.ppc=ppc
-        self.config_load(power=power)
+        if power is not None:
+            self.config_load(power=power)
+        else:
+            self.config_load(ppa=ppa,ppb=ppb,ppc=ppc)
+
         self.config_voltage(voltage=self.voltage)
 
         self.switchs = list()
@@ -456,7 +460,11 @@ class LoadNode(object):
                     zipmodel=[1.0, 0.0, 0.0]):
         if power is not None:
             if self.generation is not None:
-                self.ppa = self.ppb = self.ppc = 1.0/3.0 * power + self.generation.P/3
+                self.ppa = self.ppb = self.ppc = 1.0/3.0 * power 
+                self.ppa = self.generation.Pa
+                self.ppb = self.generation.Pb
+                self.ppc = self.generation.Pc
+
             
             else:
                 self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
@@ -464,14 +472,15 @@ class LoadNode(object):
         else:
 
             if self.generation is not None:
-                self.ppa = self.ppa + self.generation.Pa
-                self.ppb = self.ppb + self.generation.Pb
-                self.ppc = self.ppc + self.generation.Pc
+                self.ppa = ppa + self.generation.Pa
+                self.ppb = ppb + self.generation.Pb
+                self.ppc = ppc + self.generation.Pc
 
             else:
-                self.ppa = self.ppa
-                self.ppb = self.ppb
-                self.ppc = self.ppc
+                print(self.name,ppa,ppb,ppc)
+                self.ppa = ppa
+                self.ppb = ppb
+                self.ppc = ppc
 
         self.zipmodel = np.array(zipmodel)
 
@@ -501,7 +510,7 @@ class LoadNode(object):
         elif self.type_connection=="wye":
             self.vpm=self.vp
             
-        if self.pp.all() == 0.0+0.0j:
+        if not(self.pp.any() != 0.0+0.0j):
             self.i = np.zeros((3, 1), dtype=complex)
 
         else:
@@ -525,9 +534,16 @@ class LoadNode(object):
 
 
             self.ipq = self.zipmodel[0] * np.conjugate((self.pp) / self.vpm)
+
             self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
             self.iz = self.zipmodel[1] * (self.vpm / self.z)
             self.ii = self.zipmodel[2] * self.vpm / self.z
+
+            self.iz=np.where(np.isnan(self.iz),np.zeros(np.shape(self.iz), dtype=complex),self.iz)
+            self.ii=np.where(np.isnan(self.ii),np.zeros(np.shape(self.ii), dtype=complex),self.ii)
+            
+
+
             self.i =  self.ipq + self.iz + self.ii
             self.i.shape = (3, 1)
             if self.type_connection=="delta":
