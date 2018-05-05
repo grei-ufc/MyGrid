@@ -38,7 +38,7 @@ def calc_power_flow(dist_grid):
         nodes_converg[node.name] = 1e6
 
     # calculo da profundidade máxima da rede
-    max_depth = _get_dist_grid_max_depth(dist_grid)
+    max_depth = np.max(dist_grid.load_nodes_tree.rnp.transpose()[:, 0].astype(int))
 
     nodes_depth_dict = _make_nodes_depth_dictionary(dist_grid)
     # -------------------------------------
@@ -204,27 +204,6 @@ def _make_nodes_depth_dictionary(dist_grid):
         else:
             nodes_depth_dict[depth] = [dist_grid.load_nodes[node]]
     return nodes_depth_dict
-
-def _get_dist_grid_max_depth(dist_grid):
-    
-    dist_grid_nodes = dist_grid.load_nodes.values()
-    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
-    
-    max_depth = 0
-
-    # for percorre a rnp dos nós de carga tomando valores
-    # em pares (profundidade, nó).
-    for node_depth in dist_grid_rnp.transpose():
-        # obtem os nomes dos nos de carga.
-        dist_grid_nodes_names = [node.name for node in dist_grid_nodes]
-
-        # verifica se a profundidade do nó é maior do que a
-        # profundidade máxima e se ele está na lista de nós do dist_grid.
-        if (int(node_depth[0]) > max_depth) \
-           and (node_depth[1] in dist_grid_nodes_names):
-            max_depth = int(node_depth[0])
-
-    return max_depth
 
 
 def _get_downstream_neighbors_nodes_cached(f):
