@@ -37,6 +37,10 @@ def calc_power_flow(dist_grid):
     for node in dist_grid.load_nodes.values():
         nodes_converg[node.name] = 1e6
 
+    # calculo da profundidade máxima da rede
+    max_depth = _get_dist_grid_max_depth(dist_grid)
+
+    nodes_depth_dict = _make_nodes_depth_dictionary(dist_grid)
     # -------------------------------------
     # main loop for power flow calculation
     # -------------------------------------
@@ -52,7 +56,7 @@ def calc_power_flow(dist_grid):
         # ----------------------------------
         # back-forward sweep implementation
         # ----------------------------------
-        _dist_grid_sweep(dist_grid)
+        _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict)
 
         # -------------------------
         # convergence verification
@@ -109,15 +113,14 @@ def calc_power_flow(dist_grid):
         calc_power_flow(dist_grid)
 
 
-def _dist_grid_sweep(dist_grid):
+def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     """ Função que varre a dist_grid pelo
     método varredura direta/inversa"""
 
     dist_grid_rnp = dist_grid.load_nodes_tree.rnp
     load_nodes_tree = dist_grid.load_nodes_tree.tree
 
-    # depth and max_depth recebem a profundidae maxima
-    depth = max_depth = _get_dist_grid_max_depth(dist_grid)
+    depth = max_depth
 
     # ----------------------------------------------
     # Inicio da varredura inversa
@@ -127,9 +130,7 @@ def _dist_grid_sweep(dist_grid):
     # nós com maiores profundidades até o nó raíz
     while depth >= 0:
         # guarda os nós com maiores profundidades.
-        nodes = [dist_grid.load_nodes[node_depth[1]]
-               for node_depth in dist_grid_rnp.transpose() if
-               int(node_depth[0]) == depth]
+        nodes = nodes_depth_dict[str(depth)]
 
         # decrementodo da profundidade.
         depth -= 1
@@ -173,9 +174,7 @@ def _dist_grid_sweep(dist_grid):
     # seção do cálculo de atualização das tensões
     while depth <= max_depth:
         # salva os nós de carga a montante
-        nodes = [dist_grid.load_nodes[col_depth_node[1]]
-                 for col_depth_node in dist_grid_rnp.transpose()
-                 if int(col_depth_node[0]) == depth]
+        nodes = nodes_depth_dict[str(depth)]
 
         # percorre os nós para guardar a árvore do nó requerido
         for node in nodes:
@@ -191,6 +190,20 @@ def _dist_grid_sweep(dist_grid):
             #print(upstream_node.name + '--->>>' + node.name)
         depth += 1
 
+
+def _make_nodes_depth_dictionary(dist_grid):
+    
+    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
+
+    nodes_depth_dict = dict()
+    for node_depth in dist_grid_rnp.transpose():
+        depth = node_depth[0]
+        node = node_depth[1]
+        if depth in nodes_depth_dict.keys():
+            nodes_depth_dict[depth] += [dist_grid.load_nodes[node]]
+        else:
+            nodes_depth_dict[depth] = [dist_grid.load_nodes[node]]
+    return nodes_depth_dict
 
 def _get_dist_grid_max_depth(dist_grid):
     
@@ -227,31 +240,17 @@ def _get_downstream_neighbors_nodes_cached(f):
 @_get_downstream_neighbors_nodes_cached
 def _get_downstream_neighbors_nodes(node, dist_grid):
 
-    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
     load_nodes_tree = dist_grid.load_nodes_tree.tree
-
-    # guarda os pares (profundidade, nó)
-    node_depth = [node_depth for node_depth in dist_grid_rnp.transpose()
-                  if node_depth[1] == node.name]
+    dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dic()
 
     neighbors = load_nodes_tree[node.name]
     downstream_neighbors = list()
 
     # for que percorre a árvore de cada nó de carga vizinho
-    for neighbor in neighbors:
-        
-        # Tem como melhorar
-
-        # verifica quem é neighbor do nó desejado.
-        depth_neighbor = [n_depth for n_depth in
-                          dist_grid_rnp.transpose()
-                          if n_depth[1] == neighbor]
-
+    for neighbor in neighbors:        
         # verifica se a profundidade do neighbor é maior
-        if int(depth_neighbor[0][0]) > int(node_depth[0][0]):
-            # armazena os neighbors a jusante.
-            downstream_neighbors.append(
-                dist_grid.load_nodes[depth_neighbor[0][1]])
+        if int(dist_grid_rnp_dict[neighbor]) > int(dist_grid_rnp_dict[node.name]):
+            downstream_neighbors.append(dist_grid.load_nodes[neighbor])
 
     return downstream_neighbors
 
@@ -269,24 +268,17 @@ def _get_upstream_neighbor_node_cached(f):
 @_get_upstream_neighbor_node_cached
 def _get_upstream_neighbor_node(node, dist_grid):
     
-    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
     load_nodes_tree = dist_grid.load_nodes_tree.tree
+    dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dic()
 
     neighbors = load_nodes_tree[node.name]
-    # guarda os pares (profundidade,nó)
-    node_depth = [col_depth_node
-               for col_depth_node in dist_grid_rnp.transpose()
-               if col_depth_node[1] == node.name]
+    
     upstream_neighbors = list()
+
     # verifica quem é neighbor do nó desejado.
     for neighbor in neighbors:
-        depth_neighbor = [n_depth
-                        for n_depth in dist_grid_rnp.transpose()
-                        if n_depth[1] == neighbor]
-        if int(depth_neighbor[0][0]) < int(node_depth[0][0]):
-            # armazena os neighbors a montante.
-            upstream_neighbors.append(
-                dist_grid.load_nodes[depth_neighbor[0][1]])
+        if int(dist_grid_rnp_dict[neighbor]) < int(dist_grid_rnp_dict[node.name]):
+            upstream_neighbors.append(dist_grid.load_nodes[neighbor])
 
     # retorna o primeiro neighbor a montante
     return upstream_neighbors[0]
