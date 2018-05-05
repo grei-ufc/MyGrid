@@ -4,6 +4,20 @@ from mygrid.grid import Section,Auto_TransformerModel
 
 import numpy as np
 
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
+
+from numba import jit
+
+from functools import wraps
+
+
+def calc_power_flow_profiling(dist_grid):
+    graphviz = GraphvizOutput()
+    graphviz.output_file = 'basic.png'
+
+    with PyCallGraph(output=graphviz):
+        calc_power_flow(dist_grid)
 
 def calc_power_flow(dist_grid):
 
@@ -142,9 +156,7 @@ def _dist_grid_sweep(dist_grid):
                 for downstream_node in downstream_neighbors:
                     # chama a função busca_trecho para definir
                     # quais sections estão entre o nó atual e o nó a jusante
-                    section = _search_section(dist_grid,
-                                              node,
-                                              downstream_node)
+                    section = _search_section(node, downstream_node, dist_grid)
                     
                     # ------------------------------------
                     # Equacionamento: Calculo de corretes
@@ -167,8 +179,8 @@ def _dist_grid_sweep(dist_grid):
 
         # percorre os nós para guardar a árvore do nó requerido
         for node in nodes:
-            upstream_node = _get_upstream_neighbor_node(dist_grid, node)
-            section = _search_section(dist_grid, node, upstream_node)
+            upstream_node = _get_upstream_neighbor_node(node, dist_grid)
+            section = _search_section(node, upstream_node, dist_grid)
 
             # ------------------------------------
             # Equacionamento: Calculo de tensoes
@@ -202,6 +214,17 @@ def _get_dist_grid_max_depth(dist_grid):
     return max_depth
 
 
+def _get_downstream_neighbors_nodes_cached(f):
+    cache = dict()
+    @wraps(f)
+    def inner(arg1, arg2):
+        if arg1 not in cache:
+            cache[arg1] = f(arg1, arg2)
+        return cache[arg1]
+    return inner
+
+
+@_get_downstream_neighbors_nodes_cached
 def _get_downstream_neighbors_nodes(node, dist_grid):
 
     dist_grid_rnp = dist_grid.load_nodes_tree.rnp
@@ -233,7 +256,18 @@ def _get_downstream_neighbors_nodes(node, dist_grid):
     return downstream_neighbors
 
 
-def _get_upstream_neighbor_node(dist_grid, node):
+def _get_upstream_neighbor_node_cached(f):
+    cache = dict()
+    @wraps(f)
+    def inner(arg1, arg2):
+        if arg1 not in cache:
+            cache[arg1] = f(arg1, arg2)
+        return cache[arg1]
+    return inner
+
+
+@_get_upstream_neighbor_node_cached
+def _get_upstream_neighbor_node(node, dist_grid):
     
     dist_grid_rnp = dist_grid.load_nodes_tree.rnp
     load_nodes_tree = dist_grid.load_nodes_tree.tree
@@ -258,7 +292,18 @@ def _get_upstream_neighbor_node(dist_grid, node):
     return upstream_neighbors[0]
 
 
-def _search_section(dist_grid, n1, n2):
+def _search_section_cached(f):
+    cache = dict()
+    @wraps(f)
+    def inner(arg1, arg2, arg3):
+        if (arg1, arg2) not in cache:
+            cache[(arg1, arg2)] = f(arg1, arg2, arg3)
+        return cache[(arg1, arg2)]
+    return inner
+
+
+@_search_section_cached
+def _search_section(n1, n2, dist_grid):
     """Função que busca sections em um alimendador entre os nos
       n1 e n2"""
 
@@ -373,8 +418,6 @@ def _define_power_insertion(DG_unconv_, dist_grid):
         DG_unconv_[i].generation.update_Q(delta_I[0][i][0]*vmin_dg)
 
 
-
-
 def sections_path_to_root(dist_grid, n2):
 
     
@@ -402,6 +445,7 @@ def sections_path_to_root(dist_grid, n2):
                 section_list.append(dist_grid.sections[name])
 
                 return section_list
+
 
 def sum_imped(sections):
     nt=1

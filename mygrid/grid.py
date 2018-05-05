@@ -477,7 +477,6 @@ class LoadNode(object):
                 self.ppc = ppc + self.generation.Pc
 
             else:
-                print(self.name,ppa,ppb,ppc)
                 self.ppa = ppa
                 self.ppb = ppb
                 self.ppc = ppc
