@@ -71,6 +71,8 @@ class Tree(object):
         self.root = None
         self._tree = None
 
+        self.rnp_dict_ = None
+
     def order(self, root):
         """
         metodo ordena
@@ -139,17 +141,21 @@ class Tree(object):
                 return
         return self._search(next_, visited, stack)
 
-    def rnp_dic(self):
+    def rnp_dict(self):
         """
         método rnp_dict
         ---------------
             Este método retorna a representação da tree rnp em forma de um
             dicionário ordenado
         """
-        rnp = OrderedDict()
-        for i in self.rnp.transpose():
-            rnp[i[1]] = i[0]
-        return rnp
+        if self.rnp_dict_ == None:
+            rnp = OrderedDict()
+            for i in self.rnp.transpose():
+                rnp[i[1]] = i[0]
+            self.rnp_dict_ = rnp
+            return self.rnp_dict_
+        else:
+            return self.rnp_dict_
 
     def prune(self, no, change_rnp=True):
         """

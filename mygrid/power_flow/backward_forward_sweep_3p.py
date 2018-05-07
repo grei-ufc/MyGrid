@@ -209,18 +209,18 @@ def _make_nodes_depth_dictionary(dist_grid):
 def _get_downstream_neighbors_nodes_cached(f):
     cache = dict()
     @wraps(f)
-    def inner(arg1, arg2):
+    def inner_get_downstream_neighbors_nodes(arg1, arg2):
         if arg1 not in cache:
             cache[arg1] = f(arg1, arg2)
         return cache[arg1]
-    return inner
+    return inner_get_downstream_neighbors_nodes
 
 
 @_get_downstream_neighbors_nodes_cached
 def _get_downstream_neighbors_nodes(node, dist_grid):
 
     load_nodes_tree = dist_grid.load_nodes_tree.tree
-    dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dic()
+    dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dict()
 
     neighbors = load_nodes_tree[node.name]
     downstream_neighbors = list()
@@ -237,18 +237,17 @@ def _get_downstream_neighbors_nodes(node, dist_grid):
 def _get_upstream_neighbor_node_cached(f):
     cache = dict()
     @wraps(f)
-    def inner(arg1, arg2):
+    def inner_get_upstream_neighbor_node(arg1, arg2):
         if arg1 not in cache:
             cache[arg1] = f(arg1, arg2)
         return cache[arg1]
-    return inner
-
+    return inner_get_upstream_neighbor_node
 
 @_get_upstream_neighbor_node_cached
 def _get_upstream_neighbor_node(node, dist_grid):
     
     load_nodes_tree = dist_grid.load_nodes_tree.tree
-    dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dic()
+    dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dict()
 
     neighbors = load_nodes_tree[node.name]
     
@@ -266,11 +265,11 @@ def _get_upstream_neighbor_node(node, dist_grid):
 def _search_section_cached(f):
     cache = dict()
     @wraps(f)
-    def inner(arg1, arg2, arg3):
-        if (arg1, arg2) not in cache:
+    def inner_search_section(arg1, arg2, arg3):
+        if (arg1, arg2) not in cache or (arg2, arg1) not in cache:
             cache[(arg1, arg2)] = f(arg1, arg2, arg3)
         return cache[(arg1, arg2)]
-    return inner
+    return inner_search_section
 
 
 @_search_section_cached
@@ -278,10 +277,10 @@ def _search_section(n1, n2, dist_grid):
     """Função que busca sections em um alimendador entre os nos
       n1 e n2"""
 
-    for section in dist_grid.sections.values():
-        nodes = list([section.n1, section.n2])
-        if (n1 in nodes) and (n2 in nodes):
-            return section
+    if (n1, n2) in dist_grid.sections_by_nodes.keys():
+        return dist_grid.sections_by_nodes[(n1, n2)]
+    elif (n2, n1) in dist_grid.sections_by_nodes.keys():
+        return dist_grid.sections_by_nodes[(n2, n1)]
 
 
 def _nodes_out_limit(dist_grid):

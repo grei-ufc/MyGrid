@@ -6,6 +6,8 @@ from mygrid.util import Phasor, P, R, Base
 from mygrid.util import p2r, r2p
 import os
 
+from numba import jit
+
 np.seterr(divide='ignore')
 np.seterr(invalid='ignore')
 
@@ -502,6 +504,7 @@ class LoadNode(object):
         self.vpl=np.dot(self.D,self._vp)
         self._calc_currents()
 
+
     def _calc_currents(self):
         if self.type_connection=="delta":
             self.vpm=self.vpl
@@ -549,6 +552,8 @@ class LoadNode(object):
                 self.i=np.dot(self.D.T,self.i) + i_shunt_C+i_gd
             elif self.type_connection=="wye":
                 self.i=self.i + i_shunt_C+i_gd
+                
+    
     @property
     def VI(self):
         return self._VI
@@ -1396,8 +1401,12 @@ class DistGrid(Tree):
                 self.load_nodes[node.name] = node
 
         self.sections = dict()
+        self.sections_by_nodes = dict()
         for section in sections:
             self.sections[section.name] = section
+            self.sections_by_nodes[(section.n1, section.n2)] = section
+
+
 
         self.switchs = dict()
         for section in sections:
