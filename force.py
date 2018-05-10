@@ -192,18 +192,18 @@ def generate_grid(nodes_mv):
     # nome, nível de tensão, cor para representação gráfica 
     # e potências ativas e reativas.
     pf = 0.9 # power factor
-    for n in graph:
+    for k, n in enumerate(graph):
         graph.node[n]['name'] = n
         if n >= nodes_mv:
             graph.node[n]['color'] = 'rgb(255, 127, 14)'
             graph.node[n]['voltage_level'] = 'low voltage'
 
             # demanda diversificada dos consumidores conectados em baixa tensão
-            s = (2.5 - 1.0) * random.random() + 1.0
+            s = ((1.5 - 0.8) * random.random() + 0.8) * (1.0 / (k * 0.001 + 1.0)) 
 
             graph.node[n]['active_power'] = round(s * np.cos(np.arccos(pf)), 3)
             graph.node[n]['reactive_power'] = round(s * np.sin(np.arcsin(pf)), 3)
-            if s <= 2.0:
+            if s > 2.0:
                 graph.node[n]['phase'] = random.choice(['a', 'b', 'c'])
             else:
                 graph.node[n]['phase'] = 'abc'
@@ -227,8 +227,8 @@ def generate_grid(nodes_mv):
             graph.edges[i]['type'] = 'line'
 
             if graph.node[source]['voltage_level'] == 'medium voltage':
-                a = 0.1
-                b = 0.25
+                a = 0.05
+                b = 0.1
                 graph.edges[i]['length'] = round((b - a) * random.random() + a, 3)
             else:
                 a = 0.006
@@ -421,7 +421,7 @@ def display_data(grid):
     #print(table.table)
 
 def main():
-    nodes_mv_ = 100
+    nodes_mv_ = 500
     graph = generate_grid(nodes_mv=nodes_mv_)
     return graph
 
