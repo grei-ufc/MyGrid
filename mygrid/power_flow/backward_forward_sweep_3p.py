@@ -52,6 +52,7 @@ def calc_power_flow(dist_grid):
         voltage_nodes = dict()
         for node in dist_grid.load_nodes.values():
             voltage_nodes[node.name] = node.vp
+            node._calc_currents()
 
         # ----------------------------------
         # back-forward sweep implementation
@@ -71,6 +72,7 @@ def calc_power_flow(dist_grid):
         # das barras PV (se houverem).
         # -------------------------
 
+    print(iter)
     calc=False 
     for sections in dist_grid.sections.values():
         if isinstance(sections.transformer, Auto_TransformerModel) and not(sections.transformer_visited):
@@ -94,24 +96,41 @@ def calc_power_flow(dist_grid):
         for node in dist_grid.load_nodes.values():
             node.config_voltage(voltage=node.voltage)
 
-        calc_power_flow(dist_grid, Vnom * np.sqrt(3))
-
-
-    DG_unconv_ = _nodes_out_limit(dist_grid)
-    if DG_unconv_ != []:
-
-        for sections in dist_grid.sections.values():
-
-            if isinstance(sections.transformer, Auto_TransformerModel):
-                sections.transformer_visited=False
-
-        _define_power_insertion(DG_unconv_, dist_grid)
-
-        for node in dist_grid.load_nodes.values():
-            node.config_voltage(voltage=node.voltage)
-        
         calc_power_flow(dist_grid)
 
+    i=10
+    while i >0:
+
+        DG_unconv_ = _nodes_out_limit(dist_grid)
+        if DG_unconv_ != []:
+
+            for sections in dist_grid.sections.values():
+
+                if isinstance(sections.transformer, Auto_TransformerModel):
+                    sections.transformer_visited=False
+
+            _define_power_insertion(DG_unconv_, dist_grid)
+
+            for node in dist_grid.load_nodes.values():
+                node.config_voltage(voltage=node.voltage)
+                node._calc_currents()
+            
+            power_flow(dist_grid)
+
+        else:
+            
+
+            for node in dist_grid.load_nodes.values():
+                if (node.generation != None and node.generation.type == 'PV') and \
+                    node.generation.limit_PV :
+
+                    print("{0} exceeded the limit Generation ".format(node.generation.name))
+            return 
+
+        i-=1
+
+    print("Load flow did not converge")
+    return
 
 def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     """ Função que varre a dist_grid pelo
@@ -284,59 +303,62 @@ def _search_section(n1, n2, dist_grid):
 
 
 def _nodes_out_limit(dist_grid):
+    
     root_3=np.sqrt(3)
     DG_unconv_ = list()
     for node in dist_grid.load_nodes.values():
 
-        vaa = np.abs(node.vp[0]) / np.abs(node.voltage/root_3)
-        vbb = np.abs(node.vp[1]) / np.abs(node.voltage/root_3)
-        vcc = np.abs(node.vp[2]) / np.abs(node.voltage/root_3)
-        vphase_max = max([vaa,vbb,vcc])
-        vphase_min = min([vaa,vbb,vcc])
+
 
         if (node.generation != None and node.generation.type == 'PV'):
-            if (node.generation.no_limit_PV or (vphase_max) > node.generation.Vmax):
-            
-                node.generation.no_limit_PV = True
-                
-                if (vphase_min < node.generation.Vmin) and \
-                    (vphase_max > node.generation.Vmax) or \
-                    (node.generation.PV_Provides and node.generation.PV_Consumes):
 
-                    if (vphase_min < node.generation.Vmin) and \
-                        (vphase_max > node.generation.Vmax):
+            vaa = np.abs(node.vp[0]) / np.abs(node.voltage/root_3)
+            vbb = np.abs(node.vp[1]) / np.abs(node.voltage/root_3)
+            vcc = np.abs(node.vp[2]) / np.abs(node.voltage/root_3)
+            vphase_max = max([vaa,vbb,vcc])
+            vphase_min = min([vaa,vbb,vcc])
+               
+            if node.generation.defective_phase != None:
 
-                        print("It is not possible to use a three-phase PV type generation" \
-                                 +" to correct voltage levels by phase.")
-                    else:
-                        # node.generation.Pa-=node.generation.Qa
-                        # node.generation.Pb-=node.generation.Qb
-                        # node.generation.Pc-=node.generation.Qc
-                        pass
+                v_defective=np.abs(node.vp[node.generation.defective_phase]/np.abs(node.voltage/root_3))
+                if np.abs(v_defective-node.generation.Vspecified)>node.generation.DV_presc:
                     
-                if ((vphase_min) < node.generation.Vmin or \
-                    ((node.generation.Vspecified - (vphase_min)) \
-                        > node.generation.DV_presc and\
-                        (node.generation.PV_Provides))):
+                    DG_unconv_.append(node)
 
-                    node.generation.PV_Provides = True
+            else:
+                if (vphase_min) < node.generation.Vmin:
+
+                    if vaa==vphase_min:
+                        node.generation.defective_phase=0
+                    if vbb==vphase_min:
+                        node.generation.defective_phase=1
+                    if vcc==vphase_min:
+                        node.generation.defective_phase=2
+
+                    
                     DG_unconv_.append(node)
                     
 
-                elif ((vphase_max)>node.generation.Vmax or \
-                    ((node.generation.Vspecified - (vphase_min)) \
-                        < node.generation.DV_presc and\
-                        (node.generation.PV_Consumes))):
+                elif (vphase_max) > node.generation.Vmax:
+                    if vaa==vphase_max:
+                        node.generation.defective_phase=0
+                    if vbb==vphase_max:
+                        node.generation.defective_phase=1
+                    if vcc==vphase_max:
+                        node.generation.defective_phase=2
 
-                    node.generation.PV_Consumes = True
+                    
                     DG_unconv_.append(node)  
+
     return DG_unconv_
 
 
 def _define_power_insertion(DG_unconv_, dist_grid):
+
     Vnom=13.8e3/np.sqrt(3)
     z_base = (Vnom)**2 / 100e6
     I_base = 100e6 / Vnom
+
     reactan_mat_ = np.ones((len(DG_unconv_), len(DG_unconv_))) * (0.0 + 1.0j)
     equal_section_ = {}
     name_root = list(dist_grid.sectors[dist_grid.root].load_nodes.values())[0].name
@@ -362,30 +384,36 @@ def _define_power_insertion(DG_unconv_, dist_grid):
 
     inv_X = np.linalg.inv(reactan_mat_)
     delta_I = {}
-    for j in range(3):
-        delta_V = np.ones((len(DG_unconv_),1))
-        for i in range(len(DG_unconv_)):
-            if DG_unconv_[i].generation.PV_Provides:
-                if  DG_unconv_[i].generation.gd_type_phase !=  "mono":
-                    Vcurrent = np.min([np.abs(x) for x in DG_unconv_[i].vp])
-                else:
-                    Vcurrent = (np.abs(x) for x in DG_unconv_[i].vp[j])/(DG_unconv_[i].voltage/np.sqrt(3))
 
-            elif DG_unconv_[i].generation.PV_Consumes:
-                if  DG_unconv_[i].generation.gd_type_phase !=  "mono":
-                    Vcurrent = np.max([np.abs(x) for x in DG_unconv_[i].vp])
-                else:
-                    Vcurrent = (np.abs(x) for x in DG_unconv_[i].vp[j])
-            ves=np.abs(DG_unconv_[i].generation.Vspecified*DG_unconv_[i].voltage/np.sqrt(3))
-            delta_V[i,0] =ves - (Vcurrent)
-        delta_Q = inv_X.dot(delta_V)
-        delta_I[j] = inv_X.dot(delta_V) 
+ 
+
+    delta_V = np.ones((len(DG_unconv_),1))
+
+    for i in range(len(DG_unconv_)):
+        v=np.abs(DG_unconv_[i].vp0[0])
+        Vcurrent =np.abs(DG_unconv_[i].vp[DG_unconv_[i].generation.defective_phase][0]/v)
+
+        ves=np.abs(DG_unconv_[i].generation.Vspecified)
+
+        delta_V[i,0] =ves - (Vcurrent)
+
+    
+        
+    delta_I = inv_X.dot(delta_V)
+    
+
 
     for i in range(len(DG_unconv_)):
         vmin_dg = np.min([np.abs(x) for x in DG_unconv_[i].vp])
-        
         vln=np.abs(DG_unconv_[i].voltage)/np.sqrt(3)
-        DG_unconv_[i].generation.update_Q(delta_I[0][i][0]*vmin_dg)
+        Q=delta_I[i][0]*(100e6)
+        
+        DG_unconv_[i].generation.update_Q(Q,Q,Q)
+        print(DG_unconv_[i].generation.P/3)
+
+
+
+
 
 
 def sections_path_to_root(dist_grid, n2):
@@ -416,17 +444,18 @@ def sections_path_to_root(dist_grid, n2):
 
                 return section_list
 
-
 def sum_imped(sections):
-    nt=1
+
     z=0
     for i in sections:
+
         if i.line_model is not None:
-            z +=nt*np.imag(i.line_model.z012[1,1])*i.length*1j
+            z_base = np.abs((i.n1.vp0[0])**2 / 100e6)
+            z +=np.imag(i.Z012[1,1])*1j/z_base
 
         else:
-            
-            z +=nt*np.imag(i.transformer.zt)*1j
-            nt=(nt*(i.transformer.at**2))
+
+            z_base = np.abs((i.n2.vp0[0])**2 / 100e6)
+            z +=np.imag(i.transformer.zt_012[1,1])*1j/z_base
 
     return z

@@ -82,14 +82,13 @@ class GridElements(object):
         # determinacao dos vizinhos 
         # dos nos de carga
         # ----------------------------------
-        for load_node in self.load_nodes.values():
-            neighbors = list()
-            for section in self.sections.values():
-                if section.n1 == load_node:
-                    neighbors.append(section.n2)
-                if section.n2 == load_node:
-                    neighbors.append(section.n1)
-            load_node.set_neighbors(neighbors)
+        # for load_node in self.load_nodes.values():
+        #     neighbors = list()
+        for section in self.sections.values():
+            section.n1.set_neighbors(section.n2)
+            section.n2.set_neighbors(section.n1)
+
+
 
         # ----------------------------------
         # determinacao dos vizinhos 
@@ -305,15 +304,15 @@ class GridElements(object):
                 node=self.load_nodes[name_node]
                 node_data.append([node.name,
 
-                                   str(round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                   str(np.round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
                                     if v =="pu" else 1),4)) +\
-                                        "∠"+str(round(np.angle(node.vpa, deg=True),2))+"°",
-                                   str(round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                        "∠"+str(np.round(np.angle(node.vpa, deg=True),2))+"°",
+                                   str(np.round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
                                     if v =="pu" else 1),4)) +\
-                                        "∠"+str(round(np.angle(node.vpb, deg=True),2))+"°",
-                                   str(round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                                        "∠"+str(np.round(np.angle(node.vpb, deg=True),2))+"°",
+                                   str(np.round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
                                     if v =="pu" else 1),4)) +\
-                                        "∠"+str(round(np.angle(node.vpc, deg=True),2))+"°",
+                                        "∠"+str(np.round(np.angle(node.vpc, deg=True),2))+"°",
 
                                    str(round(np.abs(node.ppa)/1000,2))+u"∠"\
                                    +str(round(np.angle(node.ppa, deg=True),2))+"°",
@@ -427,6 +426,8 @@ class LoadNode(object):
         self.generation = generation
         self.type_connection=type_connection
         self.shunt_capacitor=shunt_capacitor
+        self.neighbors=list()
+        self.constant_currents_calc=False
    
         self._vp = np.zeros((3, 1), dtype=complex)
         self._pp = np.zeros((3, 1), dtype=complex)
@@ -439,6 +440,9 @@ class LoadNode(object):
         
         self.voltage=voltage
         self.voltage_nom=voltage
+        self.ipq=np.zeros((3, 1), dtype=complex)
+        self.iz=np.zeros((3, 1), dtype=complex)
+        self.ii=np.zeros((3, 1), dtype=complex)
 
         if power is not None:
             self.config_load(power=power)
@@ -446,13 +450,30 @@ class LoadNode(object):
             self.config_load(ppa=ppa,ppb=ppb,ppc=ppc)
 
         self.config_voltage(voltage=self.voltage)
-
+        self._calc_currents()
+        self.z = np.divide(np.abs(self.vpm_0)**2, np.conjugate(self.pp))
+        self.i_constant=np.abs(np.divide(self.pp, self.vp))
         self.switchs = list()
         self.sector = None
         self.external_grid = external_grid
+        self.vp_pi=self.vp0
+
+
 
     def set_neighbors(self, neighbors):
-        self.neighbors = neighbors
+        self.neighbors.append(neighbors)
+
+    def set_ds_neighbors(self, ds):
+        self.ds_neighbors=ds
+
+    def set_us_neighbors(self, us):
+        self.us_neighbors = us
+
+    def set_section_ds(self, section_ds):
+        self.section_ds=section_ds
+
+    def section_us(self, section_us):
+        set_self.section_us=section_us  
 
     def config_load(self,
                     ppa=0.0+0.0j,
@@ -461,30 +482,17 @@ class LoadNode(object):
                     power=None,
                     zipmodel=[1.0, 0.0, 0.0]):
         if power is not None:
-            if self.generation is not None:
-                self.ppa = self.ppb = self.ppc = 1.0/3.0 * power 
-                self.ppa = self.generation.Pa
-                self.ppb = self.generation.Pb
-                self.ppc = self.generation.Pc
 
-            
-            else:
-                self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
+            self.ppa = self.ppb = self.ppc = 1.0/3.0 * power
 
         else:
-
-            if self.generation is not None:
-                self.ppa = ppa + self.generation.Pa
-                self.ppb = ppb + self.generation.Pb
-                self.ppc = ppc + self.generation.Pc
-
-            else:
-                self.ppa = ppa
-                self.ppb = ppb
-                self.ppc = ppc
+            self.ppa = ppa
+            self.ppb = ppb
+            self.ppc = ppc
 
         self.zipmodel = np.array(zipmodel)
 
+    
     def config_voltage(self,
                        vpa=0.0+0.0j,
                        vpb=0.0+0.0j,
@@ -496,77 +504,87 @@ class LoadNode(object):
             self.vpa = p2r(v, 0.0)
             self.vpb = p2r(v, -120.0)
             self.vpc = p2r(v, 120.0)
+            self.vp0=np.array( [[self.vpa],
+                           [self.vpb],
+                           [self.vpc]])
+            self.vpl_0=np.dot(self.D,self.vp0)
+
         else:
             self.vpa = vpa
             self.vpb = vpb
             self.vpc = vpc
 
         self.vpl=np.dot(self.D,self._vp)
-        self._calc_currents()
 
+        
 
     def _calc_currents(self):
+
         if self.type_connection=="delta":
             self.vpm=self.vpl
+            self.vpm_0=self.vpl_0
 
         elif self.type_connection=="wye":
             self.vpm=self.vp
+            self.vpm_0=self.vp0
             
-        if not(self.pp.any() != 0.0+0.0j):
-            self.i = np.zeros((3, 1), dtype=complex)
+
+        if self.shunt_capacitor is not None:
+            i_shunt_C=self.shunt_capacitor.calc_currents(self.vpa,self.vpb,self.vpc)
 
         else:
-
-            if self.shunt_capacitor is not None:
-                i_shunt_C=self.shunt_capacitor.calc_currents(self.vpa,self.vpb,self.vpc)
-
-            else:
-                i_shunt_C=0
+            i_shunt_C=0
 
 
-            if self.generation !=  None:
-                if self.generation.type_connection=="wye":
-                    i_gd=np.conjugate(self.generation.pp/self.vp)
-                elif self.generation.type_connection=="delta":
-                    i_gd=np.conjugate(self.generation.pp/self.vpl)
-                    i_gd=np.dot(self.D.T,i_gd)
+        if self.generation !=  None:
 
-            else:
-                i_gd=0
+            if self.generation.type_connection=="wye":
+                i_gd=np.conjugate(self.generation.pp/self.vp)
+            elif self.generation.type_connection=="delta":
+                i_gd=np.conjugate(self.generation.pp/self.vpl)
+                i_gd=np.dot(self.D.T,i_gd)
 
+        else:
+            i_gd=0
 
-            self.ipq = self.zipmodel[0] * np.conjugate((self.pp) / self.vpm)
+        
 
-            self.z = np.abs(self.vp)**2 / np.conjugate(self.pp)
-            self.iz = self.zipmodel[1] * (self.vpm / self.z)
-            self.ii = self.zipmodel[2] * self.vpm / self.z
+        self.ipq = self.zipmodel[0] * np.conjugate(np.divide(self.pp, self.vp))
+        
+        if  self.zipmodel[1] !=0:
 
+            self.iz = self.zipmodel[1] * np.divide(self.vp, self.z)
             self.iz=np.where(np.isnan(self.iz),np.zeros(np.shape(self.iz), dtype=complex),self.iz)
+
+        if  self.zipmodel[2] !=0:   
+
+            alpha=np.angle(self.vp)-np.angle(self.pp)
+            self.ii = self.zipmodel[2]*self.i_constant*(np.cos(alpha)+np.sin(alpha)*1j) 
             self.ii=np.where(np.isnan(self.ii),np.zeros(np.shape(self.ii), dtype=complex),self.ii)
-            
+
+        
 
 
-            self.i =  self.ipq + self.iz + self.ii
-            self.i.shape = (3, 1)
-            if self.type_connection=="delta":
-                self.i=np.dot(self.D.T,self.i) + i_shunt_C+i_gd
-            elif self.type_connection=="wye":
-                self.i=self.i + i_shunt_C+i_gd
-                
-    
-    @property
-    def VI(self):
-        return self._VI
+        self.i =  self.ipq  + self.iz + self.ii
+        if self.type_connection=="delta":
+            self.i=np.dot(self.D.T,self.i) + i_shunt_C+i_gd
+        elif self.type_connection=="wye":
+            self.i=self.i + i_shunt_C+i_gd
 
-    @VI.setter
-    def VI(self, valor):
-        self._VI = valor
-        self._vp = valor[:3, 0]
-        self._vp.shape = (3, 1)
-        aux = valor[3:, 0]
-        aux.shape = (3, 1)
-        self._ip += aux
-        self._ip.shape = (3, 1)
+
+    # @property
+    # def VI(self):
+    #     return self._VI
+
+    # @VI.setter
+    # def VI(self, valor):
+    #     self._VI = valor
+    #     self._vp = valor[:3, 0]
+    #     self._vp.shape = (3, 1)
+    #     aux = valor[3:, 0]
+    #     aux.shape = (3, 1)
+    #     self._ip += aux
+    #     self._ip.shape = (3, 1)
 
     @property
     def ip(self):
@@ -576,7 +594,7 @@ class LoadNode(object):
     def ip(self, valor):
         self._ip = valor
         self._ip.shape = (3, 1)
-        self._VI = np.concatenate((self._vp, self._ip))
+        # self._VI = np.concatenate((self._vp, self._ip))
 
     @property
     def vp(self):
@@ -587,15 +605,17 @@ class LoadNode(object):
         self._vp = valor
         self._vp.shape = (3, 1)
 
-        self._vpa = valor[0]
-        self._vpb = valor[1]
-        self._vpc = valor[2]
+        self._vpa = valor[0,0]
+        self._vpb = valor[1,0]
+        self._vpc = valor[2,0]
 
-        self._VI = np.concatenate((self._vp, self._ip))
+        #self._calc_currents()
 
-        self.config_voltage(vpa=self._vp[0, 0],
-                            vpb=self._vp[1, 0],
-                            vpc=self._vp[2, 0])
+        # self._VI = np.concatenate((self._vp, self._ip))
+
+        # self.config_voltage(vpa=self._vp[0, 0],
+        #                     vpb=self._vp[1, 0],
+        #                     vpc=self._vp[2, 0])
 
     @property
     def vpa(self):
@@ -706,11 +726,10 @@ class Generation(object):
 
         self.type_connection=type_connection
         if generation_type=="PV":
-            self.PV_Provides=False
-            self.PV_Consumes=False
+            self.defective_phase=None
             self.name=name
             self.type="PV"
-            self.no_limit_PV=True
+            self.limit_PV=False
             self.DV_presc=DV_presc
 
             if P is not None:
@@ -752,6 +771,7 @@ class Generation(object):
                 self.P=-P
                 self.Pa=self.Pb=self.Pc=-P/3
             else:
+                
                 self.Pa=-Pa
                 self.Pb=-Pb
                 self.Pc=-Pc
@@ -759,9 +779,11 @@ class Generation(object):
 
         self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
 
-    def update_Q(self,Q):
+    def update_Q(self,Qa,Qb,Qc):
 
-        self.Qa= self.Qb=self.Qc=Q
+        self.Qa=Qa
+        self.Qb=Qb
+        self.Qc=Qc
         self.Pa= self.Qa+self.Pa
         self.Pb= self.Qb+self.Pb
         self.Pc= self.Qc+self.Pc
@@ -769,23 +791,19 @@ class Generation(object):
 
 
         
-
-        if np.imag(-self.P)>3*np.imag(self.Qmax):
-            
-
-            self.P=self.P.real-self.Qmax*3
-            self.Pa=self.Pb=self.Pc=self.P/3
-            self.no_limit_PV=False
-            self.type=None
-
-        elif np.imag(-self.P)<3*np.imag(self.Qmin):
-            
-            self.P=self.P.real-self.Qmin*3
-            self.Pa=self.Pb=self.Pc=self.P/3
-            self.no_limit_PV=False
-            self.type=None
-
         self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
+        
+        if np.imag(-self.P)>np.imag(self.Qmax):
+            
+
+            self.limit_PV=True
+
+
+        elif np.imag(-self.P)<np.imag(self.Qmin):
+            
+            self.limit_PV=True
+
+        
 
 
 
@@ -913,6 +931,7 @@ class LineModel(object):
                  neutral=False,
                  conductor=None,
                  neutral_conductor=None,
+                 Transpose=False,
                  units='Imperial'):
         
         self.loc_a = loc_a
@@ -946,7 +965,15 @@ class LineModel(object):
         A = np.array([[1.0, 1.0, 1.0],
                       [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
                       [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
-        self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
+        if Transpose:
+            m_d = (self.z[0,0]+self.z[1,1]+self.z[2,2])/3
+            m_f_d = (self.z[0,1]+self.z[0,2]+self.z[1,2])/3
+            self.m = np.array([[m_d,m_f_d,m_f_d],[m_f_d,m_d,m_f_d],[m_f_d,m_f_d,m_d]])
+            self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
+            self.z = np.array([[self.z012[1,1],0,0],[0,self.z012[1,1],0],[0,0,self.z012[1,1]]])
+
+        else:
+            self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
 
         # --------------------------------------
         # Shunt Admittance Y matrix calculation
@@ -1081,8 +1108,8 @@ class Shunt_Capacitor(object):
     def __init__(self,vll, Qa,Qb,Qc,type_connection):
         self.vll=vll/1000
         self.Qa=Qa/1000
-        self.Qb=Qa/1000
-        self.Qc=Qa/1000
+        self.Qb=Qb/1000
+        self.Qc=Qc/1000
         self.type_connection=type_connection
 
     def calc_currents(self,va,vb,vc):
@@ -1136,6 +1163,9 @@ class TransformerModel(object):
         self.connection = connection
         self.power = power
         self.zt = impedance
+        A = np.array([[1.0, 1.0, 1.0],
+                      [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
+                      [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
 
         if self.connection == 'Dyn':
             self.VLL = primary_voltage
@@ -1161,6 +1191,8 @@ class TransformerModel(object):
                                              [-1.0, 1.0, 0.0],
                                              [0.0, -1.0, 1.0]])
             self.B = self.zt * np.identity(3)
+
+            self.zt_012 = np.dot(np.linalg.inv(A), np.dot(self.B, A))
 
 class Auto_TransformerModel(object):
     """ Model of Autotransformer
@@ -1352,8 +1384,6 @@ class Auto_TransformerModel(object):
         ia,ib,ic=ia/self.CT, ib/self.CT, ic/self.CT
         va,vb,vc=va-ia*self.z*self.Npt,vb-ib*self.z*self.Npt,vc-ic*self.z*self.Npt
         return va,vb,vc
-
-
 
 
 
