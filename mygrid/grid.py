@@ -549,7 +549,7 @@ class LoadNode(object):
 
         
 
-        self.ipq = self.zipmodel[0] * np.conjugate(np.divide(self.pp, self.vp))
+        self.ipq = np.multiply(self.zipmodel[0], np.conjugate(np.divide(self.pp, self.vp)))
         
         if  self.zipmodel[1] !=0:
 

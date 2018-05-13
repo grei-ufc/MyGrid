@@ -10,6 +10,7 @@ from pycallgraph.output import GraphvizOutput
 from numba import jit
 
 from functools import wraps
+import time
 
 
 def calc_power_flow_profiling(dist_grid):
@@ -40,37 +41,46 @@ def calc_power_flow(dist_grid):
     # calculo da profundidade máxima da rede
     max_depth = np.max(dist_grid.load_nodes_tree.rnp.transpose()[:, 0].astype(int))
 
+    
     nodes_depth_dict = _make_nodes_depth_dictionary(dist_grid)
+
     # -------------------------------------
     # main loop for power flow calculation
     # -------------------------------------
+    time_total=0
     while iter <= max_iterations and converg > converg_crt:
         iter += 1
         #print('<<<<-----------BFS------------>>>>')
         #print('Iteration: {iter}'.format(iter=iter))
 
-        voltage_nodes = dict()
+        
         for node in dist_grid.load_nodes.values():
-            voltage_nodes[node.name] = node.vp
             node._calc_currents()
+
+        
+        
 
         # ----------------------------------
         # back-forward sweep implementation
         # ----------------------------------
-        _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict)
+        converg=_dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict)
 
         # -------------------------
         # convergence verification
         # -------------------------
-        for node in dist_grid.load_nodes.values():
-            nodes_converg[node.name] = np.mean(abs(voltage_nodes[node.name] - node.vp))
-        converg = max(nodes_converg.values())
+        # a=time.time()
+        # for node in dist_grid.load_nodes.values():
+        #     nodes_converg[node.name] = np.mean(abs(voltage_nodes[node.name] - node.vp))
+        # converg = max(nodes_converg.values())
+        # b=time.time()
+        # time_total +=b-a
        # print('Max. diff between load nodes voltage values: {conv}'.format(conv=converg))
 
         # -------------------------
         # verificação de tensões 
         # das barras PV (se houverem).
         # -------------------------
+
 
     print(iter)
     calc=False 
@@ -136,10 +146,15 @@ def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     """ Função que varre a dist_grid pelo
     método varredura direta/inversa"""
 
-    dist_grid_rnp = dist_grid.load_nodes_tree.rnp
-    load_nodes_tree = dist_grid.load_nodes_tree.tree
+    
+    Back_Sweep(max_depth, nodes_depth_dict, dist_grid)
 
-    depth = max_depth
+    
+    conv=Forward_Sweep(max_depth, nodes_depth_dict, dist_grid)
+
+    return conv
+
+    
 
     # ----------------------------------------------
     # Inicio da varredura inversa
@@ -147,6 +162,8 @@ def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     #print('Backward Sweep phase <<<<----------')
     # seção do cálculo das potências partindo dos
     # nós com maiores profundidades até o nó raíz
+def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
+    depth = max_depth
     while depth >= 0:
         # guarda os nós com maiores profundidades.
         nodes = nodes_depth_dict[str(depth)]
@@ -181,33 +198,56 @@ def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
                     # ------------------------------------
                     # Equacionamento: Calculo de corretes
                     # ------------------------------------
-                    node.ip += np.dot(section.c, downstream_node.vp) + \
-                               np.dot(section.d, downstream_node.ip)
+                    # node.ip += np.dot(section.c, downstream_node.vp) + \
+                    #            np.dot(section.d, downstream_node.ip)
+
+                    node.ip += calc_ip(section.c,section.d,downstream_node.vp,downstream_node.ip)
                     # -------------------------------------
                     #print(node.name + '<<<---' + downstream_node.name)
 
             
     #print('Forward Sweep phase ---------->>>>')
 
+def Forward_Sweep(max_depth, nodes_depth_dict, dist_grid):
     depth = 1
     # seção do cálculo de atualização das tensões
+    conv=0
     while depth <= max_depth:
         # salva os nós de carga a montante
         nodes = nodes_depth_dict[str(depth)]
 
         # percorre os nós para guardar a árvore do nó requerido
         for node in nodes:
+
             upstream_node = _get_upstream_neighbor_node(node, dist_grid)
             section = _search_section(node, upstream_node, dist_grid)
+
 
             # ------------------------------------
             # Equacionamento: Calculo de tensoes
             # ------------------------------------
-            node.vp = np.dot(section.A, upstream_node.vp) - \
-                      np.dot(section.B, node.ip)
+            # node.vp = np.dot(section.A, upstream_node.vp) - \
+            #           np.dot(section.B, node.ip)
+
+            node.vp,vc = calc_vp(section.A, section.B, upstream_node.vp, node.ip, node.vp)
             # ------------------------------------
             #print(upstream_node.name + '--->>>' + node.name)
+            if vc>conv:
+                conv=vc
         depth += 1
+
+    return conv
+
+def calc_ip(c,d,vp,ip):
+    return c.dot(vp) + d.dot(ip)
+
+def calc_vp(A, B, vp, ip, vi):
+    v=  A.dot(vp) - B.dot(ip)
+
+    a=(abs(vi[0,0]) + abs(vi[1,0]) + abs(vi[2,0]))/3
+    b=(abs(v[0,0]) + abs(v[1,0]) + abs(v[2,0]))/3
+    vc=abs(b-a)
+    return v, vc
 
 
 def _make_nodes_depth_dictionary(dist_grid):
