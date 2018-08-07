@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
+
 from mygrid.util import Phasor, R, P
 from mygrid.util import r2p, p2r
-from mygrid.grid import Section,Auto_TransformerModel
+from mygrid.grid import Section, TransformerModel, Auto_TransformerModel
 
 import numpy as np
 
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
+# from pycallgraph import PyCallGraph
+# from pycallgraph.output import GraphvizOutput
 
 from numba import jit
 
@@ -13,19 +15,19 @@ from functools import wraps
 import time
 
 
-def calc_power_flow_profiling(dist_grid):
-    graphviz = GraphvizOutput()
-    graphviz.output_file = 'basic.png'
+# def calc_power_flow_profiling(dist_grid):
+#     graphviz = GraphvizOutput()
+#     graphviz.output_file = 'basic.png'
 
-    with PyCallGraph(output=graphviz):
-        calc_power_flow(dist_grid)
+#     with PyCallGraph(output=graphviz):
+#         calc_power_flow(dist_grid)
 
 def calc_power_flow(dist_grid):
 
     # -------------------------
     # variables declarations
     # -------------------------
-    
+
     max_iterations = 100
     converg_crt = 0.001
     converg = 1e6
@@ -33,32 +35,33 @@ def calc_power_flow(dist_grid):
 
     #print('============================')
     #print('Distribution Grid {dg} Sweep'.format(dg=dist_grid.name))
-    
+
     nodes_converg = dict()
     for node in dist_grid.load_nodes.values():
         nodes_converg[node.name] = 1e6
 
     # calculo da profundidade máxima da rede
-    max_depth = np.max(dist_grid.load_nodes_tree.rnp.transpose()[:, 0].astype(int))
+    max_depth = np.max(dist_grid.load_nodes_tree.rnp.transpose()\
+                                                            [:, 0].astype(int))
 
-    
+
     nodes_depth_dict = _make_nodes_depth_dictionary(dist_grid)
 
     # -------------------------------------
     # main loop for power flow calculation
     # -------------------------------------
-    time_total=0
-    while iter <= max_iterations and converg > converg_crt:
+   
+    while iter <=max_iterations and converg > converg_crt:
         iter += 1
         #print('<<<<-----------BFS------------>>>>')
         #print('Iteration: {iter}'.format(iter=iter))
 
-        
+
         for node in dist_grid.load_nodes.values():
             node._calc_currents()
 
-        
-        
+
+
 
         # ----------------------------------
         # back-forward sweep implementation
@@ -77,20 +80,22 @@ def calc_power_flow(dist_grid):
        # print('Max. diff between load nodes voltage values: {conv}'.format(conv=converg))
 
         # -------------------------
-        # verificação de tensões 
+        # verificação de tensões
         # das barras PV (se houverem).
         # -------------------------
 
 
-    print(iter)
-    calc=False 
+
+    calc=False
     for sections in dist_grid.sections.values():
-        if isinstance(sections.transformer, Auto_TransformerModel) and not(sections.transformer_visited):
+        if isinstance(sections.transformer, Auto_TransformerModel) and not(\
+                                                sections.transformer_visited):
             calc=True
             sections.transformer_visited=True
 
             if sections.transformer.compesator_active:
-                va,vb,vc=sections.transformer.controler_voltage(sections.n2.ip[0],sections.n2.ip[1],sections.n2.ip[2],\
+                va,vb,vc=sections.transformer.controler_voltage(\
+                sections.n2.ip[0],sections.n2.ip[1],sections.n2.ip[2],\
                     sections.n2.vp[0],sections.n2.vp[1],sections.n2.vp[2])
 
             else:
@@ -98,10 +103,10 @@ def calc_power_flow(dist_grid):
                 vb=sections.n2.vp[1]
                 vc=sections.n2.vp[2]
 
-    
+
             sections.transformer.define_parameters(va,vb,vc)
             sections._set_transformer_model()
-            
+
     if calc:
         for node in dist_grid.load_nodes.values():
             node.config_voltage(voltage=node.voltage)
@@ -124,18 +129,24 @@ def calc_power_flow(dist_grid):
             for node in dist_grid.load_nodes.values():
                 node.config_voltage(voltage=node.voltage)
                 node._calc_currents()
-            
-            power_flow(dist_grid)
+
+            calc_power_flow(dist_grid)
 
         else:
-            
 
             for node in dist_grid.load_nodes.values():
-                if (node.generation != None and node.generation.type == 'PV') and \
-                    node.generation.limit_PV :
 
-                    print("{0} exceeded the limit Generation ".format(node.generation.name))
-            return 
+                if node.generation != None:
+                    if type(node.generation) == type(list()):
+
+                        for i in node.generation:
+                            if i.type == "PV" and i.limit_PV: 
+
+                                print("{0} exceeded the limit Generation ".format(i.name))
+
+                    elif node.generation.type == "PV" and node.generation.limit_PV: 
+                        print("{0} exceeded the limit Generation ".format(node.generation.name))
+            return
 
         i-=1
 
@@ -145,16 +156,11 @@ def calc_power_flow(dist_grid):
 def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     """ Função que varre a dist_grid pelo
     método varredura direta/inversa"""
-
-    
     Back_Sweep(max_depth, nodes_depth_dict, dist_grid)
-
-    
     conv=Forward_Sweep(max_depth, nodes_depth_dict, dist_grid)
-
     return conv
 
-    
+
 
     # ----------------------------------------------
     # Inicio da varredura inversa
@@ -176,7 +182,7 @@ def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
         for node in nodes:
 
             # atualiza o valor de corrente passante com o valor
-            # da corente da carga para que na prox. iteração 
+            # da corente da carga para que na prox. iteração
             # do fluxo de carga não ocorra acúmulo.
             node.ip = node.i
 
@@ -194,18 +200,18 @@ def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
                     # chama a função busca_trecho para definir
                     # quais sections estão entre o nó atual e o nó a jusante
                     section = _search_section(node, downstream_node, dist_grid)
-                    
+
                     # ------------------------------------
                     # Equacionamento: Calculo de corretes
                     # ------------------------------------
                     # node.ip += np.dot(section.c, downstream_node.vp) + \
                     #            np.dot(section.d, downstream_node.ip)
 
-                    node.ip += calc_ip(section.c,section.d,downstream_node.vp,downstream_node.ip)
+                    node.ip += calc_ip(section.c,section.d,downstream_node.vp, downstream_node.ip)
                     # -------------------------------------
                     #print(node.name + '<<<---' + downstream_node.name)
 
-            
+
     #print('Forward Sweep phase ---------->>>>')
 
 def Forward_Sweep(max_depth, nodes_depth_dict, dist_grid):
@@ -243,7 +249,6 @@ def calc_ip(c,d,vp,ip):
 
 def calc_vp(A, B, vp, ip, vi):
     v=  A.dot(vp) - B.dot(ip)
-
     a=(abs(vi[0,0]) + abs(vi[1,0]) + abs(vi[2,0]))/3
     b=(abs(v[0,0]) + abs(v[1,0]) + abs(v[2,0]))/3
     vc=abs(b-a)
@@ -251,7 +256,7 @@ def calc_vp(A, B, vp, ip, vi):
 
 
 def _make_nodes_depth_dictionary(dist_grid):
-    
+
     dist_grid_rnp = dist_grid.load_nodes_tree.rnp
 
     nodes_depth_dict = dict()
@@ -285,7 +290,7 @@ def _get_downstream_neighbors_nodes(node, dist_grid):
     downstream_neighbors = list()
 
     # for que percorre a árvore de cada nó de carga vizinho
-    for neighbor in neighbors:        
+    for neighbor in neighbors:
         # verifica se a profundidade do neighbor é maior
         if int(dist_grid_rnp_dict[neighbor]) > int(dist_grid_rnp_dict[node.name]):
             downstream_neighbors.append(dist_grid.load_nodes[neighbor])
@@ -304,12 +309,10 @@ def _get_upstream_neighbor_node_cached(f):
 
 @_get_upstream_neighbor_node_cached
 def _get_upstream_neighbor_node(node, dist_grid):
-    
+
     load_nodes_tree = dist_grid.load_nodes_tree.tree
     dist_grid_rnp_dict = dist_grid.load_nodes_tree.rnp_dict()
-
     neighbors = load_nodes_tree[node.name]
-    
     upstream_neighbors = list()
 
     # verifica quem é neighbor do nó desejado.
@@ -320,7 +323,6 @@ def _get_upstream_neighbor_node(node, dist_grid):
     # retorna o primeiro neighbor a montante
     return upstream_neighbors[0]
 
-
 def _search_section_cached(f):
     cache = dict()
     @wraps(f)
@@ -329,7 +331,6 @@ def _search_section_cached(f):
             cache[(arg1, arg2)] = f(arg1, arg2, arg3)
         return cache[(arg1, arg2)]
     return inner_search_section
-
 
 @_search_section_cached
 def _search_section(n1, n2, dist_grid):
@@ -341,76 +342,63 @@ def _search_section(n1, n2, dist_grid):
     elif (n2, n1) in dist_grid.sections_by_nodes.keys():
         return dist_grid.sections_by_nodes[(n2, n1)]
 
-
 def _nodes_out_limit(dist_grid):
-    
+
     root_3=np.sqrt(3)
     DG_unconv_ = list()
     for node in dist_grid.load_nodes.values():
 
-
-
-        if (node.generation != None and node.generation.type == 'PV'):
+        if (node.generation != None and node.type == 'PV'):
 
             vaa = np.abs(node.vp[0]) / np.abs(node.voltage/root_3)
             vbb = np.abs(node.vp[1]) / np.abs(node.voltage/root_3)
             vcc = np.abs(node.vp[2]) / np.abs(node.voltage/root_3)
             vphase_max = max([vaa,vbb,vcc])
             vphase_min = min([vaa,vbb,vcc])
-               
-            if node.generation.defective_phase != None:
 
-                v_defective=np.abs(node.vp[node.generation.defective_phase]/np.abs(node.voltage/root_3))
-                if np.abs(v_defective-node.generation.Vspecified)>node.generation.DV_presc:
-                    
+            if node.defective_phase != None:
+
+                v_defective=np.abs(node.vp[node.defective_phase] / np.abs(node.voltage/root_3)) 
+                if np.abs(v_defective-node.Vspecified)>node.DV_presc:
+
                     DG_unconv_.append(node)
 
             else:
-                if (vphase_min) < node.generation.Vmin:
+                if (vphase_min) < node.Vmin:
 
                     if vaa==vphase_min:
-                        node.generation.defective_phase=0
+                        node.defective_phase=0
                     if vbb==vphase_min:
-                        node.generation.defective_phase=1
+                        node.defective_phase=1
                     if vcc==vphase_min:
-                        node.generation.defective_phase=2
+                        node.defective_phase=2
 
-                    
                     DG_unconv_.append(node)
-                    
 
-                elif (vphase_max) > node.generation.Vmax:
+                elif (vphase_max) > node.Vmax:
                     if vaa==vphase_max:
-                        node.generation.defective_phase=0
+                        node.defective_phase=0
                     if vbb==vphase_max:
-                        node.generation.defective_phase=1
+                        node.defective_phase=1
                     if vcc==vphase_max:
-                        node.generation.defective_phase=2
+                        node.defective_phase=2
 
-                    
-                    DG_unconv_.append(node)  
+                    DG_unconv_.append(node)
 
     return DG_unconv_
 
-
 def _define_power_insertion(DG_unconv_, dist_grid):
 
-    Vnom=13.8e3/np.sqrt(3)
-    z_base = (Vnom)**2 / 100e6
-    I_base = 100e6 / Vnom
+
+    data2=list()
 
     reactan_mat_ = np.ones((len(DG_unconv_), len(DG_unconv_))) * (0.0 + 1.0j)
-    equal_section_ = {}
-    name_root = list(dist_grid.sectors[dist_grid.root].load_nodes.values())[0].name
     section_list = list()
     for i in range(len(DG_unconv_)):
 
-       
         dg_source=sections_path_to_root(dist_grid, DG_unconv_[i].name)
         section_list.append(dg_source)
         reactan_mat_[i, i] = sum_imped(dg_source)
-
-
 
     for i in range(len(section_list)):
         for j in range(i+1,len(section_list)):
@@ -419,37 +407,40 @@ def _define_power_insertion(DG_unconv_, dist_grid):
                 for y in section_list[j]:
                     if x==y:
                         comm_path.append(x)
-            reactan_mat_[i, j] =reactan_mat_[j, i]= sum_imped(comm_path)
 
+            reactan_mat_[i, j] =reactan_mat_[j, i]= sum_imped(comm_path)
 
     inv_X = np.linalg.inv(reactan_mat_)
     delta_I = {}
-
- 
 
     delta_V = np.ones((len(DG_unconv_),1))
 
     for i in range(len(DG_unconv_)):
         v=np.abs(DG_unconv_[i].vp0[0])
-        Vcurrent =np.abs(DG_unconv_[i].vp[DG_unconv_[i].generation.defective_phase][0]/v)
-
-        ves=np.abs(DG_unconv_[i].generation.Vspecified)
-
+        Vcurrent =np.abs(DG_unconv_[i].vp[DG_unconv_[i].defective_phase][0]/v)
+        ves=np.abs(DG_unconv_[i].Vspecified)
         delta_V[i,0] =ves - (Vcurrent)
 
-    
-        
     delta_I = inv_X.dot(delta_V)
-    
-
 
     for i in range(len(DG_unconv_)):
-        vmin_dg = np.min([np.abs(x) for x in DG_unconv_[i].vp])
-        vln=np.abs(DG_unconv_[i].voltage)/np.sqrt(3)
         Q=delta_I[i][0]*(100e6)
-        
-        DG_unconv_[i].generation.update_Q(Q,Q,Q)
-        print(DG_unconv_[i].generation.P/3)
+        if type(DG_unconv_[i].generation) == type(list()):
+            a=0
+
+            for j in DG_unconv_[i].generation:
+                if j.type == "PV":
+                    a += 1
+
+            for j in DG_unconv_[i].generation:
+                if j.type == "PV":
+                    j.update_Q(Q/a,Q/a,Q/a)
+            
+            data2.append(a)
+
+        else:
+            DG_unconv_[i].generation.update_Q(Q,Q,Q)
+
 
 
 
@@ -458,7 +449,7 @@ def _define_power_insertion(DG_unconv_, dist_grid):
 
 def sections_path_to_root(dist_grid, n2):
 
-    
+
     root=list(dist_grid.sectors[dist_grid.root].load_nodes.values())[0].name
     if n2 == root:
         return list()
@@ -466,22 +457,17 @@ def sections_path_to_root(dist_grid, n2):
     for section in dist_grid.sections.values():
         name=section.name
 
-        if not(dist_grid.sections[name].switch !=None and dist_grid.sections[name].switch.state==0):
+        if not(dist_grid.sections[name].switch != None and dist_grid.sections[name].switch.state==0):
 
             if dist_grid.sections[name].n1.name == n2:
-                
-
                 section_list=sections_path_to_root(dist_grid,dist_grid.sections[name].n2.name)
                 section_list.append(dist_grid.sections[name])
-
                 return section_list
 
 
             elif dist_grid.sections[name].n2.name == n2:
-
                 section_list=sections_path_to_root(dist_grid,dist_grid.sections[name].n1.name)
                 section_list.append(dist_grid.sections[name])
-
                 return section_list
 
 def sum_imped(sections):
@@ -493,7 +479,10 @@ def sum_imped(sections):
             z_base = np.abs((i.n1.vp0[0])**2 / 100e6)
             z +=np.imag(i.Z012[1,1])*1j/z_base
 
-        else:
+        elif isinstance(i.transformer, Auto_TransformerModel):
+            continue
+
+        elif isinstance(i.transformer, TransformerModel):
 
             z_base = np.abs((i.n2.vp0[0])**2 / 100e6)
             z +=np.imag(i.transformer.zt_012[1,1])*1j/z_base

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from mygrid.util import P, R, Base
 from mygrid.grid import Switch
 

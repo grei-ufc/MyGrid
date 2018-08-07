@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from terminaltables import AsciiTable
 import numpy as np
 from random import randint
@@ -8,8 +10,8 @@ import os
 
 from numba import jit
 
-np.seterr(divide='ignore')
-np.seterr(invalid='ignore')
+np.seterr(divide = 'ignore')
+np.seterr(invalid = 'ignore')
 
 class GridElements(object):
     def __init__(self, name):
@@ -73,13 +75,13 @@ class GridElements(object):
                                                                    visitados,
                                                                    sector_load_nodes,
                                                                    stack)
-                
+
                 s = Sector(name='S' + str(i), load_nodes=sector_load_nodes)
                 i += 1
                 self.sectors[s.name] = s
 
         # ----------------------------------
-        # determinacao dos vizinhos 
+        # determinacao dos vizinhos
         # dos nos de carga
         # ----------------------------------
         # for load_node in self.load_nodes.values():
@@ -88,10 +90,8 @@ class GridElements(object):
             section.n1.set_neighbors(section.n2)
             section.n2.set_neighbors(section.n1)
 
-
-
         # ----------------------------------
-        # determinacao dos vizinhos 
+        # determinacao dos vizinhos
         # dos setores
         # ----------------------------------
         for sector in self.sectors.values():
@@ -107,7 +107,7 @@ class GridElements(object):
             sector.set_neighbors(neighbors)
 
         # ----------------------------------
-        # determinacao dos setores 
+        # determinacao dos setores
         # vizinhos das chaves
         # ----------------------------------
         for section in self.sections.values():
@@ -193,8 +193,6 @@ class GridElements(object):
                                     self.dist_grids[dg.name] = dg
                                     break
 
-
-
     def search_sectors(self, load_node, load_nodes, sections, visitados, sector_load_nodes, stack):
         for section in sections:
             if section.n1 == load_node:
@@ -243,7 +241,7 @@ class GridElements(object):
             if section.n1 == load_node:
                 if section.switch is not None:
                     if section.switch.state == 0:
-                        grid_dist_sections.append(section)    
+                        grid_dist_sections.append(section)
                         continue
                 if section.n2 not in visitados:
                     visitados.append(section.n2)
@@ -281,9 +279,6 @@ class GridElements(object):
             vb_name="Vb (V)"
             vc_name="Vc (V)"
 
-
-        
-
         for i in self.dist_grids:
             load_nodes=self.dist_grids[i].load_nodes
             title="Grid_Name: "+ i
@@ -299,53 +294,67 @@ class GridElements(object):
                      "DG_Pc (kW +KVar)"
                      ]]
             for name_node in load_nodes:
-                
 
                 node=self.load_nodes[name_node]
-                node_data.append([node.name,
+                pa=0.0+0.0j
+                pb=0.0+0.0j
+                pc=0.0+0.0j
 
-                                   str(np.round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
-                                    if v =="pu" else 1),4)) +\
-                                        "∠"+str(np.round(np.angle(node.vpa, deg=True),2))+"°",
-                                   str(np.round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
-                                    if v =="pu" else 1),4)) +\
-                                        "∠"+str(np.round(np.angle(node.vpb, deg=True),2))+"°",
-                                   str(np.round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
-                                    if v =="pu" else 1),4)) +\
-                                        "∠"+str(np.round(np.angle(node.vpc, deg=True),2))+"°",
+                if node.generation is not None:
+                    if type(node.generation) == type(list()):
+                        for i in node.generation:
+                            pa += i.Pa
+                            pb += i.Pb
+                            pc += i.Pc
+                        
+                    else:
+                       
+                        pa += node.generation.Pa
+                        pb += node.generation.Pb
+                        pc += node.generation.Pc
 
-                                   str(round(np.abs(node.ppa)/1000,2))+u"∠"\
-                                   +str(round(np.angle(node.ppa, deg=True),2))+"°",
-                                   str(round(np.abs(node.ppb)/1000,2))+u"∠"\
-                                   +str(round(np.angle(node.ppb, deg=True),2))+"°",
-                                   str(round(np.abs(node.ppc)/1000,2))+u"∠"\
-                                   +str(round(np.angle(node.ppc, deg=True),2))+"°",
+                
+                node_data.append([node.name,\
+                   str(np.round(np.abs(node.vpa)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                    if v =="pu" else 1),4)) +\
+                        "∠"+str(np.round(np.angle(node.vpa, deg=True),2))+"°",
+                   str(np.round(np.abs(node.vpb)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                    if v =="pu" else 1),4)) +\
+                        "∠"+str(np.round(np.angle(node.vpb, deg=True),2))+"°",
+                   str(np.round(np.abs(node.vpc)/(np.abs(node.voltage_nom)/np.sqrt(3) \
+                    if v =="pu" else 1),4)) +\
+                        "∠"+str(np.round(np.angle(node.vpc, deg=True),2))+"°",
 
-                                   str(round(node.generation.Pa.real/1000,2))\
-                                   +("+" if node.generation != None and \
-                                   node.generation.Pa.imag > 0 else "")+\
-                                   str(round(node.generation.Pa.imag/1000,2))+"j"\
-                                   if node.generation != None else "",
+                   str(round(np.abs(node.ppa)/1000,2))+u"∠"\
+                   +str(round(np.angle(node.ppa, deg=True),2))+"°",
+                   str(round(np.abs(node.ppb)/1000,2))+u"∠"\
+                   +str(round(np.angle(node.ppb, deg=True),2))+"°",
+                   str(round(np.abs(node.ppc)/1000,2))+u"∠"\
+                   +str(round(np.angle(node.ppc, deg=True),2))+"°",
 
-                                   str(round(node.generation.Pb.real/1000,2))\
-                                   +("+" if node.generation != None and \
-                                   node.generation.Pb.imag > 0 else "")+\
-                                   str(round(node.generation.Pb.imag/1000,2))+"j"\
-                                   if node.generation != None else "",
+                   str(round(pa.real/1000,2)) + " + " + "j" + \
+                   str(round(pa.imag/1000,2)),
 
-                                   str(round(node.generation.Pc.real/1000,2))\
-                                   +("+" if node.generation != None and \
-                                   node.generation.Pc.imag > 0 else "")+\
-                                   str(round(node.generation.Pc.imag/1000,2))+"j"\
-                                   if node.generation != None else ""])
+                   str(round(pb.real/1000,2)) + " + " + "j" + \
+                   str(round(pb.imag/1000,2)),
+
+                   str(round(pc.real/1000,2)) + " + " + "j" + \
+                   str(round(pc.imag/1000,2))])
 
             table=AsciiTable(node_data)
             table.title=title
             print(table.table)
 
 class ExternalGrid(object):
-    def __init__(self, name, vll):
+    def __init__(self, name, vll, Z=None):
         self.vll = vll
+        self.name=name
+
+        if type(Z) == type(None):
+            self.Z=np.zeros((3,3), dtype=complex)
+
+        else:
+            self.Z=Z
 
 
 class Sector(Tree):
@@ -381,7 +390,7 @@ class Sector(Tree):
         tree_sector = dict()
         # for percorre os nós de carga do sector
         for i, j in self.load_nodes.items():
-            
+
             neighbors = list()
             # for percorre os neighbors do nó de carga
             for k in j.neighbors:
@@ -404,7 +413,7 @@ class Sector(Tree):
     def __repr__(self):
         return 'Sector: ' + self.name
 
-    
+
 
 
 class LoadNode(object):
@@ -415,6 +424,10 @@ class LoadNode(object):
                  ppb=0.0+0.0j,
                  ppc=0.0+0.0j,
                  voltage=0.0+0.0j,
+                 Vmin=0.98,
+                 Vmax=1.05,
+                 Vspecified=1.0,
+                 DV_presc=0.002,
                  generation=None,
                  type_connection="wye",
                  shunt_capacitor=None,
@@ -424,11 +437,31 @@ class LoadNode(object):
 
         self.name = name
         self.generation = generation
+        self.type = "PQ"
+
+        if type(self.generation) != type(None):
+
+            if type(self.generation) == type(list()):
+                for i in generation:
+                    if i.type == "PV":
+                        self.type = "PV"
+                        break
+
+            elif self.generation.type == "PV":
+                self.type = "PV"
+
+
         self.type_connection=type_connection
         self.shunt_capacitor=shunt_capacitor
         self.neighbors=list()
         self.constant_currents_calc=False
-   
+        self.Vmin=Vmin
+        self.Vmax=Vmax
+        self.Vspecified=Vspecified
+        self.DV_presc=DV_presc
+
+        self.defective_phase=None
+
         self._vp = np.zeros((3, 1), dtype=complex)
         self._pp = np.zeros((3, 1), dtype=complex)
         self.i = np.zeros((3, 1), dtype=complex)
@@ -437,12 +470,13 @@ class LoadNode(object):
         self.ineu=self._ip.sum()
         self.D=np.array([[1,-1,0],[0,1,-1],[-1,0,1]])
 
-        
+
         self.voltage=voltage
         self.voltage_nom=voltage
         self.ipq=np.zeros((3, 1), dtype=complex)
         self.iz=np.zeros((3, 1), dtype=complex)
         self.ii=np.zeros((3, 1), dtype=complex)
+        self.Xf=np.zeros((7, 1), dtype=complex)
 
         if power is not None:
             self.config_load(power=power)
@@ -473,7 +507,7 @@ class LoadNode(object):
         self.section_ds=section_ds
 
     def section_us(self, section_us):
-        set_self.section_us=section_us  
+        set_self.section_us=section_us
 
     def config_load(self,
                     ppa=0.0+0.0j,
@@ -492,7 +526,7 @@ class LoadNode(object):
 
         self.zipmodel = np.array(zipmodel)
 
-    
+
     def config_voltage(self,
                        vpa=0.0+0.0j,
                        vpb=0.0+0.0j,
@@ -516,7 +550,7 @@ class LoadNode(object):
 
         self.vpl=np.dot(self.D,self._vp)
 
-        
+
 
     def _calc_currents(self):
 
@@ -527,7 +561,7 @@ class LoadNode(object):
         elif self.type_connection=="wye":
             self.vpm=self.vp
             self.vpm_0=self.vp0
-            
+
 
         if self.shunt_capacitor is not None:
             i_shunt_C=self.shunt_capacitor.calc_currents(self.vpa,self.vpb,self.vpc)
@@ -536,33 +570,43 @@ class LoadNode(object):
             i_shunt_C=0
 
 
-        if self.generation !=  None:
+        if type(self.generation) !=  type(None):
 
-            if self.generation.type_connection=="wye":
-                i_gd=np.conjugate(self.generation.pp/self.vp)
-            elif self.generation.type_connection=="delta":
-                i_gd=np.conjugate(self.generation.pp/self.vpl)
-                i_gd=np.dot(self.D.T,i_gd)
+            if type(self.generation) == type(list()):
+                i_gd=0+0j
+                for i in self.generation:
+                    if i.type_connection=="wye":
+                        i_gd += np.conjugate(i.pp/self.vp)
+                    elif i.type_connection=="delta":
+                        i_g=np.conjugate(i.pp/self.vpl)
+                        i_gd += np.dot(self.D.T,i_g)
+
+            else:
+                if self.generation.type_connection=="wye":
+                    i_gd=np.conjugate(self.generation.pp/self.vp)
+                elif self.generation.type_connection=="delta":
+                    i_gd=np.conjugate(self.generation.pp/self.vpl)
+                    i_gd=np.dot(self.D.T,i_gd)
 
         else:
-            i_gd=0
+            i_gd=0+0j
 
-        
+
 
         self.ipq = np.multiply(self.zipmodel[0], np.conjugate(np.divide(self.pp, self.vp)))
-        
+
         if  self.zipmodel[1] !=0:
 
             self.iz = self.zipmodel[1] * np.divide(self.vp, self.z)
             self.iz=np.where(np.isnan(self.iz),np.zeros(np.shape(self.iz), dtype=complex),self.iz)
 
-        if  self.zipmodel[2] !=0:   
+        if  self.zipmodel[2] !=0:
 
             alpha=np.angle(self.vp)-np.angle(self.pp)
-            self.ii = self.zipmodel[2]*self.i_constant*(np.cos(alpha)+np.sin(alpha)*1j) 
+            self.ii = self.zipmodel[2]*self.i_constant*(np.cos(alpha)+np.sin(alpha)*1j)
             self.ii=np.where(np.isnan(self.ii),np.zeros(np.shape(self.ii), dtype=complex),self.ii)
 
-        
+
 
 
         self.i =  self.ipq  + self.iz + self.ii
@@ -586,10 +630,11 @@ class LoadNode(object):
     #     self._ip += aux
     #     self._ip.shape = (3, 1)
 
+
     @property
     def ip(self):
         return self._ip
-    
+
     @ip.setter
     def ip(self, valor):
         self._ip = valor
@@ -721,10 +766,15 @@ class Generation(object):
     def __init__(self,name,Pa=0.0+0.0j,Pb=0.0+0.0j,Pc=0.0+0.0j,
                  P=None,Qmin=0.0+0.0j,Qmax=0.0+0.0j,
                  Vmin=0.95,Vmax=1.05,Vspecified=None,DV_presc=0.005,generation_type="PQ",
-                 type_connection="wye"):
+                 type_connection="wye",Z=None):
 
 
         self.type_connection=type_connection
+        if type(Z) == type(None):
+            self.Z=np.zeros((3,3), dtype=complex)
+
+        else:
+            self.Z=Z
         if generation_type=="PV":
             self.defective_phase=None
             self.name=name
@@ -745,11 +795,10 @@ class Generation(object):
                 self.Pb=-Pb
                 self.Pc=-Pc
                 self.P=P
-                self.gd_type_phase="mono"
+
 
             self.Qmin=Qmin
             self.Qmax=Qmax
-
             self.Vmin=Vmin
             self.Vmax=Vmax
 
@@ -767,11 +816,11 @@ class Generation(object):
             self.type="PQ"
 
             if P is not None:
-
                 self.P=-P
                 self.Pa=self.Pb=self.Pc=-P/3
+
             else:
-                
+
                 self.Pa=-Pa
                 self.Pb=-Pb
                 self.Pc=-Pc
@@ -790,20 +839,21 @@ class Generation(object):
         self.P=  (self.Qa+self.Qb+self.Qc)+self.P
 
 
-        
-        self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
-        
-        if np.imag(-self.P)>np.imag(self.Qmax):
-            
 
+        self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
+
+        if np.imag(-self.P)>np.imag(self.Qmax):
             self.limit_PV=True
 
 
         elif np.imag(-self.P)<np.imag(self.Qmin):
-            
             self.limit_PV=True
 
-        
+
+
+
+
+
 
 
 
@@ -922,7 +972,7 @@ class Section(Edge):
 
 
 class LineModel(object):
-    
+
     def __init__(self,
                  loc_a=0.0+0.0j,
                  loc_b=0.0+0.0j,
@@ -933,7 +983,7 @@ class LineModel(object):
                  neutral_conductor=None,
                  Transpose=False,
                  units='Imperial'):
-        
+
         self.loc_a = loc_a
         self.loc_b = loc_b
         self.loc_c = loc_c
@@ -942,7 +992,7 @@ class LineModel(object):
             self.loc = [loc_a, loc_b, loc_c, loc_n]
         else:
             self.loc = [loc_a, loc_b, loc_c]
-        
+
         self.conductor = conductor
         self.neutral_conductor = neutral_conductor
 
@@ -969,8 +1019,9 @@ class LineModel(object):
             m_d = (self.z[0,0]+self.z[1,1]+self.z[2,2])/3
             m_f_d = (self.z[0,1]+self.z[0,2]+self.z[1,2])/3
             self.m = np.array([[m_d,m_f_d,m_f_d],[m_f_d,m_d,m_f_d],[m_f_d,m_f_d,m_d]])
+            self.z=self.m
             self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
-            self.z = np.array([[self.z012[1,1],0,0],[0,self.z012[1,1],0],[0,0,self.z012[1,1]]])
+
 
         else:
             self.z012 = np.dot(np.linalg.inv(A), np.dot(self.z, A))
@@ -981,14 +1032,14 @@ class LineModel(object):
 
         # S distance matrix calculation
         self.p = np.array(self._calc_potencial_primitive_matrix(self.loc))
-        
+
         # kron reduction, if there is neutral
         if np.shape(self.p) == (4, 4):
             self.p = self._calc_potential_coefficient_matrix(self.p)
 
         # shunt capacitance matrix calculation
         self.c = np.linalg.inv(self.p)
-        
+
         # shunt admittance matrix calculation
         self.y = 1j * 2.0 * np.pi * 60.0 * self.c
 
@@ -1013,7 +1064,7 @@ class LineModel(object):
         r = self.conductor.conductor_data['resistence']['value']
         gmr = self.conductor.conductor_data['gmr']['value']
         rn = self.neutral_conductor.conductor_data['resistence']['value']
-        gmrn = self.neutral_conductor.conductor_data['gmr']['value'] 
+        gmrn = self.neutral_conductor.conductor_data['gmr']['value']
         for i in range(len(loc)):
             z = list()
             for j in range(len(loc)):
@@ -1034,7 +1085,7 @@ class LineModel(object):
         P = list()
         r = self.conductor.conductor_data['diameter']['value'] / 2.0
         rn = self.neutral_conductor.conductor_data['diameter']['value'] / 2.0
-        
+
         # inch to feet conversion
         r = r * 0.0833
         rn = rn * 0.0833
@@ -1158,11 +1209,12 @@ class TransformerModel(object):
                  impedance,
                  connection='Dyn'):
         assert isinstance(name, str), 'O parâmetro name deve ser do tipo str'
-        
+
         self.name = name
         self.connection = connection
         self.power = power
         self.zt = impedance
+        self.z=np.identity((3), dtype=complex)*self.zt
         A = np.array([[1.0, 1.0, 1.0],
                       [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
                       [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
@@ -1191,6 +1243,35 @@ class TransformerModel(object):
                                              [-1.0, 1.0, 0.0],
                                              [0.0, -1.0, 1.0]])
             self.B = self.zt * np.identity(3)
+
+            self.zt_012 = np.dot(np.linalg.inv(A), np.dot(self.B, A))
+
+        elif self.connection == 'Yd':
+            self.ztab = self.ztbc = self.ztca = self.zt
+            self.VLL = primary_voltage
+            self.Vll = secondary_voltage
+            self.at = self.VLL / self.Vll
+            self.nt = (self.VLL / np.sqrt(3.0)) / self.Vll
+
+            self.a =  self.nt * np.array([[1.0, -1.0, 0.0],
+                                            [0.0, 1.0, -1.0],
+                                            [-1.0, 0.0, 1.0]])
+
+            self.b =  self.nt / 3.0 * np.array([[self.ztab, -self.ztab, 0.0],
+                                                 [self.ztbc, 2*self.ztbc, 0.0],
+                                                 [-2*self.ztca, -self.ztca, 0.0]])
+            self.c = np.zeros((3, 3))
+            self.d = 1.0 / 3 * self.nt * np.array([[1.0, -1.0, 0.0],
+                                                    [1.0, 2.0, 0.0],
+                                                    [-2.0, -1.0, 0.0]])
+
+
+            self.A = 1.0 / 3*self.nt * np.array([[2.0, 1.0, 0.0],
+                                             [0.0, 2.0, 1.0],
+                                             [1.0, 0.0, 2.0]])
+            self.B = 1.0 / 9.0 * self.zt *np.array([[2.0*self.ztab+self.ztbc, 2.0*self.ztbc-2*self.ztab, 0.0],
+                                             [2.0*self.ztbc-2*self.ztca, 4.0*self.ztbc-self.ztca, 0.0],
+                                             [self.ztab-4*self.ztca, -self.ztab-2*self.ztca, 0.0]])
 
             self.zt_012 = np.dot(np.linalg.inv(A), np.dot(self.B, A))
 
@@ -1251,7 +1332,7 @@ class Auto_TransformerModel(object):
                  r=None,
                  x=None):
 
-    
+
         self.visited=False
         self.name = name
         self.step=step
@@ -1300,9 +1381,9 @@ class Auto_TransformerModel(object):
         else:
             self.tap_manual=True
 
-        
 
-        
+
+
         self.define_parameters(self.vn,self.vn,self.vn)
 
     def define_parameters(self,va,vb,vc):
@@ -1327,13 +1408,13 @@ class Auto_TransformerModel(object):
 
 
             self.define_tap()
-            
+
         else:
             self.define_tap()
 
 
-        
-        
+
+
 
 
         self.a=np.array([[self.aR_a,0,0],
@@ -1352,7 +1433,7 @@ class Auto_TransformerModel(object):
         self.A=self.d
         self.B=np.zeros((3,3))
 
-        
+
 
     def define_tap(self):
 
@@ -1377,7 +1458,7 @@ class Auto_TransformerModel(object):
         else:
             self.aR_c=float(1-self.step_pu*np.round(self.tap_max))
 
-    
+
 
     def controler_voltage(self,ia,ib,ic,va,vb,vc):
 
@@ -1441,7 +1522,7 @@ class DistGrid(Tree):
         self.switchs = dict()
         for section in sections:
             if section.switch is not None:
-                self.switchs[section.switch.name] = section.switch       
+                self.switchs[section.switch.name] = section.switch
 
     def order(self, root):
 
@@ -1771,7 +1852,7 @@ class Conductor(object):
                  rz=None,
                  xz=None,
                  ampacity=None):
-        if name is not None: 
+        if name is not None:
             self.name = name
             self.rp = float(rp)
             self.xp = float(xp)

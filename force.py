@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """This script file generate a random feeder with medium and 
 low voltage nodes, write the graph to a networkx graph object
 then write the graph to a json file named force.json with some
@@ -26,8 +27,10 @@ from terminaltables import AsciiTable
 from mygrid.grid import GridElements, ExternalGrid, Section, LoadNode
 from mygrid.grid import Conductor, Switch, TransformerModel, LineModel
 from mygrid.util import p2r, r2p
-from mygrid.power_flow.backward_forward_sweep_3p import calc_power_flow, calc_power_flow_profiling
+from mygrid.power_flow.backward_forward_sweep_3p import calc_power_flow#, calc_power_flow_profiling
+from os import sys
 
+sys.setrecursionlimit(100000)
 
 def _search_tree(node, stack, prob, max_nodes, visit, tree):
     """Este metodo tem por objetivo gerar uma árvore de grafo
@@ -356,6 +359,8 @@ def create_mygrid_model(file):
                                        voltage=vll_bt)
         nodes[node['name']] = node_object
 
+
+    print('qt nodes:' , len(nodes))
     sections = dict()
     for link in data['links']:
         if link['type'] == 'line':
@@ -421,11 +426,11 @@ def display_data(grid):
     #print(table.table)
 
 def main():
-    nodes_mv_ = 500
+    nodes_mv_ = 300
     graph = generate_grid(nodes_mv=nodes_mv_)
     return graph
 
 if __name__ == '__main__':
-    graph = main()
+    #graph = main()
     grid = create_mygrid_model(open('force.json', 'r'))
     # calc_power_flow(grid.dist_grids['F0'])
