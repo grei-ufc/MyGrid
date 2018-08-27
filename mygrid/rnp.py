@@ -5,6 +5,7 @@ node depth representation (RNP) module
 
 from collections import OrderedDict
 from numpy import array, size, reshape, where, concatenate, mat, delete, ndarray, insert
+import graphviz as gv
 
 
 class Node(object):
@@ -352,6 +353,37 @@ class Tree(object):
             return path
         else:
             return path[:, range(size(path, axis=1) - 1, -1, -1)]
+
+
+    def show_graph(self):
+        nodes = list(self.tree.keys())
+
+        for i in nodes:
+            if i == self.root:
+                nodes.remove(i)
+                nodes.insert(0, i)
+
+        edges = list()
+        self.g = gv.Graph(format='svg')
+        self.g.graph_attr['rankdir'] = 'LR'
+        self.g.node_attr['penwidth'] = '2.0'
+        self.g.edge_attr['penwidth'] = '2.0'
+
+        for i in nodes:
+            self.g.node(i)
+            for j in self.tree[i]:
+                ij = set((i, j))
+                if ij not in edges:
+                    edges.append(ij.copy())
+                    n1 = ij.pop()
+                    n2 = ij.pop()
+                    p1 = self._search_depth(n1)[0]
+                    p2 = self._search_depth(n2)[0]
+                    if p1 < p2:
+                        self.g.edge(n1, n2)
+                    else:
+                        self.g.edge(n2, n1)
+        return self.g
 
 
 

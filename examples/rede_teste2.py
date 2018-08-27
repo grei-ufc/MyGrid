@@ -1,4 +1,4 @@
-from mygrid.grid import GridElements, ExternalGrid,Generation,Shunt_Capacitor
+from mygrid.grid import GridElements, ExternalGrid, Generation, Shunt_Capacitor
 from mygrid.grid import Substation, Sector, Switch, LineModel
 from mygrid.grid import Section, LoadNode, TransformerModel, Conductor, Auto_TransformerModel
 from mygrid.util import R, P
@@ -74,158 +74,158 @@ vll_bt = p2r(380.0, 0.0)
 
 # transformers
 t1 = TransformerModel(name="T1",
-											primary_voltage=vll_mt,
-											secondary_voltage=vll_bt,
-											power=225e3,
-											impedance=0.01 + 0.2j)
+                      primary_voltage=vll_mt,
+                      secondary_voltage=vll_bt,
+                      power=225e3,
+                      impedance=0.01 + 0.2j)
 
 eg1 = ExternalGrid(name='extern grid 1', vll=vll_mt)
 
 # Definição GD's
 
-c2_PV=Generation(name="c2_PV",
-          P=10e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV")
-c3_PV=Generation(name="c3_PV",
-          P=10e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV")
-b2_PV=Generation(name="b2_PV",
-          P=10e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV")
-b1_PQ=Generation(name="b2_PV",
-          Pa=100e3+300e3j,
-          Pb=0.0e3+200.0e3j,
-          Pc=0.0e3+0.0e3j,
-          generation_type="PQ")
-SC_C1=Shunt_Capacitor(vll=13.8e3,
-                       Qa=100e3,Qb=100e3,Qc=100e3,
-                      type_connection="wye")
+c2_PV = Generation(name="c2_PV",
+                   P=10e3 + 0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV")
+c3_PV = Generation(name="c3_PV",
+                   P=10e3 + 0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV")
+b2_PV = Generation(name="b2_PV",
+                   P=10e3 + 0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV")
+b1_PQ = Generation(name="b2_PV",
+                   Pa=100e3 + 300e3j,
+                   Pb=0.0e3 + 200.0e3j,
+                   Pc=0.0e3 + 0.0e3j,
+                   generation_type="PQ")
+SC_C1 = Shunt_Capacitor(vll=13.8e3,
+                        Qa=100e3, Qb=100e3, Qc=100e3,
+                        type_connection="wye")
 
-auto_t1=Auto_TransformerModel(name="auto_t1",
-															step=0.75,
-															tap_max=15,
-															voltage=12.47e3,
-															# tap_a=0.96,
-															# tap_b=0.96,
-															# tap_c=0.96,
-															v_c=120,
-															v_c_min=119,
-															R=5,
-															X=11,
-															CTP=600,
-															CTS=5)
+auto_t1 = Auto_TransformerModel(name="auto_t1",
+                                step=0.75,
+                                tap_max=15,
+                                voltage=12.47e3,
+                                # tap_a=0.96,
+                                # tap_b=0.96,
+                                # tap_c=0.96,
+                                v_c=120,
+                                v_c_min=119,
+                                R=5,
+                                X=11,
+                                CTP=600,
+                                CTS=5)
 
 # Nos de carga do alimentador S1_AL1
 s1 = LoadNode(name='S1',
-							voltage=vll_mt,
-							external_grid=eg1)
+              voltage=vll_mt,
+              external_grid=eg1)
 a1 = LoadNode(name='A1',
-              power=120+160j,
+              power=120 + 160j,
               voltage=vll_mt)
 a2 = LoadNode(name='A2',
               power=150.0e3 + 110.0e3j,
               voltage=vll_mt)
 
 a3 = LoadNode(name='A3',
-							power=100.0e3 + 80.0e3j,
-							voltage=vll_mt)
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
 b1 = LoadNode(name='B1',
               power=200.0e3 + 140.0e3j,
-              #generation=b1_PQ,
+              # generation=b1_PQ,
               voltage=vll_mt)
 b2 = LoadNode(name='B2',
               power=150.0e3 + 110.0e3j,
-              #generation=b2_PV,
+              # generation=b2_PV,
               voltage=vll_mt)
 
 b3 = LoadNode(name='B3',
-							power=100.0e3 + 80.0e3j,
-							voltage=vll_mt)
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
 c1 = LoadNode(name='C1',
               power=200.0e3 + 140.0e3j,
-              #shunt_capacitor=SC_C1,
+              # shunt_capacitor=SC_C1,
               voltage=vll_mt)
 c2 = LoadNode(name='C2',
               power=150.0e3 + 110.0e3j,
-              #generation=c2_PV,
+              # generation=c2_PV,
               voltage=vll_mt)
 c3 = LoadNode(name='C3',
-              ppa=400.0e3+0.0j,
-              ppb=0.0e3+0.0j,
-              ppc=0.0e3+0.0j,
-              #generation=c3_PV,
+              ppa=400.0e3 + 0.0j,
+              ppb=0.0e3 + 0.0j,
+              ppc=0.0e3 + 0.0j,
+              # generation=c3_PV,
               voltage=vll_mt)
 
 # Nos de carga do alimentador S1_AL1
 f1 = LoadNode(name='F1',
-							power=100.0e3 + 80.0e3j,
-							voltage=vll_mt)
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
 g1 = LoadNode(name='G1',
-							power=100.0e3 + 80.0e3j,
-							voltage=vll_mt)
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
 
 # Nos de carga do alimentador S2_AL1
 s2 = LoadNode(name='S2',
-							voltage=vll_mt,
-							external_grid=eg1)
+              voltage=vll_mt,
+              external_grid=eg1)
 d1 = LoadNode(name='D1',
-							power=200.0e3 + 160.0e3j,
-							voltage=vll_mt)
+              power=200.0e3 + 160.0e3j,
+              voltage=vll_mt)
 d2 = LoadNode(name='D2',
-							power=900.0e3 + 40.0e3j,
-							voltage=vll_mt)
+              power=900.0e3 + 40.0e3j,
+              voltage=vll_mt)
 d3 = LoadNode(name='D3',
-							power=100.0e3 + 80.0e3j,
-							voltage=vll_mt,)
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt,)
 e1 = LoadNode(name='E1',
-							power=100.0e3 + 40.0e3j,
-							voltage=vll_mt)
+              power=100.0e3 + 40.0e3j,
+              voltage=vll_mt)
 e2 = LoadNode(name='E2',
-							power=110.0e3 + 70.0e3j,
-							voltage=vll_mt)
+              power=110.0e3 + 70.0e3j,
+              voltage=vll_mt)
 e3 = LoadNode(name='E3',
-							power=150.0e3 + 80.0e3j,
-							voltage=vll_mt)
+              power=150.0e3 + 80.0e3j,
+              voltage=vll_mt)
 
 # Subgrid load-nodes connecteds to A1
 aa1 = LoadNode(name='AA1',
-							 power=0.0 + 0.0j,
-							 voltage=vll_bt)
+               power=0.0 + 0.0j,
+               voltage=vll_bt)
 aa2 = LoadNode(name='AA2',
-							 power=20.0e3 + 5.0e3j,
-							 voltage=vll_bt)
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
 aa3 = LoadNode(name='AA3',
-							 power=20.0e3 + 5.0e3j,
-							 voltage=vll_bt)
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
 
 phase_conduct = Conductor(id=57)
 neutral_conduct = Conductor(id=44)
 
 line_model_a = LineModel(loc_a=0.0 + 29.0j,
-												 loc_b=2.5 + 29.0j,
-												 loc_c=7.0 + 29.0j,
-												 loc_n=4.0 + 25.0j,
-												 conductor=phase_conduct,
-												 neutral_conductor=neutral_conduct,
-												 neutral=False)
+                         loc_b=2.5 + 29.0j,
+                         loc_c=7.0 + 29.0j,
+                         loc_n=4.0 + 25.0j,
+                         conductor=phase_conduct,
+                         neutral_conductor=neutral_conduct,
+                         neutral=False)
 
 phase_conduct_bt = Conductor(id=32)
 line_model_b = LineModel(loc_a=0.0 + 29.0j,
@@ -245,15 +245,15 @@ s1_a2 = Section(name='S1A2',
                 length=4)
 
 a2_a1 = Section(name='A2A1',
-								n1=a2,
-								n2=a1,
-								line_model=line_model_a,
-								length=4)
+                n1=a2,
+                n2=a1,
+                line_model=line_model_a,
+                length=4)
 a2_a3 = Section(name='A2A3',
-								n1=a2,
-								n2=a3,
-								line_model=line_model_a,
-								length=4)
+                n1=a2,
+                n2=a3,
+                line_model=line_model_a,
+                length=4)
 a2_c1 = Section(name='A2C1',
                 n1=a2,
                 n2=c1,
@@ -280,99 +280,99 @@ a3_b1 = Section(name='A3B1',
                 length=4)
 
 b1_b2 = Section(name='B1B2',
-								n1=b1,
-								n2=b2,
-								line_model=line_model_a,
-								length=4)
+                n1=b1,
+                n2=b2,
+                line_model=line_model_a,
+                length=4)
 b2_b3 = Section(name='B2B3',
-								n1=b2,
-								n2=b3,
-								line_model=line_model_a,
-								length=4)
+                n1=b2,
+                n2=b3,
+                line_model=line_model_a,
+                length=4)
 
 # Trechos do alimentador S1_AL2
 s1_f1 = Section(name='S1F1',
-								n1=s1,
-								n2=f1,
-								switch=ch9,
-								line_model=line_model_a,
-								length=1.0)
+                n1=s1,
+                n2=f1,
+                switch=ch9,
+                line_model=line_model_a,
+                length=1.0)
 f1_g1 = Section(name='F1G1',
-								n1=f1,
-								n2=g1,
-								switch=ch10,
-								line_model=line_model_a,
-								length=1.0)
+                n1=f1,
+                n2=g1,
+                switch=ch10,
+                line_model=line_model_a,
+                length=1.0)
 g1_d2 = Section(name='G1D2',
-								n1=g1,
-								n2=d2,
-								switch=ch11,
-								line_model=line_model_a,
-								length=1.0)
+                n1=g1,
+                n2=d2,
+                switch=ch11,
+                line_model=line_model_a,
+                length=1.0)
 
 # Trechos do alimentador S2_AL1
 s2_d1 = Section(name='S2D1',
-								n1=s2,
-								n2=d1,
-								switch=ch6,
-								line_model=line_model_a,
-								length=1.0)
+                n1=s2,
+                n2=d1,
+                switch=ch6,
+                line_model=line_model_a,
+                length=1.0)
 
 d1_d2 = Section(name='D1D2',
-								n1=d1,
-								n2=d2,
-								line_model=line_model_a,
-								length=1.0)
+                n1=d1,
+                n2=d2,
+                line_model=line_model_a,
+                length=1.0)
 d1_d3 = Section(name='D1D3',
-								n1=d1,
-								n2=d3,
-								line_model=line_model_a,
-								length=1.0)
+                n1=d1,
+                n2=d3,
+                line_model=line_model_a,
+                length=1.0)
 d1_e1 = Section(name='D1E1',
-								n1=d1,
-								n2=e1,
-								switch=ch7,
-								line_model=line_model_a,
-								length=1.0)
+                n1=d1,
+                n2=e1,
+                switch=ch7,
+                line_model=line_model_a,
+                length=1.0)
 e1_e2 = Section(name='E1E2',
-								n1=e1,
-								n2=e2,
-								line_model=line_model_a,
-								length=1.0)
+                n1=e1,
+                n2=e2,
+                line_model=line_model_a,
+                length=1.0)
 e1_e3 = Section(name='E1E3',
-								n1=e1,
-								n2=e3,
-								line_model=line_model_a,
-								length=1.0)
+                n1=e1,
+                n2=e3,
+                line_model=line_model_a,
+                length=1.0)
 
 # Sections de encontro de alimentador
 c3_e3 = Section(name='C3E3',
-								n1=c3,
-								n2=e3,
-								switch=ch8,
-								line_model=line_model_a,
-								length=1.0)
+                n1=c3,
+                n2=e3,
+                switch=ch8,
+                line_model=line_model_a,
+                length=1.0)
 b2_e2 = Section(name='B2E2',
-								n1=b2,
-								n2=e2,
-								switch=ch4,
-								line_model=line_model_a,
-								length=1.0)
+                n1=b2,
+                n2=e2,
+                switch=ch4,
+                line_model=line_model_a,
+                length=1.0)
 
 b3_c3 = Section(name='B3C3',
-								n1=b3,
-								n2=c3,
-								switch=ch5,
-								line_model=line_model_a,
-								length=0.5)
+                n1=b3,
+                n2=c3,
+                switch=ch5,
+                line_model=line_model_a,
+                length=0.5)
 
 
 # subgrid sections connecteds to A1
 a1_aa1 = Section(name='A1AA1',
-								 n1=a1,
-								 n2=aa1,
-								 transformer=t1,
-								 length=3.0e-2)
+                 n1=a1,
+                 n2=aa1,
+                 transformer=t1,
+                 length=3.0e-2)
 aa1_aa2 = Section(name='AA1AA2',
                   n1=aa1,
                   n2=aa2,
@@ -385,7 +385,7 @@ aa1_aa3 = Section(name='AA2AA3',
                   length=3.0e-2)
 
 load_nodes = [s1, a1, a2, a3, b1, b2, b3, c1, c2, c3,
-							s2, d1, d2, d3, e1, e2, e3, f1, g1, aa1, aa2, aa3]
+              s2, d1, d2, d3, e1, e2, e3, f1, g1, aa1, aa2, aa3]
 sections = [s1_a2, a2_a1, a2_a3, a2_c1, c1_c2, c1_c3, c3_e3, a3_b1, b1_b2, b2_b3, b2_e2,
             b3_c3, s2_d1, d1_d2, d1_d3, d1_e1, e1_e2, e1_e3, s1_f1, f1_g1, g1_d2,
             a1_aa1, aa1_aa2, aa1_aa3]
@@ -405,7 +405,6 @@ inicio = time.time()
 calc_power_flow(grid_elements.dist_grids['F0'])
 fim = time.time()
 print(fim - inicio)
-
 
 
 # # calculo de curto circuito

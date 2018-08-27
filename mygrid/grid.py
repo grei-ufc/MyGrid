@@ -662,7 +662,7 @@ class LoadNode(object):
     @ppa.setter
     def ppa(self, valor):
         self._ppa = valor
-        self._pp[0] = valor
+        self._pp[0] = complex(valor)
 
     @property
     def ppb(self):
@@ -671,7 +671,7 @@ class LoadNode(object):
     @ppb.setter
     def ppb(self, valor):
         self._ppb = valor
-        self._pp[1] = valor
+        self._pp[1] = complex(valor)
 
     @property
     def ppc(self):
@@ -680,7 +680,7 @@ class LoadNode(object):
     @ppc.setter
     def ppc(self, valor):
         self._ppc = valor
-        self._pp[2] = valor
+        self._pp[2] = complex(valor)
 
     def __repr__(self):
         return 'Load Node: ' + self.name

@@ -421,7 +421,7 @@ def display_data(grid):
     #print(table.table)
 
 def main():
-    nodes_mv_ = 500
+    nodes_mv_ = 5
     graph = generate_grid(nodes_mv=nodes_mv_)
     return graph
 

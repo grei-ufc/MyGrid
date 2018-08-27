@@ -71,8 +71,6 @@ def calc_power_flow(dist_grid):
         # verificação de tensões 
         # das barras PV (se houverem).
         # -------------------------
-
-    print(iter)
     calc=False 
     for sections in dist_grid.sections.values():
         if isinstance(sections.transformer, Auto_TransformerModel) and not(sections.transformer_visited):
