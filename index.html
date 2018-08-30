@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  <link rel="shortcut icon" href="./img/favicon.ico">
+  <title>Inicio - MyGrid</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Inicio";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> MyGrid</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href=".">Inicio</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#bem-vindo-a-documentacao-do-projeto-mygrid">Bem vindo à documentação do projeto MyGrid</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#comecando-do-comeco">Começando do começo</a></li>
+        
+            <li><a class="toctree-l3" href="#principios-gerais">Princípios Gerais</a></li>
+        
+            <li><a class="toctree-l3" href="#representacao-de-grafos">Representação de Grafos</a></li>
+        
+            <li><a class="toctree-l3" href="#instanciando-uma-rede-eletrica">Instanciando uma rede elétrica</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="about/">Sobre</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">MyGrid</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Inicio</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div style="text-align:center">
+    <img src="my_grid_logo_2.png" width="300">    
+</div>
+
+<p><br></p>
+<h1 id="bem-vindo-a-documentacao-do-projeto-mygrid">Bem vindo à documentação do projeto MyGrid</h1>
+<p>O projeto MyGrid tem o objetivo de oferecer uma ferramenta computacional para <strong>representação topológica e descritiva dos componentes da rede elétrica de distribuição</strong>, permitindo em contrapartida a realização de estudos da rede definida, tais como:</p>
+<ul>
+<li>análise de fluxo de carga;</li>
+<li>ajuste de reguladores de tensão;</li>
+<li>cálculo de curto-circuito;</li>
+<li>estudos de impactos causados pela inserção de micro-geração distribuída.</li>
+</ul>
+<p>A representação que o MyGrid faz de todos os componentes da rede elétrica é trifásica o que permite uma representação mais fiel à realidade, permitindo o estudo de desequilíbrios no sistema e a conexão de cargas e gerações monofásica e bifásicas.</p>
+<p>O MyGrid é desenvolvido em linguagem de programação python e mantido pelo Grupo de Redes Elétricas Inteligentes da Universidade Federal do Ceará - <a href="https://grei-master.github.io/site/">GREI-UFC</a>.</p>
+<h2 id="comecando-do-comeco">Começando do começo</h2>
+<p>Para começar a utilizar o MyGrid existem duas opções. A primeira é utilizar o repositório padrão de pacotes python (PYPI), simplesmente digitando o comando:</p>
+<pre><code>$ pip install mygrid
+</code></pre>
+<p>Inicie uma seção Jupyter e digite:</p>
+<pre><code>In [1]: import mygrid
+</code></pre>
+<p>Pronto, o mygrid já está pronto para ser utilizado.</p>
+<p>A segunda opção é fazer o download do código fonte no seu computador, para fazer isso é muito simples, basta abrir o terminal e digitar o seguinte comando:</p>
+<pre><code>$ git clone https://github.com/grei-ufc/MyGrid
+</code></pre>
+<p>Após executar esse comando uma pasta com o nome MyGrid será criada no diretório em que você se encontra.</p>
+<p>Digite:</p>
+<pre><code>$ cd MyGrid
+</code></pre>
+<p>Inicie uma seção Jupyter:</p>
+<pre><code>$ jupyter qtconsole
+</code></pre>
+<p>No console Jupyter digite:</p>
+<pre><code>In [1]: import mygrid
+</code></pre>
+<p>Para instalar o código no seu ambiente Python padrão ou no virtual enviroment que estiver utilizando, basta digitar no diretório raiz do mygrid:</p>
+<pre><code>$ python setup.py install
+</code></pre>
+<p>Se tudo tiver corrido bem nenhum erro ocorrerá e você estará pronto para utilizar o MyGrid.</p>
+<h2 id="principios-gerais">Princípios Gerais</h2>
+<p>O MyGrid é a implementação computacional do conceito de RNP, ou Representação Nó Profundidade, para a representação da rede elétrica de distribuição. Ou seja, no MyGrid os conceitos de nó, profundidade, árvore de grafo, entre outros estão mesclados aos conceitos de rede elétrica, chave, trecho de condutor, setor elétrico, e assim por diante. Isso foi realizado por meio de duas camadas de implementação computacional.</p>
+<p>Na primeira camada o MyGrid implementa dos conceitos relacionados à RNP por meio da classe Árvore. Em uma segunda camada as classes implementadas representam os elementos da rede elétrica, como mencionados anteriormente, tendo alguns destes elementos as classes que representam a RNP como super-classes.</p>
+<p>Os conceitos aqui mencionados serão mais bem compreendidos por meio da montagem e utilização dos métodos computacionais disponibilizados pelas classes afim de realizar operações na rede elétrica.</p>
+<p>Além de disponibilizar uma representação computacionalmente eficiente da rede elétrica o MyGrid disponibiliza algoritmos de análise tais como cálculo de fluxo de carga e de curto-circuito.</p>
+<h2 id="representacao-de-grafos">Representação de Grafos</h2>
+<p>Para que seja possível a representação da rede elétrica por meio de grafos no modelo nó profundidade primeiro é necessário ter ferramentas que permitam a representação genérica de grafos. Quem implementa essas funções no MyGrid é o módulo principal chamado de <code>rnp.py</code>.</p>
+<p>A principal classe desse módulo se chama <code>Tree()</code> e possui todos os métodos e atributos necessários para a manipulação de uma árvore de grafo.</p>
+<p>No exemplo abaixo é mostrado o instanciamento de duas árvores de grafo, <code>tree_1</code> e <code>tree_2</code>. Para que a estrutura rnp possa ser montada duas ações precisam ser realizadas, a primeira é a passagem da estrutura da rede, isso é feito por meio de um dicionário em que cada chave é o nome de um dos nós da árvore e os valores são listas contendo os vizinhos desse nó, sem considerar orientação, ainda. A segunda ação é indicar qual a o nó será considerado o nó de referência da árvore, ou seja, qual o nó será o nó raiz, isso implica que este nó terá profundidade zero.</p>
+<pre><code class="python">nodes1 = {3: [1],
+          1: [3, 2, 7],
+          7: [1, 8, 9, 4, 10],
+          10: [7],
+          4: [7, 5, 6],
+          5: [4],
+          6: [4],
+          9: [7],
+          8: [7],
+          2: [1, 11, 12, 13],
+          11: [2],
+          12: [2, 13],
+          13: [12]}
+
+nodes2 = {14: [15],
+          15: [14, 16, 19],
+          16: [15, 17, 18],
+          17: [16],
+          18: [16],
+          19: [15]}
+
+# definição da tree a1
+tree_1 = Tree(nodes1)
+
+# ordenação da tree a1
+tree_1.order(root=3)
+print(tree_1.rnp)
+
+# definição da tree a2
+tree_2 = Tree(nodes2)
+
+# ordenação da tree a2
+tree_2.order(root=14)
+print(tree_2.rnp)
+</code></pre>
+
+<p>Após a definição das árvores de grafo e instanciados os objetos é possível relizar as operações de poda e de inserção sobre as árvores de grafos, e dessa forma modificar suas estruturas. No código abaixo é feita uma operação de poda em <code>tree_1</code> na altura do nó 7 e em seguida o ramo podado é inserido em <code>tree_2</code> na altura do nó 19.</p>
+<pre><code class="python"># operação de poda
+prune = tree_1.prune(7, change_rnp=True)
+print(prune)
+print(tree_1.rnp)
+
+# operação de inserção
+tree_2.insert_branch(19, prune, 7)
+print(tree_2.rnp)
+</code></pre>
+
+<p>Os resultados são mostrados abaixo:</p>
+<h2 id="instanciando-uma-rede-eletrica">Instanciando uma rede elétrica</h2>
+<p>O principal objetivo do MyGrid é a representação da rede elétrica em uma estrtura de grafos mas ao mesmo tempo com recursos de orientação a objetos. Isso é feito definindo classes que representam os elementos da rede elétrica mas que também herdam das classes definidas no módulo <code>rnp.py</code> para que seja possível uma representação topológica da rede.</p>
+<p>Para exemplificar o processo de representação da rede elétrica iremos considerar a rede mostrada na Figura abaixo.</p>
+<p><img alt="Rede Elétrica" src="./rede.png" title="Rede Elétrica" /></p>
+<p>Nesta rede é possível observar alguns componentes básicos de uma rede elétrica de média/baixa tensão:</p>
+<ul>
+<li>Transformadores;</li>
+<li>Chaves Elétricas;</li>
+<li>Trechos de Linahs;</li>
+<li>Pontos de derivação e de carga;</li>
+</ul>
+<p>Os primeiros elementos que podem ser instanciados para a composição da rede elétrica são as chaves existentes no sistema, para a rede exemplo temos:</p>
+<pre><code class="python">
+from mygrid.grid import Switch
+
+# switchs do alimentador 1 de S1
+ch1 = Switch(name='1', state=1)
+ch2 = Switch(name='2', state=1)
+ch3 = Switch(name='3', state=1)
+
+# Switchs do alimentador 2 de S1
+ch9 = Switch(name='9', state=1)
+ch10 = Switch(name='10', state=1)
+
+# switchs de Fronteira
+ch4 = Switch(name='4', state=0)
+ch5 = Switch(name='5', state=0)
+ch8 = Switch(name='8', state=0)
+ch11 = Switch(name='11', state=0)
+
+# switchs do alimentador de S2
+ch6 = Switch(name='6', state=1)
+ch7 = Switch(name='7', state=1)
+</code></pre>
+
+<p>Em seguinda podemos instanciar os transformadores de distribuição, ou seja, os transformadores que baixam o nível de tensão de linha de 13,8kV para 380V. Para isso é necessário também instanciar os níveis de tensão primário e secundário:</p>
+<pre><code class="python">
+from mygrid.grid import TransformerModel
+# tensao nominal
+
+vll_mt = p2r(13.8e3, 0.0)
+vll_bt = p2r(380.0, 0.0)
+
+# transformers
+t1 = TransformerModel(name=&quot;T1&quot;,
+                      primary_voltage=vll_mt,
+                      secondary_voltage=vll_bt,
+                      power=225e3,
+                      impedance=0.01 + 0.2j)
+</code></pre>
+
+<p>Após instanciar chaves e transformadores de distribuição o próximo passo é instanciar os nós de carga presentes no sistema, tanto os de média quanto os de baixa tensão, isso é feito especificando um <em>nome</em>, um <em>nível de tensão</em>, e um <em>valor de carga</em>.</p>
+<p>Também se o nó de carga possuir interface com uma rede elétrica externa isso deve ser informador no parâmetro <code>external_grid</code>.</p>
+<pre><code class="python"># Nos de carga do alimentador S1_AL1
+s1 = LoadNode(name='S1',
+              voltage=vll_mt,
+              external_grid=eg1)
+a1 = LoadNode(name='A1',
+              power=120 + 160j,
+              voltage=vll_mt)
+a2 = LoadNode(name='A2',
+              power=150.0e3 + 110.0e3j,
+              voltage=vll_mt)
+
+a3 = LoadNode(name='A3',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+b1 = LoadNode(name='B1',
+              power=200.0e3 + 140.0e3j,
+              # generation=b1_PQ,
+              voltage=vll_mt)
+b2 = LoadNode(name='B2',
+              power=150.0e3 + 110.0e3j,
+              # generation=b2_PV,
+              voltage=vll_mt)
+
+b3 = LoadNode(name='B3',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+c1 = LoadNode(name='C1',
+              power=200.0e3 + 140.0e3j,
+              # shunt_capacitor=SC_C1,
+              voltage=vll_mt)
+c2 = LoadNode(name='C2',
+              power=150.0e3 + 110.0e3j,
+              # generation=c2_PV,
+              voltage=vll_mt)
+c3 = LoadNode(name='C3',
+              ppa=400.0e3 + 0.0j,
+              ppb=0.0e3 + 0.0j,
+              ppc=0.0e3 + 0.0j,
+              # generation=c3_PV,
+              voltage=vll_mt)
+
+# Nos de carga do alimentador S1_AL1
+f1 = LoadNode(name='F1',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+g1 = LoadNode(name='G1',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+
+# Nos de carga do alimentador S2_AL1
+s2 = LoadNode(name='S2',
+              voltage=vll_mt,
+              external_grid=eg1)
+d1 = LoadNode(name='D1',
+              power=200.0e3 + 160.0e3j,
+              voltage=vll_mt)
+d2 = LoadNode(name='D2',
+              power=900.0e3 + 40.0e3j,
+              voltage=vll_mt)
+d3 = LoadNode(name='D3',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt,)
+e1 = LoadNode(name='E1',
+              power=100.0e3 + 40.0e3j,
+              voltage=vll_mt)
+e2 = LoadNode(name='E2',
+              power=110.0e3 + 70.0e3j,
+              voltage=vll_mt)
+e3 = LoadNode(name='E3',
+              power=150.0e3 + 80.0e3j,
+              voltage=vll_mt)
+
+# Subgrid load-nodes connecteds to A1
+aa1 = LoadNode(name='AA1',
+               power=0.0 + 0.0j,
+               voltage=vll_bt)
+aa2 = LoadNode(name='AA2',
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
+aa3 = LoadNode(name='AA3',
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
+</code></pre>
+
+<p>Após serem definidos os nós de carga da rede elétrica, é preciso especificar os seguimentos de linha ou transformadores que estão entre dois nós, definindo assim a topologia da rede. O primeiro procedimento para isso é a definição dos condutores que serão utilizados nos seguimentos de linha. Para isso o MyGrid possui uma tabela de condutores pré-definidos conforme especificado nos apêndices do livro <strong>Distribution System Modeling and Analysis de William H. Kersting</strong>. A lista dos condutores com seus respectivos códigos pode ser visualizada abaixo:</p>
+<pre><code class="json">[
+    {
+        &quot;id&quot;: 0,
+        &quot;size&quot;: &quot;1&quot;,
+        &quot;stranding&quot;: &quot;None&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 1,
+        &quot;size&quot;: &quot;1&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 2,
+        &quot;size&quot;: &quot;1&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 3,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 4,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 5,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;7/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 6,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 7,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 8,
+        &quot;size&quot;: &quot;3&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 9,
+        &quot;size&quot;: &quot;3&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 10,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 11,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;7/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 12,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 13,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 14,
+        &quot;size&quot;: &quot;5&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 15,
+        &quot;size&quot;: &quot;5&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 16,
+        &quot;size&quot;: &quot;6&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 17,
+        &quot;size&quot;: &quot;6&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 18,
+        &quot;size&quot;: &quot;6&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 19,
+        &quot;size&quot;: &quot;7&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 20,
+        &quot;size&quot;: &quot;8&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 21,
+        &quot;size&quot;: &quot;9&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 22,
+        &quot;size&quot;: &quot;10&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 23,
+        &quot;size&quot;: &quot;12&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 24,
+        &quot;size&quot;: &quot;14&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 25,
+        &quot;size&quot;: &quot;16&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 26,
+        &quot;size&quot;: &quot;18&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 27,
+        &quot;size&quot;: &quot;19&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 28,
+        &quot;size&quot;: &quot;20&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 29,
+        &quot;size&quot;: &quot;22&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 30,
+        &quot;size&quot;: &quot;24&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 31,
+        &quot;size&quot;: &quot;1/0&quot;,
+        &quot;stranding&quot;: &quot;None&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 32,
+        &quot;size&quot;: &quot;1/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 33,
+        &quot;size&quot;: &quot;1/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 34,
+        &quot;size&quot;: &quot;2/0&quot;,
+        &quot;stranding&quot;: &quot;None&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 35,
+        &quot;size&quot;: &quot;2/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 36,
+        &quot;size&quot;: &quot;2/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 37,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 38,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 39,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 40,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 41,
+        &quot;size&quot;: &quot;3/8&quot;,
+        &quot;stranding&quot;: &quot;INCH STE&quot;,
+        &quot;material&quot;: &quot;Steel&quot;,
+    },
+    {
+        &quot;id&quot;: 42,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 43,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 44,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 45,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 46,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 47,
+        &quot;size&quot;: &quot;250000&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 48,
+        &quot;size&quot;: &quot;250000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 49,
+        &quot;size&quot;: &quot;250000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 50,
+        &quot;size&quot;: &quot;266800&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 51,
+        &quot;size&quot;: &quot;266800&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 52,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 53,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 54,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 55,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 56,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 57,
+        &quot;size&quot;: &quot;336400&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 58,
+        &quot;size&quot;: &quot;336400&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 59,
+        &quot;size&quot;: &quot;336400&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 60,
+        &quot;size&quot;: &quot;350000&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 61,
+        &quot;size&quot;: &quot;350000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 62,
+        &quot;size&quot;: &quot;350000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 63,
+        &quot;size&quot;: &quot;397500&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 64,
+        &quot;size&quot;: &quot;397500&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 65,
+        &quot;size&quot;: &quot;397500&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 66,
+        &quot;size&quot;: &quot;400000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 67,
+        &quot;size&quot;: &quot;450000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 68,
+        &quot;size&quot;: &quot;450000&quot;,
+        &quot;stranding&quot;: &quot;CON LAG&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 69,
+        &quot;size&quot;: &quot;477000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 70,
+        &quot;size&quot;: &quot;477000&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 71,
+        &quot;size&quot;: &quot;477000&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 72,
+        &quot;size&quot;: &quot;500000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 73,
+        &quot;size&quot;: &quot;500000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 74,
+        &quot;size&quot;: &quot;500000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 75,
+        &quot;size&quot;: &quot;556500&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 76,
+        &quot;size&quot;: &quot;556500&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 77,
+        &quot;size&quot;: &quot;556500&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 78,
+        &quot;size&quot;: &quot;600000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 79,
+        &quot;size&quot;: &quot;600000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 80,
+        &quot;size&quot;: &quot;605000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 81,
+        &quot;size&quot;: &quot;605000&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 82,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;27/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 83,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;30/19&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 84,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 85,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 86,
+        &quot;size&quot;: &quot;666600&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 87,
+        &quot;size&quot;: &quot;700000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+    },
+    {
+        &quot;id&quot;: 88,
+        &quot;size&quot;: &quot;700000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 89,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 90,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;30/19&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 91,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 92,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 93,
+        &quot;size&quot;: &quot;750000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 94,
+        &quot;size&quot;: &quot;750000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+    },
+    {
+        &quot;id&quot;: 95,
+        &quot;size&quot;: &quot;795000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 96,
+        &quot;size&quot;: &quot;795000&quot;,
+        &quot;stranding&quot;: &quot;30/19&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    },
+    {
+        &quot;id&quot;: 97,
+        &quot;size&quot;: &quot;795000&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+    }
+]
+</code></pre>
+
+<p>Também é necessário definir um modelo de linha especificando os condutores da linha e sua configuração geométrica na estrutura utilizada. Para este exemplo são utilizados dois tipos de modelos de linha, um para a rede de média tensão e outro para a rede de baixa tensão. Também são especificados os condutores ids dos condutires de fase e de neutro para a média e a baixa tensão:</p>
+<pre><code class="python">phase_conduct = Conductor(id=57)
+neutral_conduct = Conductor(id=44)
+
+line_model_a = LineModel(loc_a=0.0 + 29.0j,
+                         loc_b=2.5 + 29.0j,
+                         loc_c=7.0 + 29.0j,
+                         loc_n=4.0 + 25.0j,
+                         conductor=phase_conduct,
+                         neutral_conductor=neutral_conduct,
+                         neutral=False)
+
+phase_conduct_bt = Conductor(id=32)
+
+line_model_b = LineModel(loc_a=0.0 + 29.0j,
+                         loc_b=2.5 + 29.0j,
+                         loc_c=7.0 + 29.0j,
+                         loc_n=4.0 + 25.0j,
+                         conductor=phase_conduct_bt,
+                         neutral_conductor=neutral_conduct,
+                         neutral=True)
+</code></pre>
+
+<p>Especificados os modelos de linha é possível passá-los como parâmetro da classe que irá especificar a ligação entre os nós, no MyGrid essa classe tem o nome de <code>Section()</code> e recebe como parâmetros um nome, os nós que estão em seus extremos, caso haja chave no seguimento esta é informada, o modelo de linha ou de transformador, e caso seja linha, o comprimento do seguimento de linha:</p>
+<pre><code class="python"># Trechos do alimentador S1_AL1
+s1_a2 = Section(name='S1A2',
+                n1=s1,
+                n2=a2,
+                switch=ch1,
+                line_model=line_model_a,
+                length=4)
+
+a2_a1 = Section(name='A2A1',
+                n1=a2,
+                n2=a1,
+                line_model=line_model_a,
+                length=4)
+a2_a3 = Section(name='A2A3',
+                n1=a2,
+                n2=a3,
+                line_model=line_model_a,
+                length=4)
+a2_c1 = Section(name='A2C1',
+                n1=a2,
+                n2=c1,
+                switch=ch3,
+                line_model=line_model_a,
+                length=4)
+
+c1_c2 = Section(name='C1C2',
+                n1=c1,
+                n2=c2,
+                line_model=line_model_a,
+                length=4)
+c1_c3 = Section(name='C1C3',
+                n1=c1,
+                n2=c3,
+                line_model=line_model_a,
+                length=4)
+
+a3_b1 = Section(name='A3B1',
+                n1=a3,
+                n2=b1,
+                switch=ch2,
+                line_model=line_model_a,
+                length=4)
+
+b1_b2 = Section(name='B1B2',
+                n1=b1,
+                n2=b2,
+                line_model=line_model_a,
+                length=4)
+b2_b3 = Section(name='B2B3',
+                n1=b2,
+                n2=b3,
+                line_model=line_model_a,
+                length=4)
+
+# Trechos do alimentador S1_AL2
+s1_f1 = Section(name='S1F1',
+                n1=s1,
+                n2=f1,
+                switch=ch9,
+                line_model=line_model_a,
+                length=1.0)
+f1_g1 = Section(name='F1G1',
+                n1=f1,
+                n2=g1,
+                switch=ch10,
+                line_model=line_model_a,
+                length=1.0)
+g1_d2 = Section(name='G1D2',
+                n1=g1,
+                n2=d2,
+                switch=ch11,
+                line_model=line_model_a,
+                length=1.0)
+
+# Trechos do alimentador S2_AL1
+s2_d1 = Section(name='S2D1',
+                n1=s2,
+                n2=d1,
+                switch=ch6,
+                line_model=line_model_a,
+                length=1.0)
+
+d1_d2 = Section(name='D1D2',
+                n1=d1,
+                n2=d2,
+                line_model=line_model_a,
+                length=1.0)
+d1_d3 = Section(name='D1D3',
+                n1=d1,
+                n2=d3,
+                line_model=line_model_a,
+                length=1.0)
+d1_e1 = Section(name='D1E1',
+                n1=d1,
+                n2=e1,
+                switch=ch7,
+                line_model=line_model_a,
+                length=1.0)
+e1_e2 = Section(name='E1E2',
+                n1=e1,
+                n2=e2,
+                line_model=line_model_a,
+                length=1.0)
+e1_e3 = Section(name='E1E3',
+                n1=e1,
+                n2=e3,
+                line_model=line_model_a,
+                length=1.0)
+
+# Sections de encontro de alimentador
+c3_e3 = Section(name='C3E3',
+                n1=c3,
+                n2=e3,
+                switch=ch8,
+                line_model=line_model_a,
+                length=1.0)
+b2_e2 = Section(name='B2E2',
+                n1=b2,
+                n2=e2,
+                switch=ch4,
+                line_model=line_model_a,
+                length=1.0)
+
+b3_c3 = Section(name='B3C3',
+                n1=b3,
+                n2=c3,
+                switch=ch5,
+                line_model=line_model_a,
+                length=0.5)
+
+
+# subgrid sections connecteds to A1
+a1_aa1 = Section(name='A1AA1',
+                 n1=a1,
+                 n2=aa1,
+                 transformer=t1,
+                 length=3.0e-2)
+aa1_aa2 = Section(name='AA1AA2',
+                  n1=aa1,
+                  n2=aa2,
+                  line_model=line_model_b,
+                  length=3.0e-2)
+aa1_aa3 = Section(name='AA2AA3',
+                  n1=aa1,
+                  n2=aa3,
+                  line_model=line_model_b,
+                  length=3.0e-2)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="about/" class="btn btn-neutral float-right" title="Sobre">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="about/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="./js/theme.js"></script>
+      <script src="./search/require.js"></script>
+      <script src="./search/search.js"></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 0.17.4
+Build Date UTC : 2018-08-30 16:16:02
+-->
