@@ -1,0 +1,5 @@
+site_name: MyGrid
+pages:
+  - Inicio: index.md
+  - Sobre: about.md
+theme: readthedocs
