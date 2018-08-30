@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='mygrid',
     packages=find_packages(),
-    data_files=[('data', ['mygrid/data/conductors.json']),],
+    data_files=[('mygrid/data', ['mygrid/data/conductors.json']),],
     version='0.1.1',
     description='A package to represent a electric grid \
     topology with extensions to make power flow and short circuit \
