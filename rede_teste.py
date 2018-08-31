@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from mygrid.grid import GridElements, ExternalGrid,Generation,Shunt_Capacitor
-from mygrid.grid import Substation, Sector, Switch, LineModel
-from mygrid.grid import Section, LoadNode, TransformerModel, Conductor, Auto_TransformerModel
+from mygrid.grid import GridElements, ExternalGrid, Generation
+from mygrid.grid import Shunt_Capacitor
+from mygrid.grid import Substation, Sector, Switch, LineModel, UnderGroundLine
+from mygrid.grid import Under_Ground_Conductor
+from mygrid.grid import Section, LoadNode, TransformerModel, Conductor
+from mygrid.grid import Auto_TransformerModel
 from mygrid.util import R, P
 from mygrid.util import p2r, r2p
 
-from mygrid.power_flow.backward_forward_sweep_3p import calc_power_flow#, calc_power_flow_profiling
-from mygrid.short_circuit.symmetrical_components import config_objects, calc_equivalent_impedance, calc_short_circuit
+from mygrid.power_flow.backward_forward_sweep_3p import calc_power_flow
+
 
 from terminaltables import AsciiTable
 import time
@@ -48,7 +51,10 @@ import numpy as np
 # a classe Arvore e contém todos os elementos que
 # representam um ramo da rede elétrica, como switchs, sectors,
 # nós de carga e sections;
-
+spacing500=[0.0 + 28.0j,
+            2.5 + 28.0j,
+            7.0 + 28.0j,
+            4.0 + 28.0j]
 
 # switchs do alimentador 1 de S1
 ch1 = Switch(name='1', state=1)
@@ -69,9 +75,9 @@ ch11 = Switch(name='11', state=0)
 ch6 = Switch(name='6', state=1)
 ch7 = Switch(name='7', state=1)
 
-Z= np.eye(3,dtype=complex)*(15+100j)
-Z1= np.eye(3, dtype=complex)
-Z2= np.eye(3, dtype=complex)*(1.5+5j)
+Z = np.eye(3, dtype=complex)*(15+100j)
+Z1 = np.eye(3, dtype=complex)
+Z2 = np.eye(3, dtype=complex)*(1.5+5j)
 
 
 # tensao nominal
@@ -90,113 +96,100 @@ eg1 = ExternalGrid(name='extern grid 1', vll=vll_mt)
 
 # Definição GD's
 
-C2_PV=Generation(name="C2_PV",
-          P=0e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV",
-          Z=Z)
+C2_PV = Generation(name="C2_PV",
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV",
+                   Z=Z)
 
-A3_PV=Generation(name="A3_PV",
-          P=0e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV",
-          Z=Z)
+A3_PV = Generation(name="A3_PV",
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV",
+                   Z=Z)
 
-B3_PV=Generation(name="B3_PV",
-          P=0e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV",
-          Z=Z)
+B3_PV = Generation(name="B3_PV",
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV",
+                   Z=Z)
 
-B1_PV=Generation(name="B1_PV",
-          P=0e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.002,
-          generation_type="PV",
-          Z=Z)
+B1_PV = Generation(name="B1_PV",
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type="PV",
+                   Z=Z)
 
-C3_PV=Generation(name="C3_PV",
-          P=10e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=1.0,
-          DV_presc=0.002,
-          generation_type="PV",
-          Z=Z)
+C3_PV = Generation(name="C3_PV",
+                   P=10e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=1.0,
+                   DV_presc=0.002,
+                   generation_type="PV",
+                   Z=Z)
 
-G1_PV=Generation(name="G1_PV",
-          P=10e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=1.0,
-          DV_presc=0.002,
-          generation_type="PV",
-          Z=Z2)
-b2_PV=Generation(name="b2_PV",
-          P=0e3+0j,
-          Qmin=-200.0e3j,
-          Qmax=200.0e3j,
-          Vmin=0.975,
-          Vmax=1.05,
-          Vspecified=0.98,
-          DV_presc=0.0002,
-          generation_type="PV",
-          Z=Z)
+G1_PV = Generation(name="G1_PV",
+                   P=10e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=1.0,
+                   DV_presc=0.002,
+                   generation_type="PV",
+                   Z=Z2)
+b2_PV = Generation(name="b2_PV",
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.0002,
+                   generation_type="PV",
+                   Z=Z)
 
-aa1_PQ=Generation(name="aa1_PV",
-          Pa=-2.62e3j,
-          Pb=-2.62e3j,
-          Pc=-2.62e3j,
-          generation_type="PQ",
-          Z=Z)
+aa1_PQ = Generation(name="aa1_PV",
+                    Pa=-2.62e3j,
+                    Pb=-2.62e3j,
+                    Pc=-2.62e3j,
+                    generation_type="PQ",
+                    Z=Z)
 
-aa2_PQ=Generation(name="aa2_PV",
-          Pa=8.12e3j,
-          Pb=8.12e3j,
-          Pc=8.12e3j,
-          generation_type="PQ",
-          Z=Z)
+aa2_PQ = Generation(name="aa2_PV",
+                    Pa=8.12e3j,
+                    Pb=8.12e3j,
+                    Pc=8.12e3j,
+                    generation_type="PQ",
+                    Z=Z)
 
-SC_C1=Shunt_Capacitor(vll=13.8e3,
-                       Qa=1000e3,Qb=1000e3,Qc=1000e3,
-                      type_connection="wye")
+SC_C1 = Shunt_Capacitor(vll=13.8e3,
+                        Qa=1000e3, Qb=1000e3, Qc=1000e3,
+                        type_connection="wye")
 
-auto_t1=Auto_TransformerModel(name="auto_t1",
-                              step=0.75,
-                              tap_max=15,
-                              voltage=12.47e3,
-                              # tap_a=0.96,
-                              # tap_b=0.96,
-                              # tap_c=0.96,
-                              v_c=120,
-                              v_c_min=119,
-                              R=5,
-                              X=11,
-                              CTP=600,
-                              CTS=5)
 
 # Nos de carga do alimentador S1_AL1
 s1 = LoadNode(name='S1',
@@ -247,7 +240,7 @@ f1 = LoadNode(name='F1',
               voltage=vll_mt)
 g1 = LoadNode(name='G1',
               power=100.0e3 + 80.0e3j,
-              #generation=G1_PV,
+              # generation=G1_PV,
               voltage=vll_mt)
 
 # Nos de carga do alimentador S2_AL1
@@ -276,38 +269,30 @@ e3 = LoadNode(name='E3',
 # Subgrid load-nodes connecteds to A1
 aa1 = LoadNode(name='AA1',
                power=0.0 + 0.0j,
-               
+
                voltage=vll_bt)
 aa2 = LoadNode(name='AA2',
-               #generation=aa2_PQ,
+               # generation=aa2_PQ,
                power=20.0e3 + 5.0e3j,
                voltage=vll_bt)
 aa3 = LoadNode(name='AA3',
-               #generation=aa1_PQ,
+               # generation=aa1_PQ,
                power=20.0e3 + 5.0e3j,
                voltage=vll_bt)
 
 phase_conduct = Conductor(id=57)
 neutral_conduct = Conductor(id=44)
 
-line_model_a = LineModel(loc_a=0.0 + 29.0j,
-                         loc_b=2.5 + 29.0j,
-                         loc_c=7.0 + 29.0j,
-                         loc_n=4.0 + 25.0j,
-                         conductor=phase_conduct,
-                         neutral_conductor=neutral_conduct,
-                         #Transpose=True,
-                         neutral=False)
+line_model_a  =  LineModel(loc=spacing500,
+                     phasing=['b','a','c','n'],
+                     conductor=phase_conduct,
+                     neutral_conductor=neutral_conduct)
 
 phase_conduct_bt = Conductor(id=32)
-line_model_b = LineModel(loc_a=0.0 + 29.0j,
-                         loc_b=2.5 + 29.0j,
-                         loc_c=7.0 + 29.0j,
-                         loc_n=4.0 + 25.0j,
-                         conductor=phase_conduct_bt,
-                         neutral_conductor=neutral_conduct,
-                         #Transpose=True,
-                         neutral=False)
+line_model_b  =  LineModel(loc=spacing500,
+                     phasing=['b','a','c','n'],
+                     conductor=phase_conduct_bt,
+                     neutral_conductor=neutral_conduct)
 
 # # Trechos do alimentador S1_AL1
 s1_a2 = Section(name='S1A2',
@@ -458,9 +443,11 @@ aa1_aa3 = Section(name='AA1AA3',
 
 load_nodes = [s1, a1, a2, a3, b1, b2, b3, c1, c2, c3,
               s2, d1, d2, d3, e1, e2, e3, f1, g1, aa1, aa2, aa3]
-sections = [s1_a2, a2_a1, a2_a3, a2_c1, c1_c2, c1_c3, c3_e3, a3_b1, b1_b2, b2_b3, b2_e2,
-            b3_c3, s2_d1, d1_d2, d1_d3, d1_e1, e1_e2, e1_e3, s1_f1, f1_g1, g1_d2,
-            a1_aa1, aa1_aa2, aa1_aa3]
+
+sections = [s1_a2, a2_a1, a2_a3, a2_c1, c1_c2, c1_c3, c3_e3, a3_b1, b1_b2,
+            b2_b3, b2_e2, b3_c3, s2_d1, d1_d2, d1_d3, d1_e1, e1_e2, e1_e3,
+            s1_f1, f1_g1, g1_d2, a1_aa1, aa1_aa2, aa1_aa3]
+
 switchs = [ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11]
 
 grid_elements = GridElements(name='my_grid_elements')
@@ -472,14 +459,12 @@ grid_elements.add_section(sections)
 grid_elements.create_grid()
 
 #calculo de fluxo de carga
-#inicio = time.time()
-# calc_power_flow(grid_elements.dist_grids['F0'])
-# fim = time.time()
-# print(fim - inicio)
+inicio = time.time()
+calc_power_flow(grid_elements.dist_grids['F0'])
+fim = time.time()
+print(fim - inicio)
 
-
-
-# # calculo de curto circuito
+# calculo de curto circuito
 
 # config_objects(sub_1)
 
@@ -487,17 +472,18 @@ grid_elements.create_grid()
 # tabela = AsciiTable(three_phase_sc)
 # print(tabela.table)
 
-# calc_short_circuit(sub_1, 'line-to-ground')
-# calc_short_circuit(sub_1, 'line-to-line')
-# calc_short_circuit(sub_1, 'line-to-ground-min')
-from mygrid.short_circuit.phase_components import biphasic, biphasic_to_ground, three_phase_to_ground
-from mygrid.short_circuit.phase_components import three_phase, mono_phase, min_mono_phase
+from mygrid.short_circuit.phase_components import biphasic
+from mygrid.short_circuit.phase_components import biphasic_to_ground
+from mygrid.short_circuit.phase_components import three_phase, mono_phase
+from mygrid.short_circuit.phase_components import min_mono_phase
+from mygrid.short_circuit.phase_components import  three_phase_to_ground
+
 distgrid=grid_elements.dist_grids['F0']
 from mygrid.short_circuit.phase_components import calc_contributions
-#inicio = time.time()
-#Iftg=three_phase_to_ground(distgrid, 'C1')
-#Ifb=biphasic(distgrid, 'C1')
-#Ifbg=biphasic_to_ground(distgrid, 'A2')
-#Ift= three_phase(distgrid, 'C1')
-# fim = time.time()
-# print(fim - inicio)
+inicio = time.time()
+Iftg=three_phase_to_ground(distgrid, 'C1')
+Ifb=biphasic(distgrid, 'C1')
+Ifbg=biphasic_to_ground(distgrid, 'A2')
+ft= three_phase(distgrid, 'C1')
+fim = time.time()
+print(fim - inicio)

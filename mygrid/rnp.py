@@ -5,7 +5,7 @@ node depth representation (RNP) module
 
 from collections import OrderedDict
 from numpy import array, size, reshape, where, concatenate, mat, delete, ndarray, insert
-import graphviz as gv
+#import graphviz as gv
 
 
 class Node(object):
@@ -31,7 +31,7 @@ class Edge(object):
     """
     Edge Class
     -------------
-        This class represents a edge in the graph. 
+        This class represents a edge in the graph.
         A edge links two nodes in a graph .
 
     Parameters
