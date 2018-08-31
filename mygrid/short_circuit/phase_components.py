@@ -1,9 +1,9 @@
 import numpy as np
 import copy
-from mygrid.grid import Section,TransformerModel
+from mygrid.grid import Section,TransformerModel, Auto_TransformerModel
 import pandas as pd
 """
-This scripts allows the user to calculate the unbalanced short-circuits on radial distribution 
+This scripts allows the user to calculate the unbalanced short-circuits on radial distribution
 systems modeled on mygrid.
 
 """
@@ -23,7 +23,7 @@ def biphasic(distgrid, node_name, fs='Higher',Df=False, zc=0+0j):
 		Designates which phases participate in the short circuit
 		Options: 'Iab', 'Iac', 'Ibc' and 'Higher'.
 	Df: bool
-		Indicates whether the function returns a dataframe or a dictionary. 
+		Indicates whether the function returns a dataframe or a dictionary.
 		If true the function returns a DataFrame.
 	zc: complex
 		Contact Impedance
@@ -72,7 +72,7 @@ def biphasic(distgrid, node_name, fs='Higher',Df=False, zc=0+0j):
 	erase=None
 	if fs =='Higher':
 		fs=If.abs().max().idxmax()
-		
+
 	if fs=='Fac':
 		Iz=If['Fac']
 		erase=[1]
@@ -81,15 +81,15 @@ def biphasic(distgrid, node_name, fs='Higher',Df=False, zc=0+0j):
 	elif fs=='Fab':
 		Iz=If['Fab']
 		erase=[2]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid,ep=erase)
 	elif fs == 'Fbc':
 		Iz=If['Fbc']
 		erase=[0]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid,ep=erase)
 
-	
+
 	if Df:
 		ict=dict_to_DataFrame(ict)
 
@@ -109,7 +109,7 @@ def biphasic_to_ground(distgrid,node_name, fs='Higher',Df=False, zc=0+0j):
 		Designates which phases participate in the short circuit
 		Options: 'Iab', 'Iac', 'Ibc' and 'Higher'.
 	Df: bool
-		Indicates whether the function returns a dataframe or a dictionary. 
+		Indicates whether the function returns a dataframe or a dictionary.
 		If true the function returns a DataFrame.
 	zc: complex
 		Contact Impedance
@@ -121,7 +121,7 @@ def biphasic_to_ground(distgrid,node_name, fs='Higher',Df=False, zc=0+0j):
 	zds,zpds=downstream_area(distgrid, node_name)
 	zz.update(zpus)
 	zz.update(zpds)
-	
+
 	Xab=np.zeros((3,1), dtype=complex)
 	Xac=np.zeros((3,1), dtype=complex)
 	Xbc=np.zeros((3,1), dtype=complex)
@@ -158,7 +158,7 @@ def biphasic_to_ground(distgrid,node_name, fs='Higher',Df=False, zc=0+0j):
 		'Facg': {'Ifa':Xac[0,0],'Ifb':Xac[1,0],'Ifc':Xac[2,0]},
 		'Fbcg': {'Ifa':Xbc[0,0],'Ifb':Xbc[1,0],'Ifc':Xbc[2,0]}}
 	If=pd.DataFrame(If)
-	
+
 	if fs =='Higher':
 		fs=If.abs().max().idxmax()
 
@@ -170,16 +170,16 @@ def biphasic_to_ground(distgrid,node_name, fs='Higher',Df=False, zc=0+0j):
 	elif fs=='Fabg':
 		Iz=If['Fabg']
 		erase=[2]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid,ep=erase)
 	elif fs == 'Fbcg':
 		Iz=If['Fbcg']
 		erase=[0]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid,ep=erase)
-	
+
 	if Df:
-		ict=dict_to_DataFrame(ict)	
+		ict=dict_to_DataFrame(ict)
 
 	return ict
 def three_phase_to_ground(distgrid,node_name,Df=False, zc=0+0j):
@@ -196,10 +196,10 @@ def three_phase_to_ground(distgrid,node_name,Df=False, zc=0+0j):
 		Designates which phases participate in the short circuit
 		Options: 'Iab', 'Iac', 'Ibc' and 'Higher'.
 	Df: bool
-		Indicates whether the function returns a dataframe or a dictionary. 
+		Indicates whether the function returns a dataframe or a dictionary.
 		If true the function returns a DataFrame.
 	zc: complex
-		Contact Impedance	
+		Contact Impedance
 	Returns:
 	Dict or a DataFrame
 	"""
@@ -241,19 +241,19 @@ def three_phase(distgrid,node_name,Df=False,  zc=0+0j):
 	node_name: str
 		The name of node fault
 	Df: bool
-		Indicates whether the function returns a dataframe or a dictionary. 
+		Indicates whether the function returns a dataframe or a dictionary.
 		If true the function returns a DataFrame.
 	zc: complex
-		Contact Impedance	
+		Contact Impedance
 	Returns:
 	Dict or a DataFrame
 	"""
-	zz=dict()	
+	zz=dict()
 	zus,zpus=upstream_area(distgrid, node_name)
 	zds,zpds=downstream_area(distgrid, node_name)
 	zz.update(zpus)
 	zz.update(zpds)
-	
+
 	X=np.zeros((3,1), dtype=complex)
 	voltage_source=voltage(distgrid,node_name)
 
@@ -272,9 +272,9 @@ def three_phase(distgrid,node_name,Df=False,  zc=0+0j):
 	X +=np.linalg.inv(C).dot(IPS)[0:3]
 
 	If={'Fabc': {'Ifa':X[0,0],'Ifb':X[1,0],'Ifc':X[2,0]}}
-	
+
 	If=pd.DataFrame(If)
-	
+
 	ict=calc_contributions(zz,np.array(If).reshape(3,1),node_name,distgrid,ep=[])
 
 	if Df:
@@ -296,10 +296,10 @@ def mono_phase(distgrid,node_name,zf=0, fs='Higher',Df=False,  zc=0+0j):
 		Designates which phases participate in the short circuit
 		Options: 'Ia', 'Ia', 'Ib' and 'Higher'.
 	Df: bool
-		Indicates whether the function returns a dataframe or a dictionary. 
+		Indicates whether the function returns a dataframe or a dictionary.
 		If true the function returns a DataFrame.
 	zc: complex
-		Contact Impedance	
+		Contact Impedance
 	Returns:
 	Dict or a DataFrame
 	"""
@@ -308,7 +308,7 @@ def mono_phase(distgrid,node_name,zf=0, fs='Higher',Df=False,  zc=0+0j):
 	zds,zpds=downstream_area(distgrid, node_name)
 	zz.update(zpus)
 	zz.update(zpds)
-	
+
 	Xa=np.zeros((3,1), dtype=complex)
 	Xb=np.zeros((3,1), dtype=complex)
 	Xc=np.zeros((3,1), dtype=complex)
@@ -357,12 +357,12 @@ def mono_phase(distgrid,node_name,zf=0, fs='Higher',Df=False,  zc=0+0j):
 	elif fs=='Fbg':
 		Iz=If['Fbg']
 		erase=[0,2]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid,ep=erase)
 	elif fs == 'Fcg':
 		Iz=If['Fcg']
 		erase=[0,1]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid,ep=erase)
 
 	if Df:
@@ -384,10 +384,10 @@ def min_mono_phase(distgrid,node_name,zf=0, zt=40, fs='Higher',Df=False,  zc=0+0
 		Designates which phases participate in the short circuit
 		Options: 'Ia', 'Ia', 'Ib' and 'Higher'.
 	Df: bool
-		Indicates whether the function returns a dataframe or a dictionary. 
+		Indicates whether the function returns a dataframe or a dictionary.
 		If true the function returns a DataFrame.
 	zc: complex
-		Contact Impedance	
+		Contact Impedance
 	Returns:
 	Dict or a DataFrame
 	"""
@@ -396,7 +396,7 @@ def min_mono_phase(distgrid,node_name,zf=0, zt=40, fs='Higher',Df=False,  zc=0+0
 	zds,zpds=downstream_area(distgrid, node_name)
 	zz.update(zpus)
 	zz.update(zpds)
-	
+
 	Xa=np.zeros((3,1), dtype=complex)
 	Xb=np.zeros((3,1), dtype=complex)
 	Xc=np.zeros((3,1), dtype=complex)
@@ -407,7 +407,6 @@ def min_mono_phase(distgrid,node_name,zf=0, zt=40, fs='Higher',Df=False,  zc=0+0
 		if type(i) != type(None):
 			l += np.linalg.inv(i)
 	l=np.linalg.inv(l+zc)
-	print(l)
 	C=calc_c(l+zt)
 	Ca=copy.copy(C)
 	Cb=copy.copy(C)
@@ -436,7 +435,7 @@ def min_mono_phase(distgrid,node_name,zf=0, zt=40, fs='Higher',Df=False,  zc=0+0
 	If=pd.DataFrame(If)
 	if fs =='Higher':
 		fs=If.abs().max().idxmax()
-		
+
 	elif fs=='Fag_min':
 		Iz=If['Fag_min']
 		erase=[1,2]
@@ -445,16 +444,16 @@ def min_mono_phase(distgrid,node_name,zf=0, zt=40, fs='Higher',Df=False,  zc=0+0
 	elif fs=='Fbg_min':
 		Iz=If['Fbg_min']
 		erase=[0,2]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid ,ep=erase)
 	elif fs == 'Fcg_min':
 		Iz=If['Fcg_min']
 		erase=[1,0]
-	
+
 		ict=calc_contributions(zz,np.array(Iz).reshape(3,1),node_name,distgrid ,ep=erase)
 
 	if Df:
-		ict=dict_to_DataFrame(ict)	
+		ict=dict_to_DataFrame(ict)
 
 	return ict
 def calc_c(l):
@@ -486,12 +485,12 @@ def voltage(distgrid,node_name):
 		section=distgrid.sections_by_nodes[(n1,n2)]
 
 		if isinstance(section.transformer, TransformerModel):
-			
+
 			voltage_source=section.A.dot(voltage_source)
 
 
 		i-=1
-	
+
 
 	return voltage_source
 
@@ -517,7 +516,7 @@ def resolve_upstream_area(distgrid, n1, tree, rnp, nf=False):
 	load_nodes=distgrid.load_nodes
 	n1_depth=int(rnp[:][0][rnp[:][1].index(n1)])
 	n1=load_nodes[n1]
-	
+
 
 	for i in distgrid.load_nodes_tree.tree[n1.name]:
 		if int(rnp[:][0][rnp[:][1].index(i)]) > n1_depth:
@@ -536,7 +535,7 @@ def resolve_upstream_area(distgrid, n1, tree, rnp, nf=False):
 				zp[n1]=n1.generation.Z
 
 		for i in ds_neighbors:
-			
+
 			a, pp=resolve_upstream_area(distgrid, i.name, tree, rnp, nf=True)
 			zp.update(pp)
 			if type(a) == type(None):
@@ -546,16 +545,20 @@ def resolve_upstream_area(distgrid, n1, tree, rnp, nf=False):
 				zeq=0
 				if (n1, i) in distgrid.sections_by_nodes.keys():
 					zeq = distgrid.sections_by_nodes[(n1, i)]
+
 					if isinstance(zeq.transformer, TransformerModel):
 						a= zeq.a.dot(a+zeq.transformer.z).dot(zeq.d)
 						zpll.append(a)
 
+					elif isinstance(zeq.transformer, Auto_TransformerModel):
+						a= zeq.a.dot(a).dot(zeq.d)
+						zpll.append(a)
 					else:
 						a=zeq.Z + a
 						zpll.append(a)
 
 				zp[n1,i] = a
-		
+
 		if len(zpll) == 0:
 			return None, zp
 		elif len(zpll) == 1 and n1.generation != None:
@@ -570,7 +573,7 @@ def resolve_upstream_area(distgrid, n1, tree, rnp, nf=False):
 			if type(n1.generation) == type(list()):
 				for i in n1.generation:
 					zpll.append(i.Z)
-				
+
 				zpll=inv_Z(zpll)
 				zp[n1]=zpll
 
@@ -580,7 +583,7 @@ def resolve_upstream_area(distgrid, n1, tree, rnp, nf=False):
 				zp[n1]=n1.generation.Z
 
 				return n1.generation.Z, zp
-				
+
 
 		else:
 			return None, zp
@@ -614,7 +617,7 @@ def resolve_downstream_area(distgrid, n1, tree, rnp, n2=None, nf=False):
 	n1_depth=int(rnp[:][0][rnp[:][1].index(n1)])
 	n1=load_nodes[n1]
 
-	
+
 	if n1_depth !=0:
 		for i in distgrid.load_nodes_tree.tree[n1.name]:
 			if int(rnp[:][0][rnp[:][1].index(i)]) < n1_depth:
@@ -634,11 +637,15 @@ def resolve_downstream_area(distgrid, n1, tree, rnp, n2=None, nf=False):
 					a = zeq.A.dot(a).dot(zeq.d) + zeq.transformer.z
 					zpll.append(a)
 
+				elif isinstance(zeq.transformer, Auto_TransformerModel):
+					a = zeq.A.dot(a).dot(zeq.d) + zeq.transformer.zz
+					zpll.append(a)
+
 				else:
 					a=zeq.Z + a
 					zpll.append(a)
 				zp[up_neighbor, n1] = a
-			
+
 
 	if n1.generation != None and nf:
 		if type(n1.generation) == type(list()):
@@ -670,7 +677,7 @@ def resolve_downstream_area(distgrid, n1, tree, rnp, n2=None, nf=False):
 				continue
 
 			else:
-				
+
 				zeq=0
 
 				if (n1, i) in distgrid.sections_by_nodes.keys():
@@ -678,6 +685,10 @@ def resolve_downstream_area(distgrid, n1, tree, rnp, n2=None, nf=False):
 
 					if isinstance(zeq.transformer, TransformerModel):
 						a= zeq.a.dot(a+zeq.transformer.z).dot(zeq.d)
+						zpll.append(a)
+
+					elif isinstance(zeq.transformer, Auto_TransformerModel):
+						a= zeq.a.dot(a + zeq.transformer.zz).dot(zeq.d)
 						zpll.append(a)
 
 					else:
@@ -715,14 +726,14 @@ def calc_contributions(zz,Iz,nodes,distgrid,ep):
 	iz_nodes[nodes[0].name]=[Iz,ep]
 	ict[nodes[0].name]=Iz
 	root_name=distgrid.load_nodes_tree.root
-	
+
 	while len(nodes) !=0:
-		
+
 		next_nodes=list()
 		for i in nodes:
 			stop=False
 			adjacent_nodes=[ln[x] for x in tree[i.name] if ln[x] not in visit_nodes]
-			
+
 			isl=dict()
 			inv=np.zeros((3,3), dtype=complex)
 			p=0
@@ -739,7 +750,7 @@ def calc_contributions(zz,Iz,nodes,distgrid,ep):
 					p=np.linalg.inv(i.generation.Z)
 					isl[i.generation.name]=[p,None]
 					inv +=p
-			
+
 			if i.name==root_name:
 				if i.external_grid.Z.all()==0:
 					stop=True
@@ -753,27 +764,34 @@ def calc_contributions(zz,Iz,nodes,distgrid,ep):
 				for j in adjacent_nodes:
 					p=0
 					if (i, j) in zz.keys():
+
 						section=distgrid.sections_by_nodes[(i,j)]
 						next_nodes.append(j)
-
 						p=np.linalg.inv(vectorize_zz(zz[(i,j)].round(6), iz_nodes[i.name][1]))
 						if isinstance(section.transformer,TransformerModel):
 							ep_n = new_phase_erase(section.transformer.connection,iz_nodes[i.name][1])
-							
+
+							isl[j.name] = [p, section.a]
+
+						elif isinstance(section.transformer, Auto_TransformerModel):
+							ep_n = new_phase_erase(section.transformer.connection,iz_nodes[i.name][1])
 							isl[j.name] = [p, section.a]
 						else:
 							ep_n=iz_nodes[i.name][1]
 							isl[j.name] = [p, None]
 						inv += p
-					
+
 					elif (j, i) in zz.keys():
 						section=distgrid.sections_by_nodes[(j,i)]
 						next_nodes.append(j)
-
 						p=np.linalg.inv(vectorize_zz(zz[(j,i)].round(6), ep))
 						if isinstance(section.transformer,TransformerModel):
 							ep_n = new_phase_erase(section.transformer.connection,iz_nodes[i.name][1])
-							
+
+							isl[j.name] = [p, section.d]
+
+						elif isinstance(section.transformer, Auto_TransformerModel):
+							ep_n = new_phase_erase(section.transformer.connection,iz_nodes[i.name][1])
 							isl[j.name] = [p, section.d]
 						else:
 							ep_n=iz_nodes[i.name][1]
@@ -783,27 +801,27 @@ def calc_contributions(zz,Iz,nodes,distgrid,ep):
 
 
 			if len(isl) !=0:
-				
-				
+
+
 				z=np.linalg.inv(inv)
 				for y in isl.keys():
 					izz=isl[y][0].dot(z).dot(iz_nodes[i.name][0])
 					if type(isl[y][1]) != type(None):
 						izz=isl[y][1].dot(izz)
 					if y[0]=="GD":
-						
+
 						iz_nodes[y] =  [izz,ep_n]
 						ict[y] =  izz
 
 					else:
 
 						iz_nodes[y] =  [izz, ep_n]
-						ict[y] =  izz		
-						
+						ict[y] =  izz
 
-		
+
+
 		visit_nodes.extend(nodes)
-		
+
 		nodes=next_nodes
 
 
@@ -825,17 +843,17 @@ def dict_to_DataFrame(ict):
 	return ict
 
 def new_phase_erase(tf_type,old_phase_erase):
-	
+
 	pr=[0,1,2]
 	if tf_type == "Dyn":
 		if len(old_phase_erase)==2:
 			pr.remove(old_phase_erase[0])
 			pr.remove(old_phase_erase[1])
-			
+
 			return pr
 		elif len(old_phase_erase)==1:
-			
+
 			return []
 		else:
-			
+
 			return []
