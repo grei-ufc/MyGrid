@@ -8,7 +8,6 @@ from mygrid.util import Phasor, P, R, Base
 from mygrid.util import p2r, r2p
 import os
 import pandas as pd
-from numba import jit
 import math
 
 np.seterr(divide = 'ignore')
@@ -348,6 +347,7 @@ class GridElements(object):
                 table.title=title
                 print(table.table)
 
+
 class ExternalGrid(object):
     def __init__(self, name, vll, Z=None):
         self.vll = vll
@@ -415,8 +415,6 @@ class Sector(Tree):
 
     def __repr__(self):
         return 'Sector: ' + self.name
-
-
 
 
 class LoadNode(object):
@@ -834,13 +832,6 @@ class Generation(object):
             self.limit_PV=True
 
 
-
-
-
-
-
-
-
 class Substation(object):
 
     def __init__(self, name, feeders, transformers):
@@ -860,9 +851,6 @@ class Substation(object):
         self.transformers = dict()
         for transformer in transformers:
             self.transformers[transformer.name] = transformer
-
-
-
 
 
 class Section(Edge):
@@ -959,9 +947,6 @@ class Section(Edge):
 
     def __repr__(self):
         return 'Section: %s' % self.name
-
-
-
 
 
 class LineModel(object):
@@ -1171,6 +1156,7 @@ class LineModel(object):
 
         return yeq
 
+
 class UnderGroundLine(LineModel):
     def __init__(self,
                  loc=[],
@@ -1247,13 +1233,6 @@ class UnderGroundLine(LineModel):
                 self.y[self.psorig[i],self.psorig[i]] = self.p*1j
 
 
-
-
-
-
-
-
-
 class Shunt_Capacitor(object):
     """ Model of shunt capacitor
 
@@ -1315,6 +1294,7 @@ class Shunt_Capacitor(object):
             _m=np.array([[1,0,-1],[-1,1,0],[0,-1,1]])
             self.ipc=np.dot(_m,i_m)
             return self.ipc
+
 
 class TransformerModel(object):
     def __init__(self,
@@ -1386,6 +1366,7 @@ class TransformerModel(object):
                                              [0.0, 0.0, 1.0]])
 
             self.B = self.zt * np.identity(3)
+
 
 class Auto_TransformerModel(object):
     """ Model of Autotransformer
@@ -1579,9 +1560,6 @@ class Auto_TransformerModel(object):
         ia,ib,ic=ia/self.CT, ib/self.CT, ic/self.CT
         va,vb,vc=(va/self.Npt)-ia*self.z, (vb/self.Npt)-ib*self.z, (vc/self.Npt)-ic*self.z
         return va,vb,vc
-
-
-
 
 
 class Switch(Edge):
@@ -1982,6 +1960,7 @@ class Conductor(object):
             self.r = self.conductor_data['resistence']['value']
             self.gmr = self.conductor_data['gmr']['value']
 
+
 class Under_Ground_Conductor(object):
     def __init__(self,
                 name = None,
@@ -2027,6 +2006,7 @@ class Under_Ground_Conductor(object):
             self.GMRcn=self.R
             self.dp = dp
             self.rn=18.826/(ds*T)
+
 
 class Distributed_Load(object):
     def __init__(self,
@@ -2090,6 +2070,7 @@ class Distributed_Load(object):
             self.i=np.dot(self.D.T,self.i)
         elif self.type_connection=="wye":
             self.i=self.i
+
 
 if __name__ == '__main__':
     pass
