@@ -8,6 +8,8 @@ import numpy as np
 # from pycallgraph import PyCallGraph
 # from pycallgraph.output import GraphvizOutput
 
+from numba import jit
+
 from functools import wraps
 import time
 
@@ -114,7 +116,7 @@ def calc_power_flow(dist_grid):
 
         DG_unconv_ = _nodes_out_limit(dist_grid)
         if DG_unconv_ != []:
-
+    
             for sections in dist_grid.sections.values():
 
                 if isinstance(sections.transformer, Auto_TransformerModel):
@@ -149,7 +151,6 @@ def calc_power_flow(dist_grid):
     print("Load flow did not converge")
     return
 
-
 def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     """ Função que varre a dist_grid pelo
     método varredura direta/inversa"""
@@ -165,8 +166,6 @@ def _dist_grid_sweep(dist_grid, max_depth, nodes_depth_dict):
     #print('Backward Sweep phase <<<<----------')
     # seção do cálculo das potências partindo dos
     # nós com maiores profundidades até o nó raíz
-
-
 def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
     depth = max_depth
     while depth >= 0:
@@ -215,7 +214,6 @@ def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
 
     #print('Forward Sweep phase ---------->>>>')
 
-
 def Forward_Sweep(max_depth, nodes_depth_dict, dist_grid):
     depth = 1
     # seção do cálculo de atualização das tensões
@@ -246,10 +244,8 @@ def Forward_Sweep(max_depth, nodes_depth_dict, dist_grid):
 
     return conv
 
-
 def calc_ip(c,d,vp,ip):
     return c.dot(vp) + d.dot(ip)
-
 
 def calc_vp(A, B, vp, ip, vi):
     v=  A.dot(vp) - B.dot(ip)
@@ -311,7 +307,6 @@ def _get_upstream_neighbor_node_cached(f):
         return cache[arg1]
     return inner_get_upstream_neighbor_node
 
-
 @_get_upstream_neighbor_node_cached
 def _get_upstream_neighbor_node(node, dist_grid):
 
@@ -328,7 +323,6 @@ def _get_upstream_neighbor_node(node, dist_grid):
     # retorna o primeiro neighbor a montante
     return upstream_neighbors[0]
 
-
 def _search_section_cached(f):
     cache = dict()
     @wraps(f)
@@ -337,7 +331,6 @@ def _search_section_cached(f):
             cache[(arg1, arg2)] = f(arg1, arg2, arg3)
         return cache[(arg1, arg2)]
     return inner_search_section
-
 
 @_search_section_cached
 def _search_section(n1, n2, dist_grid):
@@ -349,7 +342,6 @@ def _search_section(n1, n2, dist_grid):
     elif (n2, n1) in dist_grid.sections_by_nodes.keys():
         return dist_grid.sections_by_nodes[(n2, n1)]
 
-
 def _nodes_out_limit(dist_grid):
 
     root_3=np.sqrt(3)
@@ -357,6 +349,7 @@ def _nodes_out_limit(dist_grid):
     for node in dist_grid.load_nodes.values():
 
         if (node.generation != None and node.type == 'PV'):
+
 
             vaa = np.abs(node.vp[0]) / np.abs(node.voltage/root_3)
             vbb = np.abs(node.vp[1]) / np.abs(node.voltage/root_3)
@@ -394,7 +387,6 @@ def _nodes_out_limit(dist_grid):
                     DG_unconv_.append(node)
 
     return DG_unconv_
-
 
 def _define_power_insertion(DG_unconv_, dist_grid):
 
@@ -451,6 +443,11 @@ def _define_power_insertion(DG_unconv_, dist_grid):
             DG_unconv_[i].generation.update_Q(Q,Q,Q)
 
 
+
+
+
+
+
 def sections_path_to_root(dist_grid, n2):
 
 
@@ -473,7 +470,6 @@ def sections_path_to_root(dist_grid, n2):
                 section_list=sections_path_to_root(dist_grid,dist_grid.sections[name].n1.name)
                 section_list.append(dist_grid.sections[name])
                 return section_list
-
 
 def sum_imped(sections):
 

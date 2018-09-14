@@ -479,7 +479,6 @@ from mygrid.short_circuit.phase_components import min_mono_phase
 from mygrid.short_circuit.phase_components import  three_phase_to_ground
 
 distgrid=grid_elements.dist_grids['F0']
-from mygrid.short_circuit.phase_components import calc_contributions
 inicio = time.time()
 Iftg=three_phase_to_ground(distgrid, 'C1')
 Ifb=biphasic(distgrid, 'C1')
