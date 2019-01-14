@@ -8,7 +8,6 @@ from mygrid.util import Phasor, P, R, Base
 from mygrid.util import p2r, r2p
 import os
 import pandas as pd
-from numba import jit
 import math
 import copy
 

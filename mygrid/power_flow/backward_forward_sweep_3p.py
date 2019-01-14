@@ -8,8 +8,6 @@ import numpy as np
 # from pycallgraph import PyCallGraph
 # from pycallgraph.output import GraphvizOutput
 
-from numba import jit
-
 from functools import wraps
 import time
 
