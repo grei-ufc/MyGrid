@@ -389,21 +389,21 @@ class Tree(object):
 
 if __name__ == '__main__':
     # tree 1
-    nodes1 = {3: [1],
-            1: [3, 2, 7],
-            7: [1, 8, 9, 4, 10],
-            10: [7],
-            4: [7, 5, 6],
-            5: [4],
-            6: [4],
-            9: [7],
-            8: [7],
-            2: [1, 11, 12, 13],
-            11: [2],
-            12: [2, 13],
-            13: [12]}
+    nodes1 = {'3': ['1'],
+              '1': ['3', '2', '7'],
+            '7': ['1', '8', '9', '4', '10'],
+            '10': ['7', '5'],
+            '4': ['7', '5', '6'],
+            '5': ['4', '10'],
+            '6': ['4'],
+            '9': ['7'],
+            '8': ['7'],
+            '2': ['1', '11', '12', '13'],
+            '11': ['2'],
+            '12': ['2', '13'],
+            '13': ['12', '2']}
 
-    # tree 2
+    # arvore 2
     nodes2 = {14: [15],
             15: [14, 16, 19],
             16: [15, 17, 18],
@@ -412,10 +412,10 @@ if __name__ == '__main__':
             19: [15]}
 
     # definição da tree a1
-    tree_1 = Tree(nodes1)
+    tree_1 = Tree(nodes1, dtype=str)
 
     # ordenação da tree a1
-    tree_1.order(root=3)
+    tree_1.order(root='1')
     print('RNP representation of tree 1')
     print(tree_1.rnp)
 
@@ -429,18 +429,18 @@ if __name__ == '__main__':
     print(tree_2.rnp)
 
     # operação de prune
-    prune = tree_1.prune(7, change_rnp=True)
-    print('Branch Prune in tree 1')
-    print(prune)
+    # prune = tree_1.prune('7', change_rnp=True)
+    # print('Branch Prune in tree 1')
+    # print(prune)
 
-    print('RNP representation of tree 1 after prune')
-    print(tree_1.rnp)
+    # print('RNP representation of tree 1 after prune')
+    # print(tree_1.rnp)
 
     # print tree_1.node_to_root_path(no=12, direction=1)
     # print tree_1.node_to_node_path(n1=13, n2=2, direction=1)
 
-    # operação de inserção
-    tree_2.insert_branch(19, prune, 7)
+    # # operação de inserção
+    # tree_2.insert_branch(19, prune, 7)
 
-    print('RNP representation of tree 1 after branch insertion of tree 1 prune')
-    print(tree_2.rnp)
+    # print('RNP representation of tree 1 after branch insertion of tree 1 prune')
+    # print(tree_2.rnp)
