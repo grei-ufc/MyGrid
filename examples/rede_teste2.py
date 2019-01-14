@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 from mygrid.grid import GridElements, ExternalGrid, Generation, Shunt_Capacitor
 from mygrid.grid import Substation, Sector, Switch, LineModel
 from mygrid.grid import Section, LoadNode, TransformerModel, Conductor, Auto_TransformerModel
@@ -122,16 +124,13 @@ SC_C1 = Shunt_Capacitor(vll=13.8e3,
 auto_t1 = Auto_TransformerModel(name="auto_t1",
                                 step=0.75,
                                 tap_max=15,
+				vhold=120,
                                 voltage=12.47e3,
-                                # tap_a=0.96,
-                                # tap_b=0.96,
-                                # tap_c=0.96,
-                                v_c=120,
-                                v_c_min=119,
                                 R=5,
                                 X=11,
                                 CTP=600,
-                                CTS=5)
+                                Npt=20,
+				Z=(1+1J)*1e-6)
 
 # Nos de carga do alimentador S1_AL1
 s1 = LoadNode(name='S1',
@@ -216,25 +215,24 @@ aa3 = LoadNode(name='AA3',
                power=20.0e3 + 5.0e3j,
                voltage=vll_bt)
 
+spacing500=[0.0 + 28.0j,
+            2.5 + 28.0j,
+            7.0 + 28.0j,
+            4.0 + 28.0j]
+
 phase_conduct = Conductor(id=57)
 neutral_conduct = Conductor(id=44)
 
-line_model_a = LineModel(loc_a=0.0 + 29.0j,
-                         loc_b=2.5 + 29.0j,
-                         loc_c=7.0 + 29.0j,
-                         loc_n=4.0 + 25.0j,
-                         conductor=phase_conduct,
-                         neutral_conductor=neutral_conduct,
-                         neutral=False)
+line_model_a  =  LineModel(loc=spacing500,
+                     phasing=['b','a','c','n'],
+                     conductor=phase_conduct,
+                     neutral_conductor=neutral_conduct)
 
 phase_conduct_bt = Conductor(id=32)
-line_model_b = LineModel(loc_a=0.0 + 29.0j,
-                         loc_b=2.5 + 29.0j,
-                         loc_c=7.0 + 29.0j,
-                         loc_n=4.0 + 25.0j,
-                         conductor=phase_conduct_bt,
-                         neutral_conductor=neutral_conduct,
-                         neutral=True)
+line_model_b  =  LineModel(loc=spacing500,
+                     phasing=['b','a','c','n'],
+                     conductor=phase_conduct_bt,
+                     neutral_conductor=neutral_conduct)
 
 # # Trechos do alimentador S1_AL1
 s1_a2 = Section(name='S1A2',
@@ -405,16 +403,21 @@ inicio = time.time()
 calc_power_flow(grid_elements.dist_grids['F0'])
 fim = time.time()
 print(fim - inicio)
+grid_elements.nodes_table_voltage(Df=False)
 
+# calculo de curto-circuito
 
-# # calculo de curto circuito
+from mygrid.short_circuit.phase_components import biphasic
+from mygrid.short_circuit.phase_components import biphasic_to_ground
+from mygrid.short_circuit.phase_components import three_phase, mono_phase
+from mygrid.short_circuit.phase_components import min_mono_phase
+from mygrid.short_circuit.phase_components import  three_phase_to_ground
 
-# config_objects(sub_1)
-
-# three_phase_sc = calc_short_circuit(sub_1, 'three-phase')
-# tabela = AsciiTable(three_phase_sc)
-# print(tabela.table)
-
-# calc_short_circuit(sub_1, 'line-to-ground')
-# calc_short_circuit(sub_1, 'line-to-line')
-# calc_short_circuit(sub_1, 'line-to-ground-min')
+distgrid=grid_elements.dist_grids['F0']
+inicio = time.time()
+Iftg=three_phase_to_ground(distgrid, 'C1')
+Ifb=biphasic(distgrid, 'C1')
+Ifbg=biphasic_to_ground(distgrid, 'A2')
+ft= three_phase(distgrid, 'C1')
+fim = time.time()
+print(fim - inicio)

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-
+import copy
 from mygrid.util import Phasor, R, P
 from mygrid.util import r2p, p2r
 from mygrid.grid import Section, TransformerModel, Auto_TransformerModel
-
 import numpy as np
 
 # from pycallgraph import PyCallGraph
 # from pycallgraph.output import GraphvizOutput
+
+from numba import jit
 
 from functools import wraps
 import time
@@ -21,7 +22,6 @@ import time
 #         calc_power_flow(dist_grid)
 
 def calc_power_flow(dist_grid):
-
     # -------------------------
     # variables declarations
     # -------------------------
@@ -48,7 +48,7 @@ def calc_power_flow(dist_grid):
     # -------------------------------------
     # main loop for power flow calculation
     # -------------------------------------
-   
+
     while iter <=max_iterations and converg > converg_crt:
         iter += 1
         #print('<<<<-----------BFS------------>>>>')
@@ -81,8 +81,10 @@ def calc_power_flow(dist_grid):
         # verificação de tensões
         # das barras PV (se houverem).
         # -------------------------
-    calc=False 
 
+
+
+    calc=False
     for sections in dist_grid.sections.values():
         if isinstance(sections.transformer, Auto_TransformerModel) and not(\
                                                 sections.transformer_visited):
@@ -92,7 +94,7 @@ def calc_power_flow(dist_grid):
             if sections.transformer.compesator_active:
                 va,vb,vc=sections.transformer.controler_voltage(\
                 sections.n2.ip[0],sections.n2.ip[1],sections.n2.ip[2],\
-                    sections.n2.vp[0],sections.n2.vp[1],sections.n2.vp[2])
+                    sections.n2.vp0[0],sections.n2.vp0[1],sections.n2.vp0[2])
 
             else:
                 va=sections.n2.vp[0]
@@ -114,7 +116,7 @@ def calc_power_flow(dist_grid):
 
         DG_unconv_ = _nodes_out_limit(dist_grid)
         if DG_unconv_ != []:
-
+    
             for sections in dist_grid.sections.values():
 
                 if isinstance(sections.transformer, Auto_TransformerModel):
@@ -136,11 +138,11 @@ def calc_power_flow(dist_grid):
                     if type(node.generation) == type(list()):
 
                         for i in node.generation:
-                            if i.type == "PV" and i.limit_PV: 
+                            if i.type == "PV" and i.limit_PV:
 
                                 print("{0} exceeded the limit Generation ".format(i.name))
 
-                    elif node.generation.type == "PV" and node.generation.limit_PV: 
+                    elif node.generation.type == "PV" and node.generation.limit_PV:
                         print("{0} exceeded the limit Generation ".format(node.generation.name))
             return
 
@@ -180,7 +182,8 @@ def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
             # atualiza o valor de corrente passante com o valor
             # da corente da carga para que na prox. iteração
             # do fluxo de carga não ocorra acúmulo.
-            node.ip = node.i
+
+            node.ip=copy.copy(node.i)
 
             downstream_neighbors = _get_downstream_neighbors_nodes(node, dist_grid)
 
@@ -204,6 +207,7 @@ def Back_Sweep(max_depth, nodes_depth_dict, dist_grid):
                     #            np.dot(section.d, downstream_node.ip)
 
                     node.ip += calc_ip(section.c,section.d,downstream_node.vp, downstream_node.ip)
+
                     # -------------------------------------
                     #print(node.name + '<<<---' + downstream_node.name)
 
@@ -346,6 +350,7 @@ def _nodes_out_limit(dist_grid):
 
         if (node.generation != None and node.type == 'PV'):
 
+
             vaa = np.abs(node.vp[0]) / np.abs(node.voltage/root_3)
             vbb = np.abs(node.vp[1]) / np.abs(node.voltage/root_3)
             vcc = np.abs(node.vp[2]) / np.abs(node.voltage/root_3)
@@ -354,7 +359,7 @@ def _nodes_out_limit(dist_grid):
 
             if node.defective_phase != None:
 
-                v_defective=np.abs(node.vp[node.defective_phase] / np.abs(node.voltage/root_3)) 
+                v_defective=np.abs(node.vp[node.defective_phase] / np.abs(node.voltage/root_3))
                 if np.abs(v_defective-node.Vspecified)>node.DV_presc:
 
                     DG_unconv_.append(node)
@@ -431,7 +436,7 @@ def _define_power_insertion(DG_unconv_, dist_grid):
             for j in DG_unconv_[i].generation:
                 if j.type == "PV":
                     j.update_Q(Q/a,Q/a,Q/a)
-            
+
             data2.append(a)
 
         else:
