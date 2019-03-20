@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Primeira Rede - MyGrid</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Primeira Rede";
+    var mkdocs_page_input_path = "firstgrid.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> MyGrid</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Inicio</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../transformadores/">Transformadores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../linhas/">Linhas de Distribuição</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../reguladores/">Reguladores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../no/">Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../trechos/">Trechos</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Primeira Rede</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#primeira-rede-teste">Primeira Rede Teste:</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#importando-bibliotecas">Importando bibliotecas</a></li>
+        
+            <li><a class="toctree-l3" href="#definindo-chaves-espacamento-dos-cabos-de-uma-linha-eletrica-e-as-impendancias-internas-de-uma-geracao-distribuida">Definindo chaves, espaçamento dos cabos de uma linha elétrica e as impendâncias internas de uma geração distribuida</a></li>
+        
+            <li><a class="toctree-l3" href="#definindo-as-tensoes-nominais-da-rede">Definindo as tensões nominais da rede</a></li>
+        
+            <li><a class="toctree-l3" href="#transformador">Transformador</a></li>
+        
+            <li><a class="toctree-l3" href="#rede-externa">Rede externa</a></li>
+        
+            <li><a class="toctree-l3" href="#definicao-de-gds">Definição de GD's</a></li>
+        
+            <li><a class="toctree-l3" href="#capacitor-shunt">Capacitor shunt</a></li>
+        
+            <li><a class="toctree-l3" href="#nos-de-carga-do-alimentador-s1_al1">Nos de carga do alimentador S1_AL1</a></li>
+        
+            <li><a class="toctree-l3" href="#nos-de-carga-do-alimentador-s1_al2">Nos de carga do alimentador S1_AL2</a></li>
+        
+            <li><a class="toctree-l3" href="#nos-de-carga-do-alimentador-s2_al1">Nos de carga do alimentador S2_AL1</a></li>
+        
+            <li><a class="toctree-l3" href="#rede-de-baixa-tensao-conectada-em-a1">Rede de baixa tensão conectada em  A1</a></li>
+        
+            <li><a class="toctree-l3" href="#definicao-das-linhas-eletricas">Definição das linhas elétricas</a></li>
+        
+            <li><a class="toctree-l3" href="#trechos-do-alimentador-s1_al1">Trechos do alimentador S1_AL1</a></li>
+        
+            <li><a class="toctree-l3" href="#trechos-do-alimentador-s1_al2">Trechos do alimentador S1_AL2</a></li>
+        
+            <li><a class="toctree-l3" href="#trechos-do-alimentador-s2_al1">Trechos do alimentador S2_AL1</a></li>
+        
+            <li><a class="toctree-l3" href="#trechos-de-encontro-de-alimentador">Trechos de encontro de alimentador</a></li>
+        
+            <li><a class="toctree-l3" href="#trechos-em-baixa-tensao-a-montante-de-a1">Trechos em baixa tensão a montante de  A1</a></li>
+        
+            <li><a class="toctree-l3" href="#listando-nos-trechos-e-chaves">Listando nós, trechos e chaves:</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#criando-o-objeto-rede">Criando o objeto rede:</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#adicionando-os-elementos-constituintes-da-rede">Adicionando os elementos constituintes da rede.</a></li>
+        
+            <li><a class="toctree-l3" href="#criando-a-rede">Criando a rede:</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#fluxo-de-carga">Fluxo de Carga</a></li>
+    
+
+    <li class="toctree-l2"><a href="#curto-circuito">Curto-Circuito</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#exemplo">Exemplo</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../conductors/">Condutores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../about/">Sobre</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">MyGrid</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Primeira Rede</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="primeira-rede-teste">Primeira Rede Teste:</h1>
+<h4 id="importando-bibliotecas">Importando bibliotecas</h4>
+<pre><code class="python">from mygrid.grid import GridElements, ExternalGrid, Generation
+from mygrid.grid import Shunt_Capacitor
+from mygrid.grid import Substation, Sector, Switch, LineModel, UnderGroundLine
+from mygrid.grid import Under_Ground_Conductor
+from mygrid.grid import Section, LoadNode, TransformerModel, Conductor
+from mygrid.grid import Auto_TransformerModel
+from mygrid.util import R, P
+from mygrid.util import p2r, r2p
+
+from terminaltables import AsciiTable
+import time
+import numpy as np
+</code></pre>
+
+<h4 id="definindo-chaves-espacamento-dos-cabos-de-uma-linha-eletrica-e-as-impendancias-internas-de-uma-geracao-distribuida">Definindo chaves, espaçamento dos cabos de uma linha elétrica e as impendâncias internas de uma geração distribuida</h4>
+<pre><code class="python">spacing500=[0.0 + 29.0j,
+            2.5 + 29.0j,
+            7.0 + 29.0j,
+            4.0 + 25.0j]
+
+# switchs do alimentador 1 de S1
+ch1 = Switch(name='1', state=1)
+ch2 = Switch(name='2', state=1)
+ch3 = Switch(name='3', state=1)
+
+# Switchs do alimentador 2 de S1
+ch9 = Switch(name='9', state=1)
+ch10 = Switch(name='10', state=1)
+
+# switchs de Fronteira
+ch4 = Switch(name='4', state=0)
+ch5 = Switch(name='5', state=0)
+ch8 = Switch(name='8', state=0)
+ch11 = Switch(name='11', state=0)
+
+# switchs do alimentador de S2
+ch6 = Switch(name='6', state=1)
+ch7 = Switch(name='7', state=1)
+
+Z = np.eye(3, dtype=complex)*(15+100j)
+Z1 = np.eye(3, dtype=complex)
+Z2 = np.eye(3, dtype=complex)*(1.5+5j)
+
+</code></pre>
+
+<h4 id="definindo-as-tensoes-nominais-da-rede">Definindo as tensões nominais da rede</h4>
+<pre><code class="python"># tensao nominal
+
+vll_mt = p2r(13.8e3, 0.0)
+vll_bt = p2r(380.0, 0.0)
+</code></pre>
+
+<h4 id="transformador">Transformador</h4>
+<pre><code class="python">t1 = TransformerModel(name=&quot;T1&quot;,
+                      primary_voltage=vll_mt,
+                      secondary_voltage=vll_bt,
+                      power=225e3,
+                      impedance=0.01 + 0.2j)
+</code></pre>
+
+<h4 id="rede-externa">Rede externa</h4>
+<pre><code class="python">eg1 = ExternalGrid(name='extern grid 1', vll=vll_mt)
+</code></pre>
+
+<h4 id="definicao-de-gds">Definição de GD's</h4>
+<pre><code class="python">C2_PV = Generation(name=&quot;C2_PV&quot;,
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+A3_PV = Generation(name=&quot;A3_PV&quot;,
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+B3_PV = Generation(name=&quot;B3_PV&quot;,
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+B1_PV = Generation(name=&quot;B1_PV&quot;,
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+C3_PV = Generation(name=&quot;C3_PV&quot;,
+                   P=10e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=1.0,
+                   DV_presc=0.002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+G1_PV = Generation(name=&quot;G1_PV&quot;,
+                   P=10e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=1.0,
+                   DV_presc=0.002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z2)
+b2_PV = Generation(name=&quot;b2_PV&quot;,
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.0002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+aa1_PQ = Generation(name=&quot;aa1_PV&quot;,
+                    Pa=-2.62e3j,
+                    Pb=-2.62e3j,
+                    Pc=-2.62e3j,
+                    generation_type=&quot;PQ&quot;,
+                    Z=Z)
+
+aa2_PQ = Generation(name=&quot;aa2_PV&quot;,
+                    Pa=8.12e3j,
+                    Pb=8.12e3j,
+                    Pc=8.12e3j,
+                    generation_type=&quot;PQ&quot;,
+                    Z=Z)
+</code></pre>
+
+<h4 id="capacitor-shunt">Capacitor shunt</h4>
+<pre><code class="python">SC_C1 = Shunt_Capacitor(vll=13.8e3,
+                        Qa=1000e3, Qb=1000e3, Qc=1000e3,
+                        type_connection=&quot;wye&quot;)
+</code></pre>
+
+<h4 id="nos-de-carga-do-alimentador-s1_al1">Nos de carga do alimentador S1_AL1</h4>
+<pre><code class="python">s1 = LoadNode(name='S1',
+              voltage=vll_mt,
+              external_grid=eg1)
+a1 = LoadNode(name='A1',
+              power=120+160j,
+              voltage=vll_mt)
+a2 = LoadNode(name='A2',
+              power=150.0e3 + 110.0e3j,
+              voltage=vll_mt)
+a3 = LoadNode(name='A3',
+              generation=A3_PV,
+              ppa=100.0e3 + 36.670e3j,
+              ppb=100.0e3 + 36.670e3j,
+              ppc=100.0e3 + 36.670e3j,
+              voltage=vll_mt)
+b1 = LoadNode(name='B1',
+              generation=B1_PV,
+              ppa=100.0e3 + 36.670e3j,
+              ppb=100.0e3 + 36.670e3j,
+              ppc=100.0e3 + 36.670e3j,
+              voltage=vll_mt)
+b2 = LoadNode(name='B2',
+              generation = b2_PV,
+              power=150.0e3 + 110.0e3j,
+              voltage=vll_mt)
+b3 = LoadNode(name='B3',
+              generation=B3_PV,
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+c1 = LoadNode(name='C1',
+              power=200.0e3 + 140.0e3j,
+              voltage=vll_mt)
+c2 = LoadNode(name='C2',
+              generation=C2_PV,
+              power=150.0e3 + 110.0e3j,
+              voltage=vll_mt)
+c3 = LoadNode(name='C3',
+              #generation=C3_PV,
+              ppa=20.0e3 + 36.670e3j,
+              ppb=150.0e3 + 36.670e3j,
+              ppc=100.0e3 + 36.670e3j,
+              voltage=vll_mt)
+</code></pre>
+
+<h4 id="nos-de-carga-do-alimentador-s1_al2">Nos de carga do alimentador S1_AL2</h4>
+<pre><code class="python">f1 = LoadNode(name='F1',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt)
+g1 = LoadNode(name='G1',
+              power=100.0e3 + 80.0e3j,
+              # generation=G1_PV,
+              voltage=vll_mt)
+</code></pre>
+
+<h4 id="nos-de-carga-do-alimentador-s2_al1">Nos de carga do alimentador S2_AL1</h4>
+<pre><code class="python">s2 = LoadNode(name='S2',
+              voltage=vll_mt,
+              external_grid=eg1)
+d1 = LoadNode(name='D1',
+              power=200.0e3 + 160.0e3j,
+              voltage=vll_mt)
+d2 = LoadNode(name='D2',
+              power=900.0e3 + 40.0e3j,
+              voltage=vll_mt)
+d3 = LoadNode(name='D3',
+              power=100.0e3 + 80.0e3j,
+              voltage=vll_mt,)
+e1 = LoadNode(name='E1',
+              power=100.0e3 + 40.0e3j,
+              voltage=vll_mt)
+e2 = LoadNode(name='E2',
+              power=110.0e3 + 70.0e3j,
+              voltage=vll_mt)
+e3 = LoadNode(name='E3',
+              power=150.0e3 + 80.0e3j,
+              voltage=vll_mt)
+</code></pre>
+
+<h4 id="rede-de-baixa-tensao-conectada-em-a1">Rede de baixa tensão conectada em  A1</h4>
+<pre><code class="python">aa1 = LoadNode(name='AA1',
+               power=0.0 + 0.0j,
+
+               voltage=vll_bt)
+aa2 = LoadNode(name='AA2',
+               # generation=aa2_PQ,
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
+aa3 = LoadNode(name='AA3',
+               # generation=aa1_PQ,
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
+</code></pre>
+
+<h4 id="definicao-das-linhas-eletricas">Definição das linhas elétricas</h4>
+<pre><code class="python">phase_conduct = Conductor(id=57)
+neutral_conduct = Conductor(id=44)
+
+line_model_a  =  LineModel(loc=spacing500,
+                     phasing=['a','b','c','n'],
+                     conductor=phase_conduct,
+                     neutral_conductor=neutral_conduct)
+
+phase_conduct_bt = Conductor(id=32)
+line_model_b  =  LineModel(loc=spacing500,
+                     phasing=['a','b','c','n'],
+                     conductor=phase_conduct_bt,
+                     neutral_conductor=neutral_conduct)
+</code></pre>
+
+<h4 id="trechos-do-alimentador-s1_al1">Trechos do alimentador S1_AL1</h4>
+<pre><code class="python">s1_a2 = Section(name='S1A2',
+                n1=s1,
+                n2=a2,
+                switch=ch1,
+                line_model=line_model_a,
+                length=4)
+a2_a1 = Section(name='A2A1',
+                n1=a2,
+                n2=a1,
+                line_model=line_model_a,
+                length=4)
+a2_a3 = Section(name='A2A3',
+                n1=a2,
+                n2=a3,
+                line_model=line_model_a,
+                length=4)
+a2_c1 = Section(name='A2C1',
+                n1=a2,
+                n2=c1,
+                switch=ch3,
+                line_model=line_model_a,
+                length=4)
+
+c1_c2 = Section(name='C1C2',
+                n1=c1,
+                n2=c2,
+                line_model=line_model_a,
+                length=4)
+c1_c3 = Section(name='C1C3',
+                n1=c1,
+                n2=c3,
+                line_model=line_model_a,
+                length=4)
+
+a3_b1 = Section(name='A3B1',
+                n1=a3,
+                n2=b1,
+                switch=ch2,
+                line_model=line_model_a,
+                length=4)
+
+b1_b2 = Section(name='B1B2',
+                n1=b1,
+                n2=b2,
+                line_model=line_model_a,
+                length=4)
+b2_b3 = Section(name='B2B3',
+                n1=b2,
+                n2=b3,
+                line_model=line_model_a,
+                length=4)
+</code></pre>
+
+<h4 id="trechos-do-alimentador-s1_al2">Trechos do alimentador S1_AL2</h4>
+<pre><code class="python">s1_f1 = Section(name='S1F1',
+                n1=s1,
+                n2=f1,
+                switch=ch9,
+                line_model=line_model_a,
+                length=1.0)
+f1_g1 = Section(name='F1G1',
+                n1=f1,
+                n2=g1,
+                switch=ch10,
+                line_model=line_model_a,
+                length=1.0)
+g1_d2 = Section(name='G1D2',
+                n1=g1,
+                n2=d2,
+                switch=ch11,
+                line_model=line_model_a,
+                length=1.0)
+</code></pre>
+
+<h4 id="trechos-do-alimentador-s2_al1">Trechos do alimentador S2_AL1</h4>
+<pre><code class="python">s2_d1 = Section(name='S2D1',
+                n1=s2,
+                n2=d1,
+                switch=ch6,
+                line_model=line_model_a,
+                length=1.0)
+
+d1_d2 = Section(name='D1D2',
+                n1=d1,
+                n2=d2,
+                line_model=line_model_a,
+                length=1.0)
+d1_d3 = Section(name='D1D3',
+                n1=d1,
+                n2=d3,
+                line_model=line_model_a,
+                length=1.0)
+d1_e1 = Section(name='D1E1',
+                n1=d1,
+                n2=e1,
+                switch=ch7,
+                line_model=line_model_a,
+                length=1.0)
+e1_e2 = Section(name='E1E2',
+                n1=e1,
+                n2=e2,
+                line_model=line_model_a,
+                length=1.0)
+e1_e3 = Section(name='E1E3',
+                n1=e1,
+                n2=e3,
+                line_model=line_model_a,
+                length=1.0)
+</code></pre>
+
+<h4 id="trechos-de-encontro-de-alimentador">Trechos de encontro de alimentador</h4>
+<pre><code class="python">c3_e3 = Section(name='C3E3',
+                n1=c3,
+                n2=e3,
+                switch=ch8,
+                line_model=line_model_a,
+                length=1.0)
+b2_e2 = Section(name='B2E2',
+                n1=b2,
+                n2=e2,
+                switch=ch4,
+                line_model=line_model_a,
+                length=1.0)
+
+b3_c3 = Section(name='B3C3',
+                n1=b3,
+                n2=c3,
+                switch=ch5,
+                line_model=line_model_a,
+                length=0.5)
+</code></pre>
+
+<h4 id="trechos-em-baixa-tensao-a-montante-de-a1">Trechos em baixa tensão a montante de  A1</h4>
+<pre><code class="python">a1_aa1 = Section(name='A1AA1',
+                 n1=a1,
+                 n2=aa1,
+                 transformer=t1,
+                 length=3.0e-2)
+aa1_aa2 = Section(name='AA1AA2',
+                  n1=aa1,
+                  n2=aa2,
+                  line_model=line_model_b,
+                  length=3.0e-2)
+aa1_aa3 = Section(name='AA1AA3',
+                  n1=aa1,
+                  n2=aa3,
+                  line_model=line_model_b,
+                  length=3.0e-2)
+</code></pre>
+
+<h4 id="listando-nos-trechos-e-chaves">Listando nós, trechos e chaves:</h4>
+<pre><code class="python">load_nodes = [s1, a1, a2, a3, b1, b2, b3, c1, c2, c3,
+              s2, d1, d2, d3, e1, e2, e3, f1, g1, aa1, aa2, aa3]
+
+sections = [s1_a2, a2_a1, a2_a3, a2_c1, c1_c2, c1_c3, c3_e3, a3_b1, b1_b2,
+            b2_b3, b2_e2, b3_c3, s2_d1, d1_d2, d1_d3, d1_e1, e1_e2, e1_e3,
+            s1_f1, f1_g1, g1_d2, a1_aa1, aa1_aa2, aa1_aa3]
+
+switchs = [ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11]
+</code></pre>
+
+<h1 id="criando-o-objeto-rede">Criando o objeto rede:</h1>
+<pre><code class="python">grid_elements = GridElements(name='my_grid_elements')
+</code></pre>
+
+<h4 id="adicionando-os-elementos-constituintes-da-rede">Adicionando os elementos constituintes da rede.</h4>
+<pre><code class="python">grid_elements.add_switch(switchs)
+grid_elements.add_load_node(load_nodes)
+grid_elements.add_section(sections)
+</code></pre>
+
+<h4 id="criando-a-rede">Criando a rede:</h4>
+<pre><code class="python">grid_elements.create_grid()
+</code></pre>
+
+<h1 id="fluxo-de-carga">Fluxo de Carga</h1>
+<pre><code class="python">from mygrid.power_flow.backward_forward_sweep_3p import calc_power_flow
+
+inicio = time.time()
+calc_power_flow(grid_elements.dist_grids['F0'])
+fim = time.time()
+print(fim - inicio)
+grid_elements.nodes_table_voltage(Df=False)  
+</code></pre>
+
+<p><code>grid_elements.dist_grids</code> retorna, em lista, objetos contidos em alimentadores que pertecem a uma mesma subestação.</p>
+<p><code>grid_elements.nodes_table_voltage</code>. Retorna em tela uma tabela que contém as principais informações do fluxo de carga para toda a rede. Caso <code>Df = True</code>, retorna um objeto no formato DataFrame.</p>
+<h1 id="curto-circuito">Curto-Circuito</h1>
+<p>Curto circuito em componentes de fase:</p>
+<pre><code class="python">from mygrid.short_circuit import phase_components
+</code></pre>
+
+<p><code>phase_components</code> possui os seguintes métodos para o cálculo do curto-circuito.</p>
+<ul>
+<li>
+<p><em><code>phase_components.biphasic</code></em> para curto bifásico.</p>
+</li>
+<li>
+<p><em><code>phase_components.biphasic_to_ground</code></em> para curto bifásico com contato para terra.</p>
+</li>
+<li>
+<p><em><code>phase_components.three_phase_to_ground</code></em> para curto trifásico com contato para terra.</p>
+</li>
+<li>
+<p><em><code>phase_components.three_phase</code></em> para curto trifásico.</p>
+</li>
+<li>
+<p><em><code>phase_components.mono_phase</code></em> para curto monofásico.</p>
+</li>
+<li>
+<p><em><code>phase_components.min_mono_phase</code></em> para curto monofásico mínimo.</p>
+</li>
+</ul>
+<p>Esses métodos possuem os seguintes argumentos:</p>
+<ul>
+<li>
+<p><code>distgrid</code> objeto rede.</p>
+</li>
+<li>
+<p><code>node_name</code> nome do nó em falta.</p>
+</li>
+<li>
+<p><code>fs='Higher'</code> Indica que fases considerar na execução do cálculo do curto-circuito. </p>
+<ul>
+<li><code>Higher</code> indica que será considerado a combinação de fases que gere o maior nível de curto.</li>
+<li>Para curto bifásico  três combinações são aceitas: <code>Fab</code>, <code>Fac</code> e <code>Fbc</code></li>
+<li>Para curto bifásico com contato para terra três combinações são aceitas: <code>Fab_g</code>, <code>Fac_g</code> e <code>Fbc_g</code></li>
+<li>Para curto monofásico  três combinações são aceitas: <code>Fag</code>, <code>Fcg</code> e <code>Fbg</code>.</li>
+<li>Para curto monofásico mínimo três combinações são aceitas: <code>Fag_min</code>, <code>Fcg_min</code> e <code>Fbg_min</code></li>
+</ul>
+</li>
+<li>
+<p><code>Df</code> Indica se o resultado retornado será no formato de dicionário ou de dataframe.</p>
+</li>
+<li>
+<p><code>zc=0+0j</code> Impedância de contato.</p>
+</li>
+<li>
+<p><code>zt</code> Impedância do solo. Usada somente em <em><code>phase_components.min_mono_phase</code></em>.</p>
+</li>
+</ul>
+<h4 id="exemplo">Exemplo</h4>
+<pre><code class="python">from mygrid.short_circuit.phase_components import biphasic
+from mygrid.short_circuit.phase_components import biphasic_to_ground
+from mygrid.short_circuit.phase_components import three_phase, mono_phase
+from mygrid.short_circuit.phase_components import min_mono_phase
+from mygrid.short_circuit.phase_components import  three_phase_to_ground
+
+distgrid=grid_elements.dist_grids['F0']
+
+Iftg=three_phase_to_ground(distgrid, 'C1')
+Ifb=biphasic(distgrid, 'C1')
+Ifbg=biphasic_to_ground(distgrid, 'A2', fs='Fab_g')
+ft= three_phase(distgrid, 'C1')
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../conductors/" class="btn btn-neutral float-right" title="Condutores">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../trechos/" class="btn btn-neutral" title="Trechos"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../trechos/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../conductors/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

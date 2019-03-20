@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt - MyGrid</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "N\u00f3s de Carga/Passagem, Genera\u00e7\u00e3o Distribu\u00edda e Capacitores Shunt";
+    var mkdocs_page_input_path = "no.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> MyGrid</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Inicio</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../transformadores/">Transformadores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../linhas/">Linhas de Distribuição</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../reguladores/">Reguladores</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#generacao-distribuida">Generação Distribuída</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#exemplo">Exemplo:</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#capacitores-shunt">Capacitores Shunt</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#exemplo_1">Exemplo:</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#nos-de-cargapassagem">Nós de Carga/Passagem</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#exemplo_2">Exemplo:</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../trechos/">Trechos</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../firstgrid/">Primeira Rede</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../conductors/">Condutores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../about/">Sobre</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">MyGrid</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="generacao-distribuida">Generação Distribuída</h1>
+<pre><code class="python">class Generation(object):
+    def __init__(self,name,
+                 Pa=0.0+0.0j,
+                 Pb=0.0+0.0j,
+                 Pc=0.0+0.0j,
+                 P=None,
+                 Qmin=0.0+0.0j,
+                 Qmax=0.0+0.0j,
+                 generation_type=&quot;PQ&quot;,
+                 type_connection=&quot;wye&quot;,
+                 Z=None)
+</code></pre>
+
+<p>Definição dos parâmetros:</p>
+<ul>
+<li><strong>name</strong>:
+    <p>Nome do nó. Obrigatório. <code>string</code></li>
+<li><strong>ppa</strong>:
+    <p>Potência da fase <em>a</em> (W+jVar). Usado somente quando <strong>power</strong> é do tipo <code>None</code>. <code>float</code></li>
+<li><strong>ppb</strong>:
+    <p>Potência da fase <em>b</em> (W+jVar). Usado somente quando <strong>power</strong> é do tipo <code>None</code>. <code>float</code></li>
+<li><strong>ppc</strong>:
+    <p>Potência da fase <em>c</em> (W+jVar). Usado somente quando <strong>power</strong> é do tipo <code>None</code>. <code>float</code></li>
+<li><strong>power</strong>:
+    <p>Potência trifásica (W+jVar). <code>float</code></li>
+<li><strong>Qmin</strong>:
+    <p>Potência Reativa mínima (p.u.). <code>float</code></li>
+<li><strong>Qmax</strong>:
+    <p>Potência Reativa máxima (p.u.). <code>float</code></li>
+<li><strong>generation_type</strong>:
+    <p>Tipo de geração, <code>"PQ</code> ou <code>"PV"</code>. <code>`string</code></li>
+<li><strong>type_connection</strong>:
+    <p>Define o tipo de conexão, <code>"wye"</code> para estrela e <code>"delta"</code> para conexão delta. <code>string</code></li>
+<li><strong>Z</strong>:
+    <p>Impedância interna da geração. <code>numpy.ndarray</code></li>
+</ul>
+<h4 id="exemplo">Exemplo:</h4>
+<pre><code class="python">from mygrid.grid import Generation
+
+Z = np.eye(3, dtype=complex)*(15+100j)
+
+b2_PV = Generation(name=&quot;b2_PV&quot;,
+                   P=0e3+0j,
+                   Qmin=-200.0e3j,
+                   Qmax=200.0e3j,
+                   Vmin=0.975,
+                   Vmax=1.05,
+                   Vspecified=0.98,
+                   DV_presc=0.0002,
+                   generation_type=&quot;PV&quot;,
+                   Z=Z)
+
+aa1_PQ = Generation(name=&quot;aa1_PV&quot;,
+                    Pa=4.0e3-2.62e3j,
+                    Pb=4.0e3-2.62e3j,
+                    Pc=4.0e3-2.62e3j,
+                    generation_type=&quot;PQ&quot;,
+                    Z=Z)
+</code></pre>
+
+<h1 id="capacitores-shunt">Capacitores Shunt</h1>
+<pre><code class="python">class Shunt_Capacitor(object):
+    def __init__(self,
+                 vll, 
+                 Qa,
+                 Qb,
+                 Qc,
+                 type_connection):
+</code></pre>
+
+<p>Definição dos parâmetros:</p>
+<ul>
+<li><strong>vll</strong>:
+    <p> Tensão de linha. <code>float</code></li>
+<li><strong>Qa</strong>:
+    <p> Potência reativa capacitiva na fase <em>a</em>. <code>float</code></li>
+<li><strong>Qb</strong>:
+    <p> Potência reativa capacitiva na fase <em>b</em>. <code>float</code></li>
+<li><strong>Qc</strong>:
+    <p> Potência reativa capacitiva na fase <em>c</em>. <code>float</code></li>
+<li><strong>type_connection</strong>:
+    <p> Define o tipo de conexão, <code>"wye"</code> para estrela e <code>"delta"</code> para conexão delta. <code>string</code></li>
+</ul>
+<h4 id="exemplo_1">Exemplo:</h4>
+<pre><code class="python">from mygrid.grid import Shunt_Capacitor
+
+capacitor_675 = Shunt_Capacitor(vll=4.16e3,
+                                Qa=200e3, Qb=200e3, Qc=200e3,
+                                type_connection=&quot;wye&quot;)
+
+capacitor_611 = Shunt_Capacitor(vll=4.16e3,
+                                Qa=0.0e3, Qb=0.0e3, Qc=100e3,
+                                type_connection=&quot;wye&quot;)
+</code></pre>
+
+<h1 id="nos-de-cargapassagem">Nós de Carga/Passagem</h1>
+<pre><code class="python">class LoadNode(object):
+    def __init__(self,
+                 name,
+                 power=None,
+                 ppa=0.0+0.0j,
+                 ppb=0.0+0.0j,
+                 ppc=0.0+0.0j,
+                 voltage=0.0+0.0j,
+                 Vmin=0.98,
+                 Vmax=1.05,
+                 Vspecified=1.0,
+                 DV_presc=0.002,
+                 generation=None,
+                 type_connection=&quot;wye&quot;,
+                 shunt_capacitor=None,
+                 external_grid=None,
+                 zipmodel=[1.0, 0.0, 0.0])
+</code></pre>
+
+<p>Definição dos parâmetros:</p>
+<ul>
+<li><strong>name</strong>:
+    <p>Nome do nó. Obrigatório. <code>string</code> </li>
+<li><strong>power</strong>:
+    <p>Potência trifásica (W+jVar). <code>float</code></li>
+<li><strong>ppa</strong>:
+    <p>Potência da fase <em>a</em> (W+jVar). Usado somente quando <strong>power</strong> é do tipo <code>None</code>. <code>float</code></li>
+<li><strong>ppb</strong>:
+    <p>Potência da fase <em>b</em> (W+jVar). Usado somente quando <strong>power</strong> é do tipo <code>None</code>. <code>float</code></li>
+<li><strong>ppc</strong>:
+    <p>Potência da fase <em>c</em> (W+jVar). Usado somente quando <strong>power</strong> é do tipo <code>None</code>. <code>float</code></li>
+<li><strong>voltage</strong>:
+    <p>Tensão no Nó (V). <code>float</code></li>
+<li><strong>Vmin</strong>:
+    <p>Tensão mínima (p.u.). <code>float</code></li>
+<li><strong>Vmax</strong>:
+    <p>Tensão máxima (p.u.). <code>float</code></li>
+<li><strong>Vspecified</strong>:
+    <p>Tensão alvo para geração PV. <code>`float</code></li>
+<li><strong>DV_presc</strong>:
+    <p>Precisão mínima para convergência da geração PV. <code>``float</code></li>
+<li><strong>generation</strong>:
+    <p>Geração distribuída. <code>Generation</code></li>
+<li><strong>type_connection</strong>:
+    <p>Define o tipo de conexão, <code>"wye"</code> para estrela e <code>"delta"</code> para conexão delta. <code>string</code></li>
+<li><strong>shunt_capacitor</strong>:
+    <p>Capacitor shunt. <code>Shunt_Capacitor</code></li>
+<li><strong>external_grid</strong>:
+    <p>Rede externa. Usada para o nó raíz. <code>ExternalGrid</code></li>
+<li><strong>zipmodel</strong>:
+    <p>Modelo zip [Potência constante, Impedância constante, Corrente constante]. <code>list</code></li>
+</ul>
+<h4 id="exemplo_2">Exemplo:</h4>
+<pre><code class="python">from mygrid.grid import LoadNode
+from mygrid.util import p2r, r2p
+
+vll_mt = p2r(13.8e3, 0.0)
+vll_bt = p2r(380.0, 0.0)
+
+Load_Node675 = LoadNode(name='675',
+                        ppa=485.0e3 + 190.0e3j,
+                        ppb=68.0e3 + 60.0e3j,
+                        ppc=290.0e3 + 212.0e3j,
+                        type_connection=&quot;wye&quot;,
+                        shunt_capacitor=capacitor_675,
+                        zipmodel=[1.0, 0.0, 0.0],
+                        voltage=vll_mt)
+
+b2 = LoadNode(name='B2',
+              generation = b2_PV,
+              power=150.0e3 + 110.0e3j,
+              voltage=vll_mt)
+
+aa3 = LoadNode(name='AA3',
+               generation=aa1_PQ,
+               power=20.0e3 + 5.0e3j,
+               voltage=vll_bt)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../trechos/" class="btn btn-neutral float-right" title="Trechos">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../reguladores/" class="btn btn-neutral" title="Reguladores"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../reguladores/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../trechos/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

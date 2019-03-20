@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Sobre - MyGrid</title>
+  <title>Transformadores - MyGrid</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -17,8 +17,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Sobre";
-    var mkdocs_page_input_path = "about.md";
+    var mkdocs_page_name = "Transformadores";
+    var mkdocs_page_input_path = "transformadores.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -53,9 +53,21 @@
     <a class="" href="..">Inicio</a>
 	    </li>
           
-            <li class="toctree-l1">
+            <li class="toctree-l1 current">
 		
-    <a class="" href="../transformadores/">Transformadores</a>
+    <a class="current" href="./">Transformadores</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#transformadores-abaixadores">Transformadores Abaixadores</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#exemplos">Exemplos:</a></li>
+        
+        </ul>
+    
+
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -88,15 +100,9 @@
     <a class="" href="../conductors/">Condutores</a>
 	    </li>
           
-            <li class="toctree-l1 current">
+            <li class="toctree-l1">
 		
-    <a class="current" href="./">Sobre</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#sobre-o-projeto-mygrid">Sobre o projeto MyGrid</a></li>
-    
-
-    </ul>
+    <a class="" href="../about/">Sobre</a>
 	    </li>
           
         </ul>
@@ -121,7 +127,7 @@
     
       
     
-    <li>Sobre</li>
+    <li>Transformadores</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -131,8 +137,85 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sobre-o-projeto-mygrid">Sobre o projeto MyGrid</h1>
-<p>O projeto MyGrid tem o objetivo de oferecer uma ferramenta computacional para representação e realização de estudos da rede elétrica de distribuição. O MyGrid é desenvolvido em linguagem de programação python e mantido pelo Grupo de redes elétricas inteligentes da Universidade Federal do Ceará.</p>
+                <h1 id="transformadores-abaixadores">Transformadores Abaixadores</h1>
+<p>Atualmente o MyGrid possui dois tipos de transformadores modelados conforme o capítulo 8 do livro <a href="#[1]"> Distribution System Modeling and Analysis </a>:</p>
+<ul>
+<li>Delta - Estrela aterrado;</li>
+<li>Estrela aterrado - Estrela aterrado.</li>
+</ul>
+<p>Definição dos parâmetros:</p>
+<pre><code class="python"> class TransformerModel(object):
+     def __init__(self,
+                  name,
+                  primary_voltage,
+                  secondary_voltage,
+                  power,
+                  impedance=None,
+                  R=5,
+                  X=5,
+                  connection='Dyn'):
+</code></pre>
+
+<ul>
+<li><strong>name</strong>:
+<p>Nome do objeto transformador. Todos os transformadores devem possuir nomes diferentes.</li>
+<li><strong>primary_voltage</strong>:
+<p>Tensão primária do transformador (V).</li>
+<li><strong>secondary_voltage</strong>:
+<p>Tensão secundária do transformador (V):  </li>
+<li><strong>power</strong>:
+<p> Potência do transformador (V.A).</li>
+<li><strong>impedance</strong>:
+<p> Impendância complexa do transformador (Ω).</li>
+<li><strong>R</strong> e <strong>X</strong>:
+<p> São, respectivamente, resistência e reatância em % (p.u x 100). Caso o valor de <strong>impedance</strong> seja <em>None</em>  os valores de <strong>R</strong> e <strong>X</strong> serão usados para computar a impedância do transformador.</li>
+<li><strong>connection</strong>:
+<p> Define o tipo de conexão do transformador. Conexões disponíveis:
+<ul>
+    <li><code>Dyn</code> - Delta-Estrela Aterrado</li>
+    <li><code>nyyn</code> - Estrela Aterrado-Estrela Aterrado</li>
+</ul></li>
+</ul>
+<h4 id="exemplos">Exemplos:</h4>
+<p><p> A seguir segue dois exemplos de transformadores modelados no MyGrid. Ambos são usados na rede teste 
+    <a href="#[2]">IEEE 13 Barras</a>. </p>
+<p>Importando bibliotecas:</p>
+<pre><code class="python">from mygrid.util import p2r, r2p
+from mygrid.grid import TransformerModel
+</code></pre>
+
+<p>Tensões:</p>
+<pre><code class="python">vll_ht = p2r(115e3, 0.0)
+vll_mt = p2r(4.16e3, 0.0)
+vll_bt = p2r(480.0, 0.0)
+</code></pre>
+
+<p>Criando instâncias dos transformadores:</p>
+<pre><code class="python">tf_Substation_t1 = TransformerModel(name=&quot;Substation_T1&quot;,
+                      primary_voltage=vll_ht,
+                      secondary_voltage=vll_mt,
+                      power=5000e3,
+                      connection='Dyn',
+                      R=1,
+                      X=8)
+
+tf_XFM_1t1 = TransformerModel(name=&quot;XMF_1&quot;,
+                      primary_voltage=vll_mt,
+                      secondary_voltage=vll_bt,
+                      connection='nyyn',
+                      power=500e3,
+                      R=1.1,
+                      X=2)
+</code></pre>
+
+<h2> Referências</h2>
+
+<p><p id = "[1]">[1] - KERSTING, W. H.
+Distribution System Modeling and Analysis
+. 3. ed. [S.l.]: CRC Press,
+2012. </p>
+  <p id = "[2]">[2] - KERSTING, W. H. Radial distribution test feeders. v. 2, p. 908–912 vol.2, Jan 2001.
+ </p></p>
               
             </div>
           </div>
@@ -140,8 +223,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="../linhas/" class="btn btn-neutral float-right" title="Linhas de Distribuição">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-        <a href="../conductors/" class="btn btn-neutral" title="Condutores"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+        <a href=".." class="btn btn-neutral" title="Inicio"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -167,8 +252,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../conductors/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
       
+      
+        <span style="margin-left: 15px"><a href="../linhas/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

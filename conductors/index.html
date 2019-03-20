@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Condutores - MyGrid</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Condutores";
+    var mkdocs_page_input_path = "conductors.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> MyGrid</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Inicio</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../transformadores/">Transformadores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../linhas/">Linhas de Distribuição</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../reguladores/">Reguladores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../no/">Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../trechos/">Trechos</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../firstgrid/">Primeira Rede</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Condutores</a>
+    <ul class="subnav">
+            
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../about/">Sobre</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">MyGrid</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Condutores</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <pre><code class="json">[
+    {
+        &quot;id&quot;: 0,
+        &quot;size&quot;: &quot;1&quot;,
+        &quot;stranding&quot;: &quot;None&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.355,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00418,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.38,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 200,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 1,
+        &quot;size&quot;: &quot;1&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.328,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00992,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.765,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 270,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 2,
+        &quot;size&quot;: &quot;1&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.328,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00991,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.224,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 177,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 3,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.316,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00418,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.69,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 180,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 4,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.292,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00883,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.964,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 230,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 5,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;7/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.325,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00504,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.65,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 180,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 6,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.258,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00836,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.945,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 220,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 7,
+        &quot;size&quot;: &quot;2&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.292,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00883,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.541,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 156,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 8,
+        &quot;size&quot;: &quot;3&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.281,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0043,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 2.07,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 160,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 9,
+        &quot;size&quot;: &quot;3&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.229,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00745,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.192,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 190,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 10,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.25,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00437,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 2.57,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 140,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 11,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;7/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.257,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00452,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 2.55,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 140,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 12,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.204,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00663,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.503,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 170,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 13,
+        &quot;size&quot;: &quot;4&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.232,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.007,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 2.453,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 90,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 14,
+        &quot;size&quot;: &quot;5&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.223,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00416,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 3.18,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 120,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 15,
+        &quot;size&quot;: &quot;5&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.1819,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0059,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.895,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 140,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 16,
+        &quot;size&quot;: &quot;6&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.198,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00394,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 3.98,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 100,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 17,
+        &quot;size&quot;: &quot;6&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.162,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00526,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 2.39,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 120,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 18,
+        &quot;size&quot;: &quot;6&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.184,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00555,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 3.903,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 65,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 19,
+        &quot;size&quot;: &quot;7&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.1443,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00468,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 3.01,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 110,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 20,
+        &quot;size&quot;: &quot;8&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.1285,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00416,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 3.8,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 90,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 21,
+        &quot;size&quot;: &quot;9&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.1144,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00371,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 4.6758,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 80,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 22,
+        &quot;size&quot;: &quot;10&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.1019,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0033,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 5.9026,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 75,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 23,
+        &quot;size&quot;: &quot;12&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0808,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00262,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 9.3747,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 40,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 24,
+        &quot;size&quot;: &quot;14&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0641,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00208,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 14.8722,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 20,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 25,
+        &quot;size&quot;: &quot;16&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0508,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00164,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 23.7262,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 10,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 26,
+        &quot;size&quot;: &quot;18&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0403,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0013,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 37.6726,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 5,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 27,
+        &quot;size&quot;: &quot;19&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0359,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00116,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 47.5103,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 4,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 28,
+        &quot;size&quot;: &quot;20&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.032,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00103,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 59.684,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 3,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 29,
+        &quot;size&quot;: &quot;22&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0253,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00082,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 95.4835,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 2,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 30,
+        &quot;size&quot;: &quot;24&quot;,
+        &quot;stranding&quot;: &quot;AWG SLD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.0201,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00065,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 151.616,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 1,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 31,
+        &quot;size&quot;: &quot;1/0&quot;,
+        &quot;stranding&quot;: &quot;None&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.398,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00446,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 1.12,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 230,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 32,
+        &quot;size&quot;: &quot;1/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.368,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01113,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.607,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 310,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 33,
+        &quot;size&quot;: &quot;1/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.368,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0111,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.97,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 202,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 34,
+        &quot;size&quot;: &quot;2/0&quot;,
+        &quot;stranding&quot;: &quot;None&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.447,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0051,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.895,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 270,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 35,
+        &quot;size&quot;: &quot;2/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.414,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01252,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.481,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 360,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 36,
+        &quot;size&quot;: &quot;2/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.414,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0125,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.769,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 230,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 37,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.492,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01559,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.382,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 420,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 38,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.502,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.006,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.723,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 300,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 39,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.464,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01404,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.382,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 420,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 40,
+        &quot;size&quot;: &quot;3/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.464,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.014,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.611,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 263,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 41,
+        &quot;size&quot;: &quot;3/8&quot;,
+        &quot;stranding&quot;: &quot;INCH STE&quot;,
+        &quot;material&quot;: &quot;Steel&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.375,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 1e-05,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 4.3,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 150,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 42,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.552,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0175,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.303,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 490,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 43,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.528,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01668,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.303,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 480,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 44,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;6/1&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.563,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.00814,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.592,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 340,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 45,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;7 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.522,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01579,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.303,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 480,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 46,
+        &quot;size&quot;: &quot;4/0&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.522,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0158,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.484,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 299,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 47,
+        &quot;size&quot;: &quot;250000&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.6,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01902,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.257,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 540,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 48,
+        &quot;size&quot;: &quot;250000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.574,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01813,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.257,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 540,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 49,
+        &quot;size&quot;: &quot;250000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.567,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0171,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.41,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 329,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 50,
+        &quot;size&quot;: &quot;266800&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.642,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0217,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.385,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 460,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 51,
+        &quot;size&quot;: &quot;266800&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.586,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0177,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.384,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 320,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 52,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.657,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0208,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.215,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 610,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 53,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.629,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.01987,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.215,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 610,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 54,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.68,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.023,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.342,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 490,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 55,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.7,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0241,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.342,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 500,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 56,
+        &quot;size&quot;: &quot;300000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.629,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0198,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.342,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 350,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 57,
+        &quot;size&quot;: &quot;336400&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.721,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0244,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.306,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 530,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 58,
+        &quot;size&quot;: &quot;336400&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.741,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0255,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.306,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 530,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 59,
+        &quot;size&quot;: &quot;336400&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.666,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.021,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.305,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 410,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 60,
+        &quot;size&quot;: &quot;350000&quot;,
+        &quot;stranding&quot;: &quot;12 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.71,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0225,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1845,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 670,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 61,
+        &quot;size&quot;: &quot;350000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.679,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0214,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1845,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 670,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 62,
+        &quot;size&quot;: &quot;350000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.679,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0214,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.294,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 399,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 63,
+        &quot;size&quot;: &quot;397500&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.783,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0265,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.259,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 590,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 64,
+        &quot;size&quot;: &quot;397500&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.806,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0278,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.259,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 600,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 65,
+        &quot;size&quot;: &quot;397500&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.724,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0228,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.258,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 440,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 66,
+        &quot;size&quot;: &quot;400000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.726,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0229,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1619,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 730,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 67,
+        &quot;size&quot;: &quot;450000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.77,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0243,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1443,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 780,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 68,
+        &quot;size&quot;: &quot;450000&quot;,
+        &quot;stranding&quot;: &quot;CON LAG&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.77,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0243,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.229,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 450,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 69,
+        &quot;size&quot;: &quot;477000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.858,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.029,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.216,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 670,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 70,
+        &quot;size&quot;: &quot;477000&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.883,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0304,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.216,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 670,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 71,
+        &quot;size&quot;: &quot;477000&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.795,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0254,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.216,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 510,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 72,
+        &quot;size&quot;: &quot;500000&quot;,
+        &quot;stranding&quot;: &quot;19 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.811,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0256,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1303,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 840,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 73,
+        &quot;size&quot;: &quot;500000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.814,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.026,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1303,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 840,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 74,
+        &quot;size&quot;: &quot;500000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.813,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.026,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.206,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 483,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 75,
+        &quot;size&quot;: &quot;556500&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.927,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0313,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1859,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 730,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 76,
+        &quot;size&quot;: &quot;556500&quot;,
+        &quot;stranding&quot;: &quot;30/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.953,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0328,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1859,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 730,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 77,
+        &quot;size&quot;: &quot;556500&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.858,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0275,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.186,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 560,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 78,
+        &quot;size&quot;: &quot;600000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.891,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0285,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1095,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 940,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 79,
+        &quot;size&quot;: &quot;600000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.891,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0285,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.172,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 520,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 80,
+        &quot;size&quot;: &quot;605000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.966,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0327,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.172,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 760,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 81,
+        &quot;size&quot;: &quot;605000&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.953,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0321,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1775,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 750,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 82,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;27/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.99,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0335,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1618,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 780,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 83,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;30/19&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.019,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0351,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1618,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 780,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 84,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.977,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0329,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1688,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 770,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 85,
+        &quot;size&quot;: &quot;636000&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.918,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0294,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.163,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 620,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 86,
+        &quot;size&quot;: &quot;666600&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0337,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1601,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 800,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 87,
+        &quot;size&quot;: &quot;700000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;Copper&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.963,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0308,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.0947,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 1040,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 88,
+        &quot;size&quot;: &quot;700000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.963,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0308,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.148,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 580,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 89,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.051,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0355,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1442,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 840,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 90,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;30/19&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.081,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0372,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1442,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 840,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 91,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.036,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0349,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1482,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 830,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 92,
+        &quot;size&quot;: &quot;715500&quot;,
+        &quot;stranding&quot;: &quot;CLASS A&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.974,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0312,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.145,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 680,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 93,
+        &quot;size&quot;: &quot;750000&quot;,
+        &quot;stranding&quot;: &quot;37 STRD&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.997,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0319,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.0888,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 1090,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 94,
+        &quot;size&quot;: &quot;750000&quot;,
+        &quot;stranding&quot;: &quot;CON LAY&quot;,
+        &quot;material&quot;: &quot;AA&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 0.997,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0319,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.139,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 602,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 95,
+        &quot;size&quot;: &quot;795000&quot;,
+        &quot;stranding&quot;: &quot;26/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.108,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0375,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1288,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 900,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 96,
+        &quot;size&quot;: &quot;795000&quot;,
+        &quot;stranding&quot;: &quot;30/19&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.14,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0393,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1288,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 910,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    },
+    {
+        &quot;id&quot;: 97,
+        &quot;size&quot;: &quot;795000&quot;,
+        &quot;stranding&quot;: &quot;54/7&quot;,
+        &quot;material&quot;: &quot;ACSR&quot;,
+        &quot;diameter&quot;: {
+            &quot;value&quot;: 1.093,
+            &quot;unity&quot;: &quot;inch&quot;
+        },
+        &quot;gmr&quot;: {
+            &quot;value&quot;: 0.0368,
+            &quot;unity&quot;: &quot;feet&quot;
+        },
+        &quot;resistence&quot;: {
+            &quot;value&quot;: 0.1378,
+            &quot;unity&quot;: &quot;ohms/mile&quot;
+        },
+        &quot;capacity&quot;: {
+            &quot;value&quot;: 900,
+            &quot;unity&quot;: &quot;amps&quot;
+        }
+    }
+]
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../about/" class="btn btn-neutral float-right" title="Sobre">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../firstgrid/" class="btn btn-neutral" title="Primeira Rede"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../firstgrid/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../about/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

@@ -7,24 +7,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="None">
   
-  <link rel="shortcut icon" href="./img/favicon.ico">
+  <link rel="shortcut icon" href="img/favicon.ico">
   <title>Inicio - MyGrid</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="./css/highlight.css">
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
   
   <script>
     // Current page data
     var mkdocs_page_name = "Inicio";
     var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = "/";
+    var mkdocs_page_url = null;
   </script>
   
-  <script src="./js/jquery-2.1.1.min.js"></script>
-  <script src="./js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
   
 </head>
 
@@ -38,7 +39,7 @@
         <a href="." class="icon icon-home"> MyGrid</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -68,6 +69,41 @@
     
 
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="transformadores/">Transformadores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="linhas/">Linhas de Distribuição</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="reguladores/">Reguladores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="no/">Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="trechos/">Trechos</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="firstgrid/">Primeira Rede</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="conductors/">Condutores</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -113,11 +149,11 @@
 
 <p><br></p>
 <h1 id="bem-vindo-a-documentacao-do-projeto-mygrid">Bem vindo à documentação do projeto MyGrid</h1>
-<p>O projeto MyGrid tem o objetivo de oferecer uma ferramenta computacional para <strong>representação topológica e descritiva dos componentes da rede elétrica de distribuição</strong>, permitindo em contrapartida a realização de estudos da rede definida, tais como:</p>
+<p>O projeto MyGrid tem o objetivo de oferecer uma ferramenta computacional para <strong>representação topológica e descritiva dos componentes da rede elétrica de distribuição radial</strong>, permitindo em contrapartida a realização de estudos da rede definida, tais como:s</p>
 <ul>
-<li>análise de fluxo de carga;</li>
+<li>análise de fluxo de carga em componentes de fase;</li>
 <li>ajuste de reguladores de tensão;</li>
-<li>cálculo de curto-circuito;</li>
+<li>cálculo de curto-circuito em componentes de fase;</li>
 <li>estudos de impactos causados pela inserção de micro-geração distribuída.</li>
 </ul>
 <p>A representação que o MyGrid faz de todos os componentes da rede elétrica é trifásica o que permite uma representação mais fiel à realidade, permitindo o estudo de desequilíbrios no sistema e a conexão de cargas e gerações monofásica e bifásicas.</p>
@@ -207,7 +243,7 @@ print(tree_2.rnp)
 <h2 id="instanciando-uma-rede-eletrica">Instanciando uma rede elétrica</h2>
 <p>O principal objetivo do MyGrid é a representação da rede elétrica em uma estrtura de grafos mas ao mesmo tempo com recursos de orientação a objetos. Isso é feito definindo classes que representam os elementos da rede elétrica mas que também herdam das classes definidas no módulo <code>rnp.py</code> para que seja possível uma representação topológica da rede.</p>
 <p>Para exemplificar o processo de representação da rede elétrica iremos considerar a rede mostrada na Figura abaixo.</p>
-<p><img alt="Rede Elétrica" src="./rede.png" title="Rede Elétrica" /></p>
+<p><img alt="Rede Elétrica" src="rede.png" title="Rede Elétrica" /></p>
 <p>Nesta rede é possível observar alguns componentes básicos de uma rede elétrica de média/baixa tensão:</p>
 <ul>
 <li>Transformadores;</li>
@@ -341,599 +377,7 @@ aa3 = LoadNode(name='AA3',
                voltage=vll_bt)
 </code></pre>
 
-<p>Após serem definidos os nós de carga da rede elétrica, é preciso especificar os seguimentos de linha ou transformadores que estão entre dois nós, definindo assim a topologia da rede. O primeiro procedimento para isso é a definição dos condutores que serão utilizados nos seguimentos de linha. Para isso o MyGrid possui uma tabela de condutores pré-definidos conforme especificado nos apêndices do livro <strong>Distribution System Modeling and Analysis de William H. Kersting</strong>. A lista dos condutores com seus respectivos códigos pode ser visualizada abaixo:</p>
-<pre><code class="json">[
-    {
-        &quot;id&quot;: 0,
-        &quot;size&quot;: &quot;1&quot;,
-        &quot;stranding&quot;: &quot;None&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 1,
-        &quot;size&quot;: &quot;1&quot;,
-        &quot;stranding&quot;: &quot;7 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 2,
-        &quot;size&quot;: &quot;1&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 3,
-        &quot;size&quot;: &quot;2&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 4,
-        &quot;size&quot;: &quot;2&quot;,
-        &quot;stranding&quot;: &quot;7 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 5,
-        &quot;size&quot;: &quot;2&quot;,
-        &quot;stranding&quot;: &quot;7/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 6,
-        &quot;size&quot;: &quot;2&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 7,
-        &quot;size&quot;: &quot;2&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 8,
-        &quot;size&quot;: &quot;3&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 9,
-        &quot;size&quot;: &quot;3&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 10,
-        &quot;size&quot;: &quot;4&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 11,
-        &quot;size&quot;: &quot;4&quot;,
-        &quot;stranding&quot;: &quot;7/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 12,
-        &quot;size&quot;: &quot;4&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 13,
-        &quot;size&quot;: &quot;4&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 14,
-        &quot;size&quot;: &quot;5&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 15,
-        &quot;size&quot;: &quot;5&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 16,
-        &quot;size&quot;: &quot;6&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 17,
-        &quot;size&quot;: &quot;6&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 18,
-        &quot;size&quot;: &quot;6&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 19,
-        &quot;size&quot;: &quot;7&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 20,
-        &quot;size&quot;: &quot;8&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 21,
-        &quot;size&quot;: &quot;9&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 22,
-        &quot;size&quot;: &quot;10&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 23,
-        &quot;size&quot;: &quot;12&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 24,
-        &quot;size&quot;: &quot;14&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 25,
-        &quot;size&quot;: &quot;16&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 26,
-        &quot;size&quot;: &quot;18&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 27,
-        &quot;size&quot;: &quot;19&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 28,
-        &quot;size&quot;: &quot;20&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 29,
-        &quot;size&quot;: &quot;22&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 30,
-        &quot;size&quot;: &quot;24&quot;,
-        &quot;stranding&quot;: &quot;AWG SLD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 31,
-        &quot;size&quot;: &quot;1/0&quot;,
-        &quot;stranding&quot;: &quot;None&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 32,
-        &quot;size&quot;: &quot;1/0&quot;,
-        &quot;stranding&quot;: &quot;7 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 33,
-        &quot;size&quot;: &quot;1/0&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 34,
-        &quot;size&quot;: &quot;2/0&quot;,
-        &quot;stranding&quot;: &quot;None&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 35,
-        &quot;size&quot;: &quot;2/0&quot;,
-        &quot;stranding&quot;: &quot;7 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 36,
-        &quot;size&quot;: &quot;2/0&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 37,
-        &quot;size&quot;: &quot;3/0&quot;,
-        &quot;stranding&quot;: &quot;12 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 38,
-        &quot;size&quot;: &quot;3/0&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 39,
-        &quot;size&quot;: &quot;3/0&quot;,
-        &quot;stranding&quot;: &quot;7 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 40,
-        &quot;size&quot;: &quot;3/0&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 41,
-        &quot;size&quot;: &quot;3/8&quot;,
-        &quot;stranding&quot;: &quot;INCH STE&quot;,
-        &quot;material&quot;: &quot;Steel&quot;,
-    },
-    {
-        &quot;id&quot;: 42,
-        &quot;size&quot;: &quot;4/0&quot;,
-        &quot;stranding&quot;: &quot;12 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 43,
-        &quot;size&quot;: &quot;4/0&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 44,
-        &quot;size&quot;: &quot;4/0&quot;,
-        &quot;stranding&quot;: &quot;6/1&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 45,
-        &quot;size&quot;: &quot;4/0&quot;,
-        &quot;stranding&quot;: &quot;7 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 46,
-        &quot;size&quot;: &quot;4/0&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 47,
-        &quot;size&quot;: &quot;250000&quot;,
-        &quot;stranding&quot;: &quot;12 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 48,
-        &quot;size&quot;: &quot;250000&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 49,
-        &quot;size&quot;: &quot;250000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 50,
-        &quot;size&quot;: &quot;266800&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 51,
-        &quot;size&quot;: &quot;266800&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 52,
-        &quot;size&quot;: &quot;300000&quot;,
-        &quot;stranding&quot;: &quot;12 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 53,
-        &quot;size&quot;: &quot;300000&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 54,
-        &quot;size&quot;: &quot;300000&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 55,
-        &quot;size&quot;: &quot;300000&quot;,
-        &quot;stranding&quot;: &quot;30/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 56,
-        &quot;size&quot;: &quot;300000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 57,
-        &quot;size&quot;: &quot;336400&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 58,
-        &quot;size&quot;: &quot;336400&quot;,
-        &quot;stranding&quot;: &quot;30/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 59,
-        &quot;size&quot;: &quot;336400&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 60,
-        &quot;size&quot;: &quot;350000&quot;,
-        &quot;stranding&quot;: &quot;12 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 61,
-        &quot;size&quot;: &quot;350000&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 62,
-        &quot;size&quot;: &quot;350000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 63,
-        &quot;size&quot;: &quot;397500&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 64,
-        &quot;size&quot;: &quot;397500&quot;,
-        &quot;stranding&quot;: &quot;30/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 65,
-        &quot;size&quot;: &quot;397500&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 66,
-        &quot;size&quot;: &quot;400000&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 67,
-        &quot;size&quot;: &quot;450000&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 68,
-        &quot;size&quot;: &quot;450000&quot;,
-        &quot;stranding&quot;: &quot;CON LAG&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 69,
-        &quot;size&quot;: &quot;477000&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 70,
-        &quot;size&quot;: &quot;477000&quot;,
-        &quot;stranding&quot;: &quot;30/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 71,
-        &quot;size&quot;: &quot;477000&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 72,
-        &quot;size&quot;: &quot;500000&quot;,
-        &quot;stranding&quot;: &quot;19 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 73,
-        &quot;size&quot;: &quot;500000&quot;,
-        &quot;stranding&quot;: &quot;37 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 74,
-        &quot;size&quot;: &quot;500000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 75,
-        &quot;size&quot;: &quot;556500&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 76,
-        &quot;size&quot;: &quot;556500&quot;,
-        &quot;stranding&quot;: &quot;30/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 77,
-        &quot;size&quot;: &quot;556500&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 78,
-        &quot;size&quot;: &quot;600000&quot;,
-        &quot;stranding&quot;: &quot;37 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 79,
-        &quot;size&quot;: &quot;600000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 80,
-        &quot;size&quot;: &quot;605000&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 81,
-        &quot;size&quot;: &quot;605000&quot;,
-        &quot;stranding&quot;: &quot;54/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 82,
-        &quot;size&quot;: &quot;636000&quot;,
-        &quot;stranding&quot;: &quot;27/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 83,
-        &quot;size&quot;: &quot;636000&quot;,
-        &quot;stranding&quot;: &quot;30/19&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 84,
-        &quot;size&quot;: &quot;636000&quot;,
-        &quot;stranding&quot;: &quot;54/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 85,
-        &quot;size&quot;: &quot;636000&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 86,
-        &quot;size&quot;: &quot;666600&quot;,
-        &quot;stranding&quot;: &quot;54/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 87,
-        &quot;size&quot;: &quot;700000&quot;,
-        &quot;stranding&quot;: &quot;37 STRD&quot;,
-        &quot;material&quot;: &quot;Copper&quot;,
-    },
-    {
-        &quot;id&quot;: 88,
-        &quot;size&quot;: &quot;700000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 89,
-        &quot;size&quot;: &quot;715500&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 90,
-        &quot;size&quot;: &quot;715500&quot;,
-        &quot;stranding&quot;: &quot;30/19&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 91,
-        &quot;size&quot;: &quot;715500&quot;,
-        &quot;stranding&quot;: &quot;54/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 92,
-        &quot;size&quot;: &quot;715500&quot;,
-        &quot;stranding&quot;: &quot;CLASS A&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 93,
-        &quot;size&quot;: &quot;750000&quot;,
-        &quot;stranding&quot;: &quot;37 STRD&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 94,
-        &quot;size&quot;: &quot;750000&quot;,
-        &quot;stranding&quot;: &quot;CON LAY&quot;,
-        &quot;material&quot;: &quot;AA&quot;,
-    },
-    {
-        &quot;id&quot;: 95,
-        &quot;size&quot;: &quot;795000&quot;,
-        &quot;stranding&quot;: &quot;26/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 96,
-        &quot;size&quot;: &quot;795000&quot;,
-        &quot;stranding&quot;: &quot;30/19&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    },
-    {
-        &quot;id&quot;: 97,
-        &quot;size&quot;: &quot;795000&quot;,
-        &quot;stranding&quot;: &quot;54/7&quot;,
-        &quot;material&quot;: &quot;ACSR&quot;,
-    }
-]
-</code></pre>
-
+<p>Após serem definidos os nós de carga da rede elétrica, é preciso especificar os seguimentos de linha ou transformadores que estão entre dois nós, definindo assim a topologia da rede. O primeiro procedimento para isso é a definição dos condutores que serão utilizados nos seguimentos de linha. Para isso o MyGrid possui uma tabela de condutores pré-definidos conforme especificado nos apêndices do livro <strong>Distribution System Modeling and Analysis de William H. Kersting</strong>. A lista dos condutores com seus respectivos códigos pode ser visualizada em <a href="/conductors/"><code>conductors.json</code></a></p>
 <p>Também é necessário definir um modelo de linha especificando os condutores da linha e sua configuração geométrica na estrutura utilizada. Para este exemplo são utilizados dois tipos de modelos de linha, um para a rede de média tensão e outro para a rede de baixa tensão. Também são especificados os condutores ids dos condutires de fase e de neutro para a média e a baixa tensão:</p>
 <pre><code class="python">phase_conduct = Conductor(id=57)
 neutral_conduct = Conductor(id=44)
@@ -1113,7 +557,7 @@ aa1_aa3 = Section(name='AA2AA3',
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="about/" class="btn btn-neutral float-right" title="Sobre">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="transformadores/" class="btn btn-neutral float-right" title="Transformadores">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>
@@ -1141,19 +585,18 @@ aa1_aa3 = Section(name='AA2AA3',
       
       
       
-        <span style="margin-left: 15px"><a href="about/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="transformadores/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
     <script>var base_url = '.';</script>
-    <script src="./js/theme.js"></script>
-      <script src="./search/require.js"></script>
-      <script src="./search/search.js"></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
 
 </body>
 </html>
 
 <!--
-MkDocs version : 0.17.4
-Build Date UTC : 2018-08-30 16:16:02
+MkDocs version : 1.0.4
+Build Date UTC : 2019-03-20 11:18:48
 -->

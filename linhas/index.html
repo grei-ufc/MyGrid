@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Linhas de Distribuição - MyGrid</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Linhas de Distribui\u00e7\u00e3o";
+    var mkdocs_page_input_path = "linhas.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> MyGrid</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Inicio</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../transformadores/">Transformadores</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Linhas de Distribuição</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#linhas-de-distribuicao">Linhas de Distribuição</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#condutores-para-linhas-aereas">Condutores para linhas aéreas</a></li>
+        
+            <li><a class="toctree-l3" href="#linhas-aereas">Linhas Aéreas</a></li>
+        
+            <li><a class="toctree-l3" href="#condutores-para-linhas-subterraneas">Condutores para linhas subterrâneas</a></li>
+        
+            <li><a class="toctree-l3" href="#linhas-subterraneas">Linhas Subterrâneas</a></li>
+        
+            <li><a class="toctree-l3" href="#referencias">Referências</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../reguladores/">Reguladores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../no/">Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../trechos/">Trechos</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../firstgrid/">Primeira Rede</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../conductors/">Condutores</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../about/">Sobre</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">MyGrid</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Linhas de Distribuição</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="linhas-de-distribuicao">Linhas de Distribuição</h1>
+<p>O MyGrid possui modelagem para linhas aéreas até 4 fios, 3 fases + neutro, e linhas subterrâneas até 3 fases + Neutro. Modelagem e cálculo dos parâmetros das linhas elétricas estão baseados nos capítulos 4, 5 e 6 do livro <a href="#[1]">Distribution System Modeling and Analysis</a>.</p>
+<h2 id="condutores-para-linhas-aereas">Condutores para linhas aéreas</h2>
+<p>Definição dos parâmetros dos condutores aéreos:</p>
+<pre><code class="python">class Conductor(object):
+    def __init__(self,
+                 id=None):
+</code></pre>
+
+<ul>
+<li><strong>id</strong>:
+    <p> Chave de indentificação do condutor no arquivo <a href="../conductors/"><code>conductor.json</code></a>. Neste arquivo, o usuário tem acesso a diversos  dados de condutores de linhas aéreas, como também pode acrescentar novas informações conforme a sua necessidade.</li>
+</ul>
+<h4 id="exemplo">Exemplo:</h4>
+<pre><code class="python">from mygrid.grid import Conductor
+conduct1 = Conductor(id=75)
+conduct2 = Conductor(id=44)
+conduct3 = Conductor(id=31)
+conduct6 = Conductor(id=32)
+</code></pre>
+
+<h2 id="linhas-aereas">Linhas Aéreas</h2>
+<pre><code class="python"> class LineModel(object):
+    def __init__(self,
+                 loc=[],
+                 neutral=False,
+                 conductor=None,
+                 neutral_conductor=None,
+                 phasing=['a','b','c','n'],
+                 Transpose=False,
+                 units='Imperial',
+                 f=60,
+                 pg=100,
+                 z012=None,
+                 y012=np.zeros((3,3)),
+                 z=None,
+                 y=np.zeros((3,3))):
+</code></pre>
+
+<p>Definição dos parâmetros:</p>
+<ul>
+<li><strong>loc</strong>:
+    <p>Posições dos condutores presentes na linha. <code>list</code></li>
+<li><strong>neutral</strong>:
+    <p>Indica a existência de neutro. <code>boolean</code></li>
+<li><strong>conductor</strong>:
+    <p>Instância do condutor Fase. <code>Conductor</code></li>
+<li><strong>neutral_conductor</strong>:
+    <p>Instância do condutor Neutro. <code>Conductor</code></li>
+<li><strong>phasing</strong>:
+    <p>Indica a que fase ou neutro, pertence as posições dadas em <strong>loc</strong>. <code>list</code></li>
+<li><strong>units</strong>:
+    <p>Define em  qual unidade, <code>'Imperial'</code> ou <code>'SI'</code>, deve se calcular a impedância série e admitância shunt da linha. <code>string</code></li>
+<li><strong>f</strong>:
+    <p>Frequência da linha (Hz).<code>float</code></li>
+<li><strong>pg</strong>:
+    <p>Resistividade do solo (Ω.m).<code>float</code></li>
+<li><strong>z012</strong>:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de impedãncia de sequência (Ω). <code>array</code></li>
+<li><strong>y012</strong>:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de admitância shunt em componentes de sequência (Ω). <code>array</code></li>
+<li><strong>z</strong>:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de impedãncia de fase (Ω). <code>array</code></li>
+<li><strong>y</strong>:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de admitância shunt em componentes de fase (Ω). <code>array</code></li>
+</ul>
+<h4 id="exemplo_1">Exemplo:</h4>
+<p>Os modelos de linha a seguir foram retirados da rede teste <a href="#[2]"> 13 Barras </a>:</p>
+<pre><code class="python">from mygrid.grid import LineModel
+</code></pre>
+
+<p>Espaçamentos dos cabos:</p>
+<pre><code class="python">spacing500=[0.0 + 28.0j,
+            2.5 + 28.0j,
+            7.0 + 28.0j,
+            4.0 + 24.0j]
+
+spacing505=[0.0 + 28.0j,
+            7.0 + 28.0j,
+            4.0 + 24.0j]
+</code></pre>
+
+<p>Criando os modelos de linhas aérea:</p>
+<pre><code class="python">line601 =  LineModel(loc=spacing500,
+                     phasing=['b','a','c','n'],
+                     conductor=conduct1,
+                     neutral_conductor=conduct2)
+
+line602 =  LineModel(loc=spacing500,
+                     phasing=['c','a','b','n'],
+                     conductor=conduct2,
+                     neutral_conductor=conduct2)
+
+line603 =  LineModel(loc=spacing505,
+                     phasing=['c','b','n'],
+                     conductor=conduct3,
+                     neutral_conductor=conduct3)
+</code></pre>
+
+<h2 id="condutores-para-linhas-subterraneas">Condutores para linhas subterrâneas</h2>
+<pre><code class="python">class Under_Ground_Conductor(object):
+    def __init__(self,
+                name = None,
+                type=&quot;concentric&quot;,
+                outsider_diameter = None,
+                rp = None,
+                GMRp = None,
+                dp = None,
+                k = None,
+                rs = None,
+                GMRs = None,
+                ds = None,
+                T=None,
+                ampacity = None):
+</code></pre>
+
+<p>Definição dos parâmetros:</p>
+<ul>
+<li><strong>name</strong>:
+    <p> Nome do condutor. Opcional. <code>string</code></li>
+<li><strong>type</strong>:
+    <p> Indica se o cabo a ser modelado é do tipo blindado, <code>"tapeshield"</code>, ou de neutro concentrico, <code>"concentric"</code>. <code>string</code></li>
+<li><strong>outsider_diameter</strong>:
+    <p> Diâmetro externo do cabo (in). </li>
+<li><strong>rp</strong>:
+    <p>Resistividade do condutor fase (Ω/mi).</li>
+<li><strong>GMRp</strong>:
+    <p>Raio médio geométrico do condutor fase (ft).</li>
+<li><strong>dp</strong>:
+    <p>Diâmetro do condutor fase (in)</li>
+<li><strong>k</strong>:
+    <p>Número de neutros concêntricos.</li>
+<li><strong>rs</strong>:
+    <p>Resistividade do neutro concêntrico (Ω/mi).</li>
+<li><strong>GMRs</strong>: 
+   <p>Raio médio geométrico do condutor fase (ft).</li>
+<li><strong>ds</strong>:
+    <p>Diâmetro do neutro concêntrico (in).</li>
+<li><strong>T</strong>:
+    <p>É a espessura da blindagem (mil)</li>
+</ul>
+<h4 id="exemplos">Exemplos:</h4>
+<pre><code class="python">from mygrid.grid import Under_Ground_Conductor
+
+conduct4 = Under_Ground_Conductor(outsider_diameter=1.29,
+                                rp=0.4100,
+                                GMRp=0.0171,
+                                dp=0.567,
+                                k=13,
+                                rs=14.87,
+                                GMRs=0.00208,
+                                ds=0.0641,
+                                ampacity=None)
+
+conduct5 = Under_Ground_Conductor(type=&quot;tapeshield&quot;,
+                                rp=0.97,
+                                GMRp=0.0111,
+                                dp=0.368,
+                                ds=0.88,
+                                T=5)
+</code></pre>
+
+<h2 id="linhas-subterraneas">Linhas Subterrâneas</h2>
+<p>No MyGrid é possível modelos linhas subterrâneas com cabo blindado ou de neutro concêntrico.</p>
+<pre><code class="python">class UnderGroundLine(LineModel):
+    def __init__(self,
+                 loc=[],
+                 conductor=None,
+                 phasing=['a','b','c'],
+                 neutral_conductor=None,
+                 Transpose=False,
+                 units='Imperial',
+                 f=60,
+                 pg=100):
+</code></pre>
+
+<p>Definição dos parâmetros:</p>
+<ul>
+<li><strong>loc</strong>:
+    <p>Posições dos condutores presentes na linha. <code>list</code></li>
+<li><strong>neutral</strong>:
+    <p>Indica a existência de neutro. <code>boolean</code></li>
+<li><strong>conductor</strong>:
+    <p>Instância do condutor Fase. <code>UnderGroundLine</code></li>
+<li><strong>neutral_conductor</strong>:
+    <p>Instância do condutor Neutro. <code>Conductor</code></li>
+<li><strong>phasing</strong>:
+    <p>Indica a que fase ou neutro, pertence as posições dadas em <strong>loc</strong>. <code>list</code></li>
+<li><strong>units</strong>:
+    <p>Define em  qual unidade, <code>'Imperial'</code> ou <code>'SI'</code>, deve se calcular a impedância série e admitância shunt da linha. <code>string</code></li>
+<li><strong>f</strong>:
+    <p>Frequência da linha (Hz).<code>float</code></li>
+<li><strong>pg</strong>:
+    <p>Resistividade do solo (Ω.m).<code>float</code></li>
+</ul>
+<h4 id="exemplos_1">Exemplos:</h4>
+<pre><code class="python">line606 =  UnderGroundLine(loc=spacing515,
+                           phasing=['a','b','c'],
+                           conductor=conduct4)
+
+line607 =  UnderGroundLine(loc=spacing520,
+                           phasing=['a', 'n'],
+                           conductor=conduct5,
+                           neutral_conductor=conduct6)
+</code></pre>
+
+<h2 id="referencias">Referências</h2>
+<p><p id = "[1]">[1] - KERSTING, W. H.
+Distribution System Modeling and Analysis. 3. ed. [S.l.]: CRC Press, 2012.</p>
+<p id = "[2]">[2] - KERSTING, W. H. Radial distribution test feeders. v. 2, p. 908–912 vol.2, Jan 2001.</p></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../reguladores/" class="btn btn-neutral float-right" title="Reguladores">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../transformadores/" class="btn btn-neutral" title="Transformadores"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../transformadores/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../reguladores/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
