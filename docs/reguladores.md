@@ -29,7 +29,7 @@ class Auto_TransformerModel(object):
 + **tap_max**:
     <p> Quantidade máxima de comutações.
 + **voltage**:
-    <p> Tensão de linhas nominal do auto-transformador (V).
+    <p> Tensão de linha nominal do auto-transformador (V).
 + **vhold**:
     <p> Tensão alvo do compensador (V).
 + **Npt**:
@@ -47,9 +47,9 @@ class Auto_TransformerModel(object):
 + **X**:
     <p> 'X' do compensador de linha (V).
 + **r**:
-    <p> 'r' do compensador de linha (V).
+    <p> 'r' do compensador de linha (Ω).
 + **x**:
-    <p> 'x' do compensador de linha (V).
+    <p> 'x' do compensador de linha (Ω).
 
 Se **R** e **X** forem definidos **r** e **x** não seram considerados, caso nenhum desses pares seja definido o auto-transformador não funcionará com compensador de linha, ou seja, será manual.
 

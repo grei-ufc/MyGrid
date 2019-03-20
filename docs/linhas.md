@@ -34,7 +34,11 @@ conduct6 = Conductor(id=32)
                  Transpose=False,
                  units='Imperial',
                  f=60,
-                 pg=100):
+                 pg=100,
+                 z012=None,
+                 y012=np.zeros((3,3)),
+                 z=None,
+                 y=np.zeros((3,3))):
 ```
 Definição dos parâmetros:
 
@@ -54,6 +58,14 @@ Definição dos parâmetros:
     <p>Frequência da linha (Hz).```float```
 + **pg**:
     <p>Resistividade do solo (Ω.m).```float```
++ **z012**:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de impedãncia de sequência (Ω). ```array```
++ **y012**:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de admitância shunt em componentes de sequência (Ω). ```array```
++ **z**:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de impedãncia de fase (Ω). ```array```
++ **y**:
+    <p> Permite a criação de um modelo de linha genérico a partir da matriz de admitância shunt em componentes de fase (Ω). ```array```
 ####Exemplo:
 Os modelos de linha a seguir foram retirados da rede teste <a href="#[2]"> 13 Barras </a>:
 ```python 
