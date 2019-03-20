@@ -8,7 +8,7 @@ setup(
     description='A package to represent a electric grid \
     topology with extensions to make power flow and short circuit \
     analysis',
-    install_requires=['numpy', 'terminaltables', 'graphviz'],
+    install_requires=['numpy', 'pandas', 'terminaltables', 'graphviz'],
     author='Lucas S Melo',
     author_email='lucassmelo@dee.ufc.br',
 )

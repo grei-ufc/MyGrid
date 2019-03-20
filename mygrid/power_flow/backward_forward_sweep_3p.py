@@ -21,14 +21,11 @@ import time
 #     with PyCallGraph(output=graphviz):
 #         calc_power_flow(dist_grid)
 
-def calc_power_flow(dist_grid):
+def calc_power_flow(dist_grid, max_iterations = 100, converg_crt = 0.001, converg = 1e6) :
     # -------------------------
     # variables declarations
     # -------------------------
-
-    max_iterations = 100
-    converg_crt = 0.001
-    converg = 1e6
+    
     iter = 0
 
     #print('============================')

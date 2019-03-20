@@ -477,6 +477,7 @@ class LoadNode(object):
         self.iin = np.zeros((3, 1), dtype=complex)
         self.ineu=self._ip.sum()
         self.D=np.array([[1,-1,0],[0,1,-1],[-1,0,1]])
+        self.If = np.zeros((3, 1), dtype=complex)
 
 
         self.voltage=voltage
@@ -523,8 +524,8 @@ class LoadNode(object):
     def set_section_ds(self, section_ds):
         self.section_ds=section_ds
 
-    def section_us(self, section_us):
-        set_self.section_us=section_us
+    def set_section_us(self, section_us):
+        self.section_us=section_us
 
     def config_load(self,
                     ppa=0.0+0.0j,
@@ -830,11 +831,11 @@ class Generation(object):
 
         self.pp=np.array([[self.Pa],[self.Pb],[self.Pc]])
 
-        if np.imag(-self.P)>np.imag(self.Qmax):
+        if np.imag(-1*self.P)>np.imag(self.Qmax):
             self.limit_PV=True
 
 
-        elif np.imag(-self.P)<np.imag(self.Qmin):
+        elif np.imag(-1*self.P)<np.imag(self.Qmin):
             self.limit_PV=True
 
 
@@ -977,7 +978,13 @@ class LineModel(object):
                  neutral_conductor=None,
                  phasing=['a','b','c','n'],
                  Transpose=False,
-                 units='Imperial'):
+                 units='Imperial',
+                 f=60,
+                 pg=100,
+                 z012=None,
+                 y012=np.zeros((3,3)),
+                 z=None,
+                 y=np.zeros((3,3))):
 
 
         self.transpose = Transpose
@@ -988,12 +995,37 @@ class LineModel(object):
         self.psorig={'a':0,
                      'b':1,
                      'c':2}
+        self.units = units
         self.r_list=list()
         self.gmr_list = list()
         self.radius = list()
         self.aa = np.zeros
+        self.f=f
+        self.pg=pg
+        self.z012=z012
+        self.y012=y012
+        self.z=z
+        self.y=y
 
-        for i in phasing:
+
+        if type(self.conductor) != type(None):
+            self.using_conductor()
+            self.system_units()
+            self.Sequence()
+            self.Parameters()
+    
+        elif type(self.z012) != type(None):
+            self.Sequence_Phase()
+            self.system_units()
+            self.Parameters()
+
+        elif type(self.z) != type(None):
+            self.system_units()
+            self.Sequence()
+            self.Parameters()
+
+    def using_conductor(self):
+        for i in self.phasing:
             if i != 'n':
                 self.r_list.append(self.conductor.r)
                 self.gmr_list.append(self.conductor.gmr)
@@ -1003,12 +1035,6 @@ class LineModel(object):
                 self.r_list.append(self.neutral_conductor.r)
                 self.gmr_list.append(self.neutral_conductor.gmr)
                 self.radius.append(self.conductor.conductor_data['diameter']['value']*0.0833 / 2.0)
-
-
-
-
-
-
 
         # --------------------------------------
         # Series Impedance Z matrix calculation
@@ -1023,7 +1049,7 @@ class LineModel(object):
 
 
         # calculation of sequence series impedance Z012 matrix
-        self.Sequence()
+        
 
         # --------------------------------------
         # Shunt Admittance Y matrix calculation
@@ -1041,11 +1067,19 @@ class LineModel(object):
         # shunt admittance matrix calculation
         self.y = 1j * 2.0 * np.pi * 60.0 * self.c* 1e-6
         # convert the Z matrix units to ohms/kilometers if units in SI
-        if units == 'SI':
+
+    def system_units(self):
+         if self.units == 'SI':
             self.z = 1.0 / 1.60934 * self.z
             self.z = 1.0 / 1.60934 * self.y
 
-        self.Parameters()
+    def Sequence_Phase(self):
+        A = np.array([[1.0, 1.0, 1.0],
+                [1.0, p2r(1.0, 240.0), p2r(1.0, 120.0)],
+                [1.0, p2r(1.0, 120.0), p2r(1.0, 240.0)]])
+        self.z = np.dot(np.linalg.inv(A), self.z012.dot(A))
+        self.y = np.dot(A, self.y012.dot(np.linalg.inv(A)))
+
     def Parameters(self):
         # generalized line matrices calculation
         self.a = np.identity(3) + 0.5 * self.z * self.y
@@ -1089,10 +1123,12 @@ class LineModel(object):
             z = list()
             for j in range(len(self.loc)):
                 if i == j:
-                    zij = self.r_list[i] + 0.09530 + 1j *  0.12134 * (np.log(1.0/self.gmr_list[i]) + 7.93402)
+                    zij = self.r_list[i] + self.f * (0.00158836  + 1j * 0.00202237 * (np.log(1.0/self.gmr_list[i]) \
+                                                        + 7.6786 + 1/2*np.log(self.pg/self.f)))
                 else:
                     l = self.loc[i] - self.loc[j]
-                    zij = 0.09530 + 1j * 0.12134 * (np.log(1.0/abs(l)) + 7.93402)
+                    zij = self.f * (0.00158836 + 1j * 0.00202237 * (np.log(1.0/abs(l)) \
+                                                                        + 7.6786 + 1/2*np.log(self.pg/self.f)))
                 z.append(zij)
             Z.append(z)
 
@@ -1119,6 +1155,7 @@ class LineModel(object):
 
     def _calc_phase_impedance_matrix(self, Z):
         # Kron Reduction
+
         size = len(self.phasing) if 'n' not in self.phasing else len(self.phasing)-1
         i, j = np.shape(Z)
         zij = Z[:size, :size]
@@ -1143,6 +1180,7 @@ class LineModel(object):
                         zeq[self.psorig[i],self.psorig[j]] = 0
 
         return zeq
+
 
     def _calc_potential_coefficient_matrix(self, P):
         # Kron Reduction
@@ -1183,7 +1221,9 @@ class UnderGroundLine(LineModel):
                  neutral_conductor=None,
                  Transpose=False,
                  type='concentric',
-                 units='Imperial'):
+                 units='Imperial',
+                 f=60,
+                 pg=100):
 
         self.gmr_list=list()
         self.r_list=list()
@@ -1196,6 +1236,8 @@ class UnderGroundLine(LineModel):
         self.psorig={'a':0,
                      'b':1,
                      'c':2}
+        self.f = f
+        self.pg = pg
 
         if self.conductor.type=='concentric':
             self.loc = copy.copy(loc)
