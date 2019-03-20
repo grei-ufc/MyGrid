@@ -1,5 +1,12 @@
 site_name: MyGrid
 pages:
   - Inicio: index.md
+  - Transformadores: transformadores.md
+  - Linhas de Distribuição: linhas.md
+  - Reguladores : reguladores.md
+  - Nós de Carga/Passagem, Generação Distribuída e Capacitores Shunt : no.md
+  - Trechos : trechos.md
+  - Primeira Rede : firstgrid.md
+  - Condutores : conductors.md
   - Sobre: about.md
 theme: readthedocs
